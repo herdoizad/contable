@@ -1,0 +1,45 @@
+.navbar-logo {
+    padding-top : 15px;
+}
+
+.navbar-logo img {
+    height : 40px;
+}
+
+.banner-top {
+    height     : 75px;
+
+    background: rgba(0,110,183,1);
+    background: -moz-linear-gradient(top, rgba(0,110,183,1) 0%, rgba(0,110,183,1) 46%, rgba(80,180,242,1) 100%);
+    background: -webkit-gradient(left top, left bottom, color-stop(0%, rgba(0,110,183,1)), color-stop(46%, rgba(0,110,183,1)), color-stop(100%, rgba(80,180,242,1)));
+    background: -webkit-linear-gradient(top, rgba(0,110,183,1) 0%, rgba(0,110,183,1) 46%, rgba(80,180,242,1) 100%);
+    background: -o-linear-gradient(top, rgba(0,110,183,1) 0%, rgba(0,110,183,1) 46%, rgba(80,180,242,1) 100%);
+    background: -ms-linear-gradient(top, rgba(0,110,183,1) 0%, rgba(0,110,183,1) 46%, rgba(80,180,242,1) 100%);
+    background: linear-gradient(to bottom, rgba(0,110,183,1) 0%, rgba(0,110,183,1) 46%, rgba(80,180,242,1) 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#006eb7', endColorstr='#50b4f2', GradientType=0 );
+}
+
+.banner-top div {
+    float  : left;
+    height : 75px;
+}
+
+.banner-esquina {
+    width      : 124px;
+    background : url("../../images/barras/esquina-left.png") no-repeat;
+}
+
+.banner-esquina.der {
+    background : url("../../images/barras/esquina-right.png") no-repeat;
+    position   : absolute;
+    right      : 0;
+}
+
+.banner-title {
+    font-family : "PT Sans Narrow", sans-serif;
+    font-size   : 20pt;
+    font-weight : bold;
+    color       : #fff;
+    margin-left : 70px;
+    margin-top  : 15px;
+}

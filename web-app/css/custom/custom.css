@@ -1,0 +1,266 @@
+body{
+
+    background-color:#EFEFF0;
+    padding: 0px !important;
+    margin: 0px !important;
+    font-size: 11px !important;
+    width: 99%;
+}
+.menu{
+    width: 180px;
+    color: #ffffff;
+    background-color: transparent;
+    position: absolute;
+}
+
+.contenido{
+    background: #F3F3F4;
+    min-height: 800px;
+    margin: 0px;
+    margin-left: 180px;
+    color: #676A6C;
+    border-left: 3px solid #E7EAEC;
+    padding-bottom: 100px;
+}
+.default{
+    background: #EFEFF0;
+    margin-left: -3px;
+    padding-left: 20px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    min-height: 30px;
+    margin-bottom: 0px;
+    color: #A1ACBE !important;
+    border-radius: 0px;
+}
+.buscar-header{
+    background: transparent;
+    border: none;
+    box-shadow: none;
+}
+
+.nav>li>a{
+    padding: 5px !important;
+    padding-left: 15px !important;
+}
+
+.titulo{
+    text-align: center;
+    font-size: 18px;
+    color: #8B8888;
+    margin-top: 5px;
+}
+.default a.item{
+    color: #8c96a8 !important;
+}
+
+.menu-vertical{
+    padding: 5px;
+    padding-bottom: 5px;
+    background: transparent;
+    list-style: none;
+
+    /*padding: 20px;*/
+}
+.menu-vertical a{
+    text-decoration: none;
+    background: transparent;
+    color: inherit;
+    padding: 0px;
+    margin: 0px;
+}
+.menu-vertical li{
+    padding: 5px;
+    color: #8095A8;
+    font-weight: normal;
+    cursor: pointer;
+    background: transparent;
+    padding-left: 15px;
+}
+.menu-vertical li:hover{
+    color: #fff;
+    background: #006EB7 !important;
+}
+.menu-vertical li:focus{
+    color: #fff;
+    background: #006EB7 !important;
+}
+.menu-vertical a:hover{
+    color: #fff;
+    background: #006EB7 !important;
+}
+.submenu{
+    display: none;
+    list-style: none;
+    background: transparent;
+    color: inherit;
+    margin-left: 0px;
+    padding: 0px;
+}
+.submenu a{
+    width: 100%;
+    background: transparent;
+    color: inherit;
+}
+.submenu li{
+    background: transparent;
+    color: #8095A8;
+    padding-left: 5px;
+    margin: 0px;
+}
+.submenu li:hover{
+    background: transparent;
+    color: inherit;
+}
+
+
+
+
+
+
+.info-user{
+    height: 170px;
+    position: relative;
+}
+.fa-menu{
+    font-size: 16px;
+    margin-right: 7px;
+
+}
+.btn-verde{
+    background:  #19AA8D;
+    color: #ffffff !important;
+}
+.btn-verde:hover{
+    background:  #18A689;
+    color: #ffffff !important;
+}
+
+.verde{
+    background:  #18A689;
+}
+.verde th{
+    background:  #18A689 !important;
+}
+.verde td{
+    background: #ffffff;
+}
+
+
+
+.btn-darkblue{
+    background:  #2F4050;
+    color: #ffffff !important;
+    padding-left: 12px;
+    padding-right: 12px;
+    font-size: 16px;
+}
+.btn-darkblue:hover{
+    background:  #293846;
+    color: #ffffff !important;
+}
+
+.darkblue{
+    background:  #2F4050;
+}
+.table-darkblue th{
+    background:  #2F4050 !important;
+}
+.table-verde th{
+    background:  #18A689 !important;
+}
+.table-sm {
+   font-size: 10px !important;
+}
+.table-sm td{
+    padding: 3px !important;
+    padding-top: 1px  !important;
+    padding-bottom: 1px  !important;
+}
+.table-sm th{
+    padding: 3px !important;
+}
+
+
+.btn-xsm{
+    padding: 1px;
+    font-size: 5px;
+}
+.resaltado{
+    background: rgba(246, 240, 0, 0.49) !important;
+}
+
+.panel-completo{
+    width: 100%;
+    display: block;
+    border-top: 3px solid #E7EAEC;
+    background: #fff;
+    padding: 20px;
+    min-height: 300px;
+}
+.titulo-panel{
+    border-bottom: 1px solid #E7EAEC;
+    padding-bottom: 10px;
+    padding-left: 10px;
+    padding-right: 10px;
+    font-weight: bold;
+}
+
+.fila{
+    margin-top: 10px;
+}
+
+h1{
+    font-weight: normal;
+    font-size: 22px;
+    margin-top: 0px;
+}
+
+/*cards!!!!*/
+.card-verde{
+    border-radius: 5px;
+    width: 100%;
+    min-height: 80px;
+    background: #1AB394;
+    color: #ffffff;
+    padding: 15px;
+}
+.card-azul{
+    border-radius: 5px;
+    width: 100%;
+    min-height: 80px;
+    background: #006EB7;
+    color: #ffffff;
+    padding: 15px;
+}
+.card-verde2{
+    border-radius: 5px;
+    width: 100%;
+    min-height: 100px;
+    background: #23C6C8;
+    color: #ffffff;
+    padding: 15px;
+}
+.card-naranja{
+    border-radius: 5px;
+    width: 100%;
+    min-height: 100px;
+    background: #F8AC59;
+    color: #ffffff;
+    padding: 15px;
+}
+
+.table{
+    font-size: 11px;
+}
+.alert{
+    padding: 5px;
+    padding-right: 35px;
+}
+.input-sm{
+    font-size: 11px;
+    line-height: 11px !important;
+
+    margin: 0px;
+
+}
