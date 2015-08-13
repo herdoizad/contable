@@ -22,7 +22,7 @@ class AccionesController  {
      * Acción que muestra un listado de acciones ordenadas por módulo
      */
     def acciones() {
-        def modulos = Modulo.list([sort: "orden"])
+        def modulos = Modulo.findAllByOrdenIsNotNull([sort: "orden"])
         return [modulos: modulos]
     }
 

@@ -19,8 +19,8 @@ class CarteraVencidaController extends Shield {
         def inicio = new Date().parse("dd-MM-yyyy",params.inicio)
         def fin = new Date().parse("dd-MM-yyyy",params.fin)
         def cuenta = Cuenta.findByNumeroAndEmpresa(params.cuenta,session.empresa)
-        def desde =params.desde
-        def hasta = params.hasta
+        def desde =cuenta.numero.trim()+"01001"
+        def hasta = cuenta.numero.trim()+"99999"
         def cierre = "01/01/2015"
         def cn = new Sql(dataSource)
         Document document = new Document();
@@ -52,22 +52,46 @@ class CarteraVencidaController extends Shield {
         document.add(p);
         document.add(new Paragraph("\n"));
         document.add(new Paragraph("\n"));
-        p = new Paragraph("CARTERA VENCIDA CUENTAS CONTABLES",titulo)
+        def tit = ""
+        switch (params.dias){
+            case "0":
+                tit="DE 0 a 29"
+                break;
+            case "30":
+                tit="DE 30 a 59"
+                break;
+            case "60":
+                tit="DE 60 a 89"
+                break;
+            case "90 a 364":
+                tit=""
+                break;
+            case "DE 365 a 1825":
+                tit=""
+                break;
+            case "1826":
+                tit="MAS DE 1825"
+                break;
+
+        }
+        p = new Paragraph("CARTERA VENCIDA CUENTAS CONTABLES\n "+tit+" DIAS",titulo)
         p.setAlignment(Element.ALIGN_CENTER)
         document.add(p);
         p = new Paragraph("Desde: ${inicio.format("dd-MM-yyyy")} Hasta: "+fin.format("dd-MM-yyyy"),contenido)
         p.setAlignment(Element.ALIGN_CENTER)
         document.add(p);
-
+        p = new Paragraph("\n",contenido)
+        p.setAlignment(Element.ALIGN_CENTER)
+        document.add(p);
 
 
         def sql = "CONTABLE..up_rpt_cartera_vencida " +
                 " 'PS' , ${inicio.format('yyyy').toInteger()}00 ,'${inicio.format('MM/dd/yyyy')}' " +
                 ", '${fin.format('MM/dd/yyyy')}'" + ",'${desde}','${hasta}', ${params.dias}"
-        println "sql "+sql
+        //println "sql "+sql
         cn.call(sql.toString())
         sql = "select * from CONTABLE..COMPROBANTES_TMP "
-        println "paso "
+        //println "paso "
         def table = new PdfPTable(5);
         table.setWidthPercentage(95.toFloat())
         int[] anchos = [15,40,15,15,15];

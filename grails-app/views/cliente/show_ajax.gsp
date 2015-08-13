@@ -9,7 +9,7 @@
 
         <g:if test="${clienteInstance?.codigo}">
             <div class="row">
-                <div class="col-sm-3 show-label">
+                <div class="col-sm-2 show-label">
                     Codigo
                 </div>
                 
@@ -22,8 +22,8 @@
     
         <g:if test="${clienteInstance?.cp}">
             <div class="row">
-                <div class="col-sm-3 show-label">
-                    Cp
+                <div class="col-sm-2 show-label">
+                    Representante
                 </div>
                 
                 <div class="col-sm-4">
@@ -33,35 +33,11 @@
             </div>
         </g:if>
     
-        <g:if test="${clienteInstance?.auxiliar}">
-            <div class="row">
-                <div class="col-sm-3 show-label">
-                    Auxiliar
-                </div>
-                
-                <div class="col-sm-4">
-                    <g:fieldValue bean="${clienteInstance}" field="auxiliar"/>
-                </div>
-                
-            </div>
-        </g:if>
-    
-        <g:if test="${clienteInstance?.auxiliar2}">
-            <div class="row">
-                <div class="col-sm-3 show-label">
-                    Auxiliar2
-                </div>
-                
-                <div class="col-sm-4">
-                    <g:fieldValue bean="${clienteInstance}" field="auxiliar2"/>
-                </div>
-                
-            </div>
-        </g:if>
+
     
         <g:if test="${clienteInstance?.nombre}">
             <div class="row">
-                <div class="col-sm-3 show-label">
+                <div class="col-sm-2 show-label">
                     Nombre
                 </div>
                 
@@ -74,7 +50,7 @@
     
         <g:if test="${clienteInstance?.ruc}">
             <div class="row">
-                <div class="col-sm-3 show-label">
+                <div class="col-sm-2 show-label">
                     Ruc
                 </div>
                 
@@ -87,7 +63,7 @@
     
         <g:if test="${clienteInstance?.ciudad}">
             <div class="row">
-                <div class="col-sm-3 show-label">
+                <div class="col-sm-2 show-label">
                     Ciudad
                 </div>
                 
@@ -100,7 +76,7 @@
     
         <g:if test="${clienteInstance?.direccion}">
             <div class="row">
-                <div class="col-sm-3 show-label">
+                <div class="col-sm-2 show-label">
                     Direccion
                 </div>
                 
@@ -113,7 +89,7 @@
     
         <g:if test="${clienteInstance?.telefono}">
             <div class="row">
-                <div class="col-sm-3 show-label">
+                <div class="col-sm-2 show-label">
                     Telefono
                 </div>
                 
@@ -126,7 +102,7 @@
     
         <g:if test="${clienteInstance?.fax}">
             <div class="row">
-                <div class="col-sm-3 show-label">
+                <div class="col-sm-2 show-label">
                     Fax
                 </div>
                 
@@ -139,7 +115,7 @@
     
         <g:if test="${clienteInstance?.contacto}">
             <div class="row">
-                <div class="col-sm-3 show-label">
+                <div class="col-sm-2 show-label">
                     Contacto
                 </div>
                 
@@ -152,7 +128,7 @@
     
         <g:if test="${clienteInstance?.observacion}">
             <div class="row">
-                <div class="col-sm-3 show-label">
+                <div class="col-sm-2 show-label">
                     Observacion
                 </div>
                 
@@ -165,7 +141,7 @@
     
         <g:if test="${clienteInstance?.codigoLista}">
             <div class="row">
-                <div class="col-sm-3 show-label">
+                <div class="col-sm-2 show-label">
                     Codigo Lista
                 </div>
                 
@@ -178,7 +154,7 @@
     
         <g:if test="${clienteInstance?.tipo}">
             <div class="row">
-                <div class="col-sm-3 show-label">
+                <div class="col-sm-2 show-label">
                     Tipo
                 </div>
                 
@@ -191,7 +167,7 @@
     
         <g:if test="${clienteInstance?.email}">
             <div class="row">
-                <div class="col-sm-3 show-label">
+                <div class="col-sm-2 show-label">
                     Email
                 </div>
                 
@@ -204,7 +180,7 @@
     
         <g:if test="${clienteInstance?.cuentaPorCobrar}">
             <div class="row">
-                <div class="col-sm-3 show-label">
+                <div class="col-sm-2 show-label">
                     Cuenta Por Cobrar
                 </div>
                 
@@ -217,7 +193,7 @@
     
         <g:if test="${clienteInstance?.cuentaPorPagar}">
             <div class="row">
-                <div class="col-sm-3 show-label">
+                <div class="col-sm-2 show-label">
                     Cuenta Por Pagar
                 </div>
                 
@@ -230,7 +206,7 @@
     
         <g:if test="${clienteInstance?.usuario}">
             <div class="row">
-                <div class="col-sm-3 show-label">
+                <div class="col-sm-2 show-label">
                     Usuario
                 </div>
                 
@@ -243,7 +219,7 @@
     
         <g:if test="${clienteInstance?.proveedor}">
             <div class="row">
-                <div class="col-sm-3 show-label">
+                <div class="col-sm-2 show-label">
                     Proveedor
                 </div>
                 
@@ -256,7 +232,7 @@
     
         <g:if test="${clienteInstance?.cliente}">
             <div class="row">
-                <div class="col-sm-3 show-label">
+                <div class="col-sm-2 show-label">
                     Cliente
                 </div>
                 
@@ -269,7 +245,7 @@
     
         <g:if test="${clienteInstance?.codigoVendedor}">
             <div class="row">
-                <div class="col-sm-3 show-label">
+                <div class="col-sm-2 show-label">
                     Codigo Vendedor
                 </div>
                 
@@ -282,7 +258,7 @@
     
         <g:if test="${clienteInstance?.aceptaMora}">
             <div class="row">
-                <div class="col-sm-3 show-label">
+                <div class="col-sm-2 show-label">
                     Acepta Mora
                 </div>
                 
@@ -295,7 +271,7 @@
     
         <g:if test="${clienteInstance?.cuentaAnticipos}">
             <div class="row">
-                <div class="col-sm-3 show-label">
+                <div class="col-sm-2 show-label">
                     Cuenta Anticipos
                 </div>
                 
@@ -308,7 +284,7 @@
     
         <g:if test="${clienteInstance?.contibuyenteEspecial}">
             <div class="row">
-                <div class="col-sm-3 show-label">
+                <div class="col-sm-2 show-label">
                     Contibuyente Especial
                 </div>
                 
@@ -321,7 +297,7 @@
     
         <g:if test="${clienteInstance?.cuentaPrestamos}">
             <div class="row">
-                <div class="col-sm-3 show-label">
+                <div class="col-sm-2 show-label">
                     Cuenta Prestamos
                 </div>
                 
@@ -334,7 +310,7 @@
     
         <g:if test="${clienteInstance?.retieneFuente}">
             <div class="row">
-                <div class="col-sm-3 show-label">
+                <div class="col-sm-2 show-label">
                     Retiene Fuente
                 </div>
                 
@@ -347,12 +323,12 @@
     
         <g:if test="${clienteInstance?.banco}">
             <div class="row">
-                <div class="col-sm-3 show-label">
+                <div class="col-sm-2 show-label">
                     Banco
                 </div>
                 
                 <div class="col-sm-4">
-                    <g:fieldValue bean="${clienteInstance}" field="banco"/>
+                    ${clienteInstance.banco.descripcion}
                 </div>
                 
             </div>
@@ -360,7 +336,7 @@
     
         <g:if test="${clienteInstance?.tipoCuenta}">
             <div class="row">
-                <div class="col-sm-3 show-label">
+                <div class="col-sm-2 show-label">
                     Tipo Cuenta
                 </div>
                 
@@ -373,7 +349,7 @@
     
         <g:if test="${clienteInstance?.numeroCuenta}">
             <div class="row">
-                <div class="col-sm-3 show-label">
+                <div class="col-sm-2 show-label">
                     Numero Cuenta
                 </div>
                 
@@ -386,7 +362,7 @@
     
         <g:if test="${clienteInstance?.tipoid}">
             <div class="row">
-                <div class="col-sm-3 show-label">
+                <div class="col-sm-2 show-label">
                     Tipoid
                 </div>
                 
@@ -399,7 +375,7 @@
     
         <g:if test="${clienteInstance?.creacion}">
             <div class="row">
-                <div class="col-sm-3 show-label">
+                <div class="col-sm-2 show-label">
                     Creacion
                 </div>
                 
@@ -412,12 +388,12 @@
     
         <g:if test="${clienteInstance?.empresa}">
             <div class="row">
-                <div class="col-sm-3 show-label">
+                <div class="col-sm-2 show-label">
                     Empresa
                 </div>
                 
                 <div class="col-sm-4">
-                    ${clienteInstance?.empresa?.encodeAsHTML()}
+                    ${clienteInstance?.empresa?.descripcion}
                 </div>
                 
             </div>

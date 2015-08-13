@@ -39,37 +39,23 @@ class ClienteController extends Shield {
                 or {
                     /* TODO: cambiar aqui segun sea necesario */
 
-                    ilike("aceptaMora", "%" + params.search + "%")
-                    ilike("auxiliar", "%" + params.search + "%")
-                    ilike("auxiliar2", "%" + params.search + "%")
-                    ilike("banco", "%" + params.search + "%")
+
+
+
                     ilike("ciudad", "%" + params.search + "%")
                     ilike("cliente", "%" + params.search + "%")
                     ilike("codigo", "%" + params.search + "%")
-                    ilike("codigoLista", "%" + params.search + "%")
                     ilike("contacto", "%" + params.search + "%")
-                    ilike("contibuyenteEspecial", "%" + params.search + "%")
                     ilike("cp", "%" + params.search + "%")
-                    ilike("cuentaAnticipos", "%" + params.search + "%")
-                    ilike("cuentaPorCobrar", "%" + params.search + "%")
-                    ilike("cuentaPorPagar", "%" + params.search + "%")
-                    ilike("cuentaPrestamos", "%" + params.search + "%")
-                    ilike("direccion", "%" + params.search + "%")
-                    ilike("email", "%" + params.search + "%")
-                    ilike("fax", "%" + params.search + "%")
                     ilike("nombre", "%" + params.search + "%")
-                    ilike("numeroCuenta", "%" + params.search + "%")
-                    ilike("observacion", "%" + params.search + "%")
-                    ilike("proveedor", "%" + params.search + "%")
-                    ilike("retieneFuente", "%" + params.search + "%")
                     ilike("ruc", "%" + params.search + "%")
-                    ilike("telefono", "%" + params.search + "%")
-                    ilike("tipoCuenta", "%" + params.search + "%")
-                    ilike("tipoid", "%" + params.search + "%")
-                    ilike("usuario", "%" + params.search + "%")
+
                 }
             }
         } else {
+            if(!params.sort){
+                params.sort="creacion"
+            }
             list = Cliente.list(params)
         }
         if (!all && params.offset.toInteger() > 0 && list.size() == 0) {
@@ -116,8 +102,10 @@ class ClienteController extends Shield {
                 return
             }
         }
+        def combo = ["S":"SI","N":"NO"]
+        def tipos = ["01":"Ahorros","00":"Corriente"]
         clienteInstance.properties = params
-        return [clienteInstance: clienteInstance]
+        return [clienteInstance: clienteInstance,combo:combo,tipos:tipos]
     } //form para cargar con ajax en un dialog
 
     /**
@@ -135,6 +123,10 @@ class ClienteController extends Shield {
         clienteInstance.properties = params
         clienteInstance.usuario=session.usuario.login
         clienteInstance.empresa=session.empresa
+        if(params.bancoOcp!="")
+            clienteInstance.banco=BancoOcp.findByCodigo(params.bancoOcp)
+        if(clienteInstance.creacion==null)
+            clienteInstance.creacion=new Date()
         if (!clienteInstance.save(flush: true)) {
             render "ERROR*Ha ocurrido un error al guardar Cliente: " + renderErrors(bean: clienteInstance)
             return

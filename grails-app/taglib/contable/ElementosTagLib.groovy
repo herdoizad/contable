@@ -56,7 +56,7 @@ class ElementosTagLib {
         def claseField2 = (attrs.claseField2 ?: 'col-md-3')
         def claseLabel2 = (attrs.claseLabel2 ?: 'col-md-2')
 
-        def parts = body().toString().split("<hr/>")
+        def parts = body().toString().split("<br/>")
 
         html += '<div class="form-group keeptogether">'
 

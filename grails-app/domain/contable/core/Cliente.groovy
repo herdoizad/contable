@@ -29,7 +29,7 @@ class Cliente implements Serializable{
     String contibuyenteEspecial
     String cuentaPrestamos
     String retieneFuente
-    String banco
+    BancoOcp banco
     String tipoCuenta
     String numeroCuenta
     String tipoid

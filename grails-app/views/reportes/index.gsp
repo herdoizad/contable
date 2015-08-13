@@ -390,22 +390,7 @@
                               id="cv-cuenta"  class="form-control input-sm select select-cnta " noSelection="['':'']" ></g:select>
                 </div>
             </div>
-            <div class="row fila">
-                <div class="col-md-2">
-                    <label>Desde:</label>
-                </div>
-                <div class="col-md-10">
-                    <input type="text" id="cv-desde" class="form-control input-sm number digits" value="001">
-                </div>
-            </div>
-            <div class="row fila">
-                <div class="col-md-2">
-                    <label>Hasta:</label>
-                </div>
-                <div class="col-md-10">
-                    <input type="text" id="cv-hasta" class="form-control input-sm number digits" value="500">
-                </div>
-            </div>
+
             <div class="row fila">
                 <div class="col-md-2">
                     <label>Días:</label>
