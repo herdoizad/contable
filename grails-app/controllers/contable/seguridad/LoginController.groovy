@@ -15,6 +15,7 @@ class LoginController {
         def usu = session.usuario
         def cn = "inicio"
         def an = "index"
+//        println "eval "+ Eval.me(' (12535.25 /30)*21')
         if (usu) {
             if (session.cn && session.an) {
                 cn = session.cn

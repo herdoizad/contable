@@ -323,7 +323,8 @@
     $(".chk").bootstrapSwitch({
         size:'mini',
         onText:"Debe",
-        offText:"Haber"
+        offText:"Haber",
+        offColor:"primary"
     });
     $(".chk-iva").bootstrapSwitch({
         size:'mini',

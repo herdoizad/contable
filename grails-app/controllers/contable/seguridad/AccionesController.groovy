@@ -7,7 +7,7 @@ import contable.seguridad.Permiso
 import contable.seguridad.TipoAccion
 import contable.seguridad.Usuario
 
-class AccionesController  {
+class AccionesController extends Shield  {
 
     static final sistema="T"  //todos
 

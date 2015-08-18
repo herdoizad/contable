@@ -31,7 +31,7 @@ class BalanceComprobacionController extends Shield {
         Font contenido = new Font(Font.FontFamily.HELVETICA, 6);
         document.open();
         Image image = Image.getInstance(img.readBytes());
-        image.setAbsolutePosition(40f, 722f);
+        image.setAbsolutePosition(40f, 738f);
         document.add(image);
         Paragraph p = new Paragraph("PETROLEOS Y SERVICIOS", header);
         p.setAlignment(Element.ALIGN_RIGHT);

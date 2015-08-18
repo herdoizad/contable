@@ -29,7 +29,7 @@
             </div>
         </div>
 
-        <table class="table table-condensed table-bordered table-striped table-hover">
+        <table class="table table-condensed table-bordered table-striped table-hover table-sm">
             <thead>
                 <tr>
                     

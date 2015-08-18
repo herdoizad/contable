@@ -40,9 +40,10 @@ class HeaderFooter implements PdfPageEvent{
 
         footer = new PdfPTable(1);
         footer.setTotalWidth(500);
-        footer.getDefaultCell().setHorizontalAlignment(Element.ALIGN_CENTER);
-        def cell = new PdfPCell(new Paragraph("Impreso el "+new Date().format("dd-MM-yyyy")+", generado por: "+usuario+extra,contenido));
+        footer.getDefaultCell().setHorizontalAlignment(Element.ALIGN_LEFT);
+        def cell = new PdfPCell(new Paragraph("Impreso el "+new Date().format("dd-MM-yyyy HH:mm")+", Generado por: "+usuario+extra,contenido));
         cell.setBorder(0)
+        cell.setHorizontalAlignment(Element.ALIGN_LEFT)
         footer.addCell(cell)
 
 
@@ -51,7 +52,7 @@ class HeaderFooter implements PdfPageEvent{
         PdfContentByte cb = writer.getDirectContent();
         if (document.getPageNumber() > 1) {
             Image image = Image.getInstance(this.img);
-            image.setAbsolutePosition(40f, 722f);
+            image.setAbsolutePosition(40f, 738f);
             document.add(image);
             ColumnText.showTextAligned(cb,
                     Element.ALIGN_RIGHT,new Phrase("PETROLEOS Y SERVICIOS",header),

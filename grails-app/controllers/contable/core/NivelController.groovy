@@ -5,9 +5,9 @@ import contable.seguridad.Shield
 
 
 /**
- * Controlador que muestra las pantallas de manejo de BancoOcp
+ * Controlador que muestra las pantallas de manejo de Nivel
  */
-class BancoOcpController extends Shield {
+class NivelController extends Shield {
 
     static allowedMethods = [save_ajax: "POST", delete_ajax: "POST"]
 
@@ -26,7 +26,7 @@ class BancoOcpController extends Shield {
      */
     def getList(params, all) {
         params = params.clone()
-        params.max = 20
+        params.max = params.max ? Math.min(params.max.toInteger(), 100) : 10
         params.offset = params.offset ?: 0
         if (all) {
             params.remove("max")
@@ -34,18 +34,23 @@ class BancoOcpController extends Shield {
         }
         def list
         if (params.search) {
-            def c = BancoOcp.createCriteria()
+            def c = Nivel.createCriteria()
             list = c.list(params) {
                 or {
                     /* TODO: cambiar aqui segun sea necesario */
 
                     ilike("codigo", "%" + params.search + "%")
-                    ilike("descripcion", "%" + params.search + "%")
+                    ilike("nivelDesc1", "%" + params.search + "%")
+                    ilike("nivelDesc2", "%" + params.search + "%")
+                    ilike("nivelDesc3", "%" + params.search + "%")
+                    ilike("nivelDesc4", "%" + params.search + "%")
+                    ilike("nivelDesc5", "%" + params.search + "%")
+                    ilike("nivelDesc6", "%" + params.search + "%")
                     ilike("usuario", "%" + params.search + "%")
                 }
             }
         } else {
-            list = BancoOcp.list(params)
+            list = Nivel.list(params)
         }
         if (!all && params.offset.toInteger() > 0 && list.size() == 0) {
             params.offset = params.offset.toInteger() - 1
@@ -58,9 +63,9 @@ class BancoOcpController extends Shield {
      * Acción que muestra la lista de elementos
      */
     def list() {
-        def bancoOcpInstanceList = getList(params, false)
-        def bancoOcpInstanceCount = getList(params, true).size()
-        return [bancoOcpInstanceList: bancoOcpInstanceList, bancoOcpInstanceCount: bancoOcpInstanceCount]
+        def nivelInstanceList = getList(params, false)
+        def nivelInstanceCount = getList(params, true).size()
+        return [nivelInstanceList: nivelInstanceList, nivelInstanceCount: nivelInstanceCount]
     }
 
     /**
@@ -68,14 +73,14 @@ class BancoOcpController extends Shield {
      */
     def show_ajax() {
         if (params.id) {
-            def bancoOcpInstance = BancoOcp.findByCodigo(params.id)
-            if (!bancoOcpInstance) {
-                render "ERROR*No se encontró BancoOcp."
+            def nivelInstance = Nivel.findByCodigo(params.id)
+            if (!nivelInstance) {
+                render "ERROR*No se encontró Nivel."
                 return
             }
-            return [bancoOcpInstance: bancoOcpInstance]
+            return [nivelInstance: nivelInstance]
         } else {
-            render "ERROR*No se encontró BancoOcp."
+            render "ERROR*No se encontró Nivel."
         }
     } //show para cargar con ajax en un dialog
 
@@ -83,39 +88,39 @@ class BancoOcpController extends Shield {
      * Acción llamada con ajax que muestra un formaulario para crear o modificar un elemento
      */
     def form_ajax() {
-        def bancoOcpInstance = new BancoOcp()
+        def nivelInstance = new Nivel()
         if (params.id) {
-            bancoOcpInstance = BancoOcp.findByCodigo(params.id)
-            if (!bancoOcpInstance) {
-                render "ERROR*No se encontró BancoOcp."
+            nivelInstance = Nivel.findByCodigo(params.id)
+            if (!nivelInstance) {
+                render "ERROR*No se encontró Nivel."
                 return
             }
         }
-        bancoOcpInstance.properties = params
-        return [bancoOcpInstance: bancoOcpInstance]
+        nivelInstance.properties = params
+        return [nivelInstance: nivelInstance]
     } //form para cargar con ajax en un dialog
 
     /**
      * Acción llamada con ajax que guarda la información de un elemento
      */
     def save_ajax() {
-        def bancoOcpInstance = new BancoOcp()
+        def nivelInstance = new Nivel()
         if (params.id) {
-            bancoOcpInstance = BancoOcp.findByCodigo(params.id)
-            if (!bancoOcpInstance) {
-                render "ERROR*No se encontró BancoOcp."
+            nivelInstance = Nivel.findByCodigo(params.id)
+            if (!nivelInstance) {
+                render "ERROR*No se encontró Nivel."
                 return
             }
         }
-        bancoOcpInstance.properties = params
-        bancoOcpInstance.usuario=session.usuario.login
-        if(bancoOcpInstance.creacion==null)
-            bancoOcpInstance.creacion=new Date()
-        if (!bancoOcpInstance.save(flush: true)) {
-            render "ERROR*Ha ocurrido un error al guardar BancoOcp: " + renderErrors(bean: bancoOcpInstance)
+        nivelInstance.properties = params
+        nivelInstance.usuario=session.usuario.login
+        if(!nivelInstance.creacion)
+            nivelInstance.creacion=new Date()
+        if (!nivelInstance.save(flush: true)) {
+            render "ERROR*Ha ocurrido un error al guardar Nivel: " + renderErrors(bean: nivelInstance)
             return
         }
-        render "SUCCESS*${params.id ? 'Actualización' : 'Creación'} de BancoOcp exitosa."
+        render "SUCCESS*${params.id ? 'Actualización' : 'Creación'} de Nivel exitosa."
         return
     } //save para grabar desde ajax
 
@@ -124,21 +129,21 @@ class BancoOcpController extends Shield {
      */
     def delete_ajax() {
         if (params.id) {
-            def bancoOcpInstance = BancoOcp.findByCodigo(params.id)
-            if (!bancoOcpInstance) {
-                render "ERROR*No se encontró BancoOcp."
+            def nivelInstance = Nivel.findByCodigo(params.id)
+            if (!nivelInstance) {
+                render "ERROR*No se encontró Nivel."
                 return
             }
             try {
-                bancoOcpInstance.delete(flush: true)
-                render "SUCCESS*Eliminación de BancoOcp exitosa."
+                nivelInstance.delete(flush: true)
+                render "SUCCESS*Eliminación de Nivel exitosa."
                 return
             } catch (DataIntegrityViolationException e) {
-                render "ERROR*Ha ocurrido un error al eliminar BancoOcp"
+                render "ERROR*Ha ocurrido un error al eliminar Nivel"
                 return
             }
         } else {
-            render "ERROR*No se encontró BancoOcp."
+            render "ERROR*No se encontró Nivel."
             return
         }
     } //delete para eliminar via ajax
@@ -150,16 +155,16 @@ class BancoOcpController extends Shield {
     def validar_unique_codigo_ajax() {
         params.codigo = params.codigo.toString().trim()
         if (params.id) {
-            def obj = BancoOcp.findByCodigo(params.id)
+            def obj = Nivel.findByCodigo(params.id)
             if (obj.codigo.toLowerCase() == params.codigo.toLowerCase()) {
                 render true
                 return
             } else {
-                render BancoOcp.countByCodigoIlike(params.codigo) == 0
+                render Nivel.countByCodigoIlike(params.codigo) == 0
                 return
             }
         } else {
-            render BancoOcp.countByCodigoIlike(params.codigo) == 0
+            render Nivel.countByCodigoIlike(params.codigo) == 0
             return
         }
     }

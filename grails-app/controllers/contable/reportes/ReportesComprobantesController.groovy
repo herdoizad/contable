@@ -43,7 +43,7 @@ class ReportesComprobantesController extends Shield {
 //            String imageUrl = "./web-app//images/logo-login.png";
             Image image = Image.getInstance(img.readBytes());
 //            Image image = Image.getInstance( new File('./web-app//images/logo-login.png').readBytes());
-            image.setAbsolutePosition(40f, 722f);
+            image.setAbsolutePosition(40f, 738f);
             document.add(image);
             Paragraph p = new Paragraph("PETROLEOS Y SERVICIOS", header);
             p.setAlignment(Element.ALIGN_RIGHT);

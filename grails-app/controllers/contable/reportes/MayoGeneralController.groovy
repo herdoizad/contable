@@ -23,7 +23,7 @@ class MayoGeneralController extends Shield  {
         def cn = new Sql(dataSource)
         Document document = new Document();
         def fecha = new Date()
-        def nombre ="ResultadoIntegral-${fecha.format('ddMMyyyy')}.pdf"
+        def nombre ="MayorGeneral-${fecha.format('ddMMyyyy')}.pdf"
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         def writer = PdfWriter.getInstance(document, baos);
         def img = grailsApplication.mainContext.getResource('/images/logo-login.png').getFile()
@@ -33,7 +33,7 @@ class MayoGeneralController extends Shield  {
         Font contenido = new Font(Font.FontFamily.HELVETICA, 6);
         document.open();
         Image image = Image.getInstance(img.readBytes());
-        image.setAbsolutePosition(40f, 722f);
+        image.setAbsolutePosition(40f, 738f);
         document.add(image);
         Paragraph p = new Paragraph("PETROLEOS Y SERVICIOS", header);
         p.setAlignment(Element.ALIGN_RIGHT);

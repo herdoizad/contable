@@ -77,18 +77,7 @@ body{
     background: transparent;
     padding-left: 15px;
 }
-.menu-vertical li:hover{
-    color: #fff;
-    background: #006EB7 !important;
-}
-.menu-vertical li:focus{
-    color: #fff;
-    background: #006EB7 !important;
-}
-.menu-vertical a:hover{
-    color: #fff;
-    background: #006EB7 !important;
-}
+
 .submenu{
     display: none;
     list-style: none;

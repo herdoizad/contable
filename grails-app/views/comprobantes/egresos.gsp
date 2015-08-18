@@ -1,11 +1,14 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
 <html>
 <head>
-    <title>Egresos</title>
+    <title>Egresos -  ${anio}</title>
     <meta name="layout" content="main">
     <style>
     .pestania{
         width: 85px;
+    }
+    .pestania a{
+        background: #EFEFF0;
     }
 
 
@@ -18,7 +21,7 @@
         <div class="panel-completo" style="margin-left: 10px">
             <div class="row">
                 <div class="col-md-8 titulo-panel">
-                    Comprobantes de egreso
+                    Comprobantes de egreso del ${anio}
                 </div>
                 <div class="col-md-2 titulo-panel" style="margin-top: -11px">
                     <a href="#" class="btn btn-sm btn-verde" id="nuevo" activo="00">

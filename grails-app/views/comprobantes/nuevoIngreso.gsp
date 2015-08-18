@@ -226,7 +226,8 @@
     $(".chk").bootstrapSwitch({
         size:'mini',
         onText:"Debe",
-        offText:"Haber"
+        offText:"Haber",
+        offColor:"primary"
     });
 
     $('.select').combobox();
