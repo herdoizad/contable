@@ -98,9 +98,7 @@ class HeaderFooter implements PdfPageEvent{
     void onStartPage(PdfWriter pdfWriter, Document document) {
         PdfContentByte cb = pdfWriter.getDirectContent();
         if (document.getPageNumber() > 1) {
-            Image image = Image.getInstance(this.img);
-            image.setAbsolutePosition(40f, 722f);
-            document.add(image);
+
 //            Paragraph p = new Paragraph("PETROLEOS Y SERVICIOS", header);
 //            p.setAlignment(Element.ALIGN_RIGHT);
 //            document.add(p);

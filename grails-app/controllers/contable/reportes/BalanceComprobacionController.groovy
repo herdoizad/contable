@@ -21,7 +21,7 @@ class BalanceComprobacionController extends Shield {
         def cn = new Sql(dataSource)
         Document document = new Document();
         def fecha = new Date()
-        def nombre ="ResultadoIntegral-${fecha.format('ddMMyyyy')}.pdf"
+        def nombre ="BalanceDeComprobacion-${fecha.format('ddMMyyyy')}.pdf"
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         def writer = PdfWriter.getInstance(document, baos);
         def img = grailsApplication.mainContext.getResource('/images/logo-login.png').getFile()
