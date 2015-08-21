@@ -2,7 +2,7 @@ package contable.nomina
 
 class Rol {
     Empleado empleado
-    Mes mes
+    MesNomina mes
     String estado  = "N"   /*A-->aprobado    N--> no aprobado*/
     Date registro = new  Date()
     String usuario

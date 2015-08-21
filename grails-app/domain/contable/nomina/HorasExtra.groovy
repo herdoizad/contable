@@ -5,7 +5,7 @@ class HorasExtra {
     Empleado empleado
     Double cantidad
     Double factor
-    Mes mes
+    MesNomina mes
 
     static auditable = [ignore: []]
 

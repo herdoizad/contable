@@ -3,7 +3,7 @@ package contable.nomina
 class Asistencia {
 
     Empleado empleado
-    Mes mes
+    MesNomina mes
     Double horas
     static auditable = [ignore: []]
 

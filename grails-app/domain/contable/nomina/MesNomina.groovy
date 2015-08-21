@@ -1,6 +1,6 @@
 package contable.nomina
 
-class Mes {
+class MesNomina {
 
     Integer codigo
     Integer diasLaborables = 30
@@ -13,7 +13,7 @@ class Mes {
      */
     static mapping = {
 
-        table 'MES'
+        table 'MESNOMINA'
         cache usage: 'read-write', include: 'non-lazy'
         version false
         id generator: "increment"
