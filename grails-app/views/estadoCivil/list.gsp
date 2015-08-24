@@ -1,16 +1,13 @@
-<%@ page import="contable.core.Cliente" %>
+
+<%@ page import="contable.nomina.EstadoCivil" %>
 <!DOCTYPE html>
 <html>
 <head>
     <meta name="layout" content="main">
-    <title>Lista de Cliente</title>
-    <style>
-        .show-label{
-            font-weight: bold;
-        }
-    </style>
+    <title>Lista de EstadoCivil</title>
 </head>
 <body>
+
 <elm:message tipo="${flash.tipo}" clase="${flash.clase}">${flash.message}</elm:message>
 
 <div class="row fila">
@@ -18,7 +15,7 @@
         <div class="panel-completo" style="margin-left: 10px">
             <div class="row">
                 <div class="col-md-8 titulo-panel">
-                    Clientes
+                    Estado civil
                 </div>
                 <div class="col-md-4 titulo-panel" style="margin-top: -11px">
                     <div class="col-md-4">
@@ -30,7 +27,7 @@
                         <div class="input-group">
                             <input type="text" class="form-control input-sm input-search" placeholder="Buscar" value="${params.search}">
                             <span class="input-group-btn">
-                                <g:link controller="cliente" action="list" class="btn btn-default btn-search btn-sm">
+                                <g:link controller="estadoCivil" action="list" class="btn btn-default btn-search btn-sm">
                                     <i class="fa fa-search"></i>&nbsp;
                                 </g:link>
                             </span>
@@ -40,42 +37,31 @@
             </div>
             <div class="row fila">
                 <div class="col-md-12">
-
-                    <table class="table table-condensed table-bordered table-striped table-hover table-sm">
+                    <table class="table table-condensed table-bordered table-striped table-hover">
                         <thead>
                         <tr>
 
                             <g:sortableColumn property="codigo" title="Codigo" />
 
-                            <g:sortableColumn property="cp" title="Cp" />
-
-                            <g:sortableColumn property="nombre" title="Nombre" />
-
-                            <g:sortableColumn property="ruc" title="Ruc" />
+                            <g:sortableColumn property="descripcion" title="Descripcion" />
 
                         </tr>
                         </thead>
                         <tbody>
-                        <g:if test="${clienteInstanceCount > 0}">
-                            <g:each in="${clienteInstanceList}" status="i" var="clienteInstance">
-                                <tr data-id="${clienteInstance.codigo}">
+                        <g:if test="${estadoCivilInstanceCount > 0}">
+                            <g:each in="${estadoCivilInstanceList}" status="i" var="estadoCivilInstance">
+                                <tr data-id="${estadoCivilInstance.id}">
 
-                                    <td>${clienteInstance.codigo}</td>
+                                    <td>${estadoCivilInstance.codigo}</td>
 
-                                    <td><elm:textoBusqueda busca="${params.search}"><g:fieldValue bean="${clienteInstance}" field="cp"/></elm:textoBusqueda></td>
-
-
-
-                                    <td><elm:textoBusqueda busca="${params.search}"><g:fieldValue bean="${clienteInstance}" field="nombre"/></elm:textoBusqueda></td>
-
-                                    <td><elm:textoBusqueda busca="${params.search}"><g:fieldValue bean="${clienteInstance}" field="ruc"/></elm:textoBusqueda></td>
+                                    <td><elm:textoBusqueda busca="${params.search}"><g:fieldValue bean="${estadoCivilInstance}" field="descripcion"/></elm:textoBusqueda></td>
 
                                 </tr>
                             </g:each>
                         </g:if>
                         <g:else>
                             <tr class="danger">
-                                <td class="text-center" colspan="32">
+                                <td class="text-center" colspan="2">
                                     <g:if test="${params.search && params.search!= ''}">
                                         No se encontraron resultados para su búsqueda
                                     </g:if>
@@ -88,26 +74,30 @@
                         </tbody>
                     </table>
 
-                    <elm:pagination total="${clienteInstanceCount}" params="${params}"/>
+                    <elm:pagination total="${estadoCivilInstanceCount}" params="${params}"/>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+
+
+
+
 <script type="text/javascript">
     var id = null;
-    function submitFormCliente() {
-        var $form = $("#frmCliente");
-        var $btn = $("#dlgCreateEditCliente").find("#btnSave");
+    function submitFormEstadoCivil() {
+        var $form = $("#frmEstadoCivil");
+        var $btn = $("#dlgCreateEditEstadoCivil").find("#btnSave");
         if ($form.valid()) {
             $btn.replaceWith(spinner);
-            openLoader("Guardando Cliente");
+            openLoader("Guardando EstadoCivil");
             $.ajax({
                 type    : "POST",
                 url     : $form.attr("action"),
                 data    : $form.serialize(),
                 success : function (msg) {
-                    closeLoader()
                     var parts = msg.split("*");
                     log(parts[1], parts[0] == "SUCCESS" ? "success" : "error"); // log(msg, type, title, hide)
                     setTimeout(function() {
@@ -129,11 +119,11 @@
             return false;
         } //else
     }
-    function deleteCliente(itemId) {
+    function deleteEstadoCivil(itemId) {
         bootbox.dialog({
             title   : "Alerta",
             message : "<i class='fa fa-trash-o fa-3x pull-left text-danger text-shadow'></i><p>" +
-                    "¿Está seguro que desea eliminar el Cliente seleccionado? Esta acción no se puede deshacer.</p>",
+            "¿Está seguro que desea eliminar el EstadoCivil seleccionado? Esta acción no se puede deshacer.</p>",
             buttons : {
                 cancelar : {
                     label     : "Cancelar",
@@ -145,10 +135,10 @@
                     label     : "<i class='fa fa-trash-o'></i> Eliminar",
                     className : "btn-danger",
                     callback  : function () {
-                        openLoader("Eliminando Cliente");
+                        openLoader("Eliminando EstadoCivil");
                         $.ajax({
                             type    : "POST",
-                            url     : '${createLink(controller:'cliente', action:'delete_ajax')}',
+                            url     : '${createLink(controller:'estadoCivil', action:'delete_ajax')}',
                             data    : {
                                 id : itemId
                             },
@@ -173,21 +163,17 @@
             }
         });
     }
-    function createEditCliente(id) {
-        openLoader()
+    function createEditEstadoCivil(id) {
         var title = id ? "Editar" : "Crear";
         var data = id ? { id: id } : {};
         $.ajax({
             type    : "POST",
-            url     : "${createLink(controller:'cliente', action:'form_ajax')}",
+            url     : "${createLink(controller:'estadoCivil', action:'form_ajax')}",
             data    : data,
             success : function (msg) {
-                closeLoader()
                 var b = bootbox.dialog({
-                    id      : "dlgCreateEditCliente",
-                    title   : title + " Cliente",
-
-                    class   : "modal-lg",
+                    id      : "dlgCreateEditEstadoCivil",
+                    title   : title + " EstadoCivil",
 
                     message : msg,
                     buttons : {
@@ -202,7 +188,7 @@
                             label     : "<i class='fa fa-save'></i> Guardar",
                             className : "btn-success",
                             callback  : function () {
-                                return submitFormCliente();
+                                return submitFormEstadoCivil();
                             } //callback
                         } //guardar
                     } //buttons
@@ -214,16 +200,16 @@
         }); //ajax
     } //createEdit
 
-    function verCliente(id) {
+    function verEstadoCivil(id) {
         $.ajax({
             type    : "POST",
-            url     : "${createLink(controller:'cliente', action:'show_ajax')}",
+            url     : "${createLink(controller:'estadoCivil', action:'show_ajax')}",
             data    : {
                 id : id
             },
             success : function (msg) {
                 bootbox.dialog({
-                    title   : "Ver Cliente",
+                    title   : "Ver EstadoCivil",
 
                     message : msg,
                     buttons : {
@@ -242,7 +228,7 @@
     $(function () {
 
         $(".btnCrear").click(function() {
-            createEditCliente();
+            createEditEstadoCivil();
             return false;
         });
 
@@ -257,7 +243,7 @@
                     icon   : "fa fa-search",
                     action : function ($element) {
                         var id = $element.data("id");
-                        verCliente(id);
+                        verEstadoCivil(id);
                     }
                 },
                 editar   : {
@@ -265,7 +251,7 @@
                     icon   : "fa fa-pencil",
                     action : function ($element) {
                         var id = $element.data("id");
-                        createEditCliente(id);
+                        createEditEstadoCivil(id);
                     }
                 },
                 eliminar : {
@@ -274,7 +260,7 @@
                     separator_before : true,
                     action           : function ($element) {
                         var id = $element.data("id");
-                        deleteCliente(id);
+                        deleteEstadoCivil(id);
                     }
                 }
             },
