@@ -5,7 +5,7 @@ import contable.core.Cuenta
 class Empleado {
 
     EstadoCivil estadoCivil
-    Ubicacion ubicacion
+//    Ubicacion ubicacion
     Unidad unidad
     String nombre
     String apellido
@@ -25,7 +25,7 @@ class Empleado {
     String cuenta
     String banco
     String tipoCuenta
-    String estado
+    String estado  ="A"
 
     String path /*path al pdf de la hoja de vida*/
 
@@ -56,7 +56,7 @@ class Empleado {
             ciudadTrabajo column: "CIUDAD_TRABAJO"
             cuenta column: "CUENTA_BANCO"
             email column: "DIRECCION_ELECTRONICA"
-            ubicacion column: 'CODIGO_UBICACION'
+//            ubicacion column: 'CODIGO_UBICACION'
             unidad column:'UNIDAD_ID'
             registro column:'FECHA_REGISTRO'
             banco column: 'BANCO'

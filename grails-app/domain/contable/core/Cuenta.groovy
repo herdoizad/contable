@@ -102,4 +102,15 @@ class Cuenta {
         }
     }
 
+    def getNumeroPad(){
+        def res =""
+        if(!this.numero)
+            return res
+        res=this.numero
+        (15-this.numero.length()).times {
+            res+=" "
+        }
+        return res
+    }
+
 }

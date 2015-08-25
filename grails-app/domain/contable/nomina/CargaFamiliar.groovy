@@ -44,11 +44,11 @@ class CargaFamiliar {
     static constraints = {
         nombre(size: 1..60)
         apellido(size: 1..60)
-        cedula(size: 1..10)
+        cedula(nullable: true,size: 1..10)
         sexo(size: 1..1,inList: ["M","F"])
         direccion(size: 1..150)
         telefono(size: 1..10)
-        email(size: 1..60)
+        email(nullable: true, size: 1..60)
         fin(nullable: true)
     }
 }
