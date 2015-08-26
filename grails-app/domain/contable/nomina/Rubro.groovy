@@ -1,11 +1,14 @@
 package contable.nomina
 
+import contable.core.Cuenta
+
 class Rubro {
 
     String formula
     String nombre
     Double valor
     Integer signo
+    Cuenta cuenta
     static auditable = [ignore: []]
 
     /**
@@ -23,6 +26,7 @@ class Rubro {
             nombre column:'NOMBRE'
             valor column:'VALOR'
             signo column:'SIGNO'
+            cuenta column: 'CTA_CUENTA'
         }
     }
 
@@ -30,6 +34,6 @@ class Rubro {
         nombre(size: 1..50)
         formula(nullable: true,size: 1..150)
         valor(nullable: true)
-
+        cuenta(nullable: true)
     }
 }

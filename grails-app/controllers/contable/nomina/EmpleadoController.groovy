@@ -1,4 +1,4 @@
-package contable
+package contable.nomina
 
 import contable.core.Cuenta
 import contable.nomina.Capacitacion

@@ -45,7 +45,7 @@
         </div>
     </g:else>
     <g:if test="${empleado?.id}">
-        <g:link controller="empleado" action="capacitacion" id="${empleado.id}">
+        <g:link controller="empleado" action="cargas" id="${empleado.id}">
             <div class="header-flow-item ">
                 <span class="badge ">3</span>
                 Cargas familiares

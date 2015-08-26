@@ -7,6 +7,7 @@ class RubroEmpleado {
     Date inicio
     Date fin
     Integer mes
+    String descontable = "S"
     static auditable = [ignore: []]
 
     /**
@@ -25,10 +26,12 @@ class RubroEmpleado {
             inicio column: 'FECHA_INICIO'
             fin column: 'FECHA_FIN'
             mes column: 'MES'
+            descontable column: 'DESCUENTA'
         }
     }
 
     static constraints = {
         fin(nullable: true)
+        descontable(size: 1..1)
     }
 }

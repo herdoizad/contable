@@ -11,7 +11,7 @@
             role="form" controller="variable" action="save_ajax" method="POST">
 
         
-        <elm:fieldRapido claseLabel="col-sm-2" label="Nombre" claseField="col-sm-6">
+        <elm:fieldRapido claseLabel="col-sm-2" label="Nombre" claseField="col-sm-10">
             <g:textField name="nombre" maxlength="100" required="" class="form-control  required" value="${variableInstance?.nombre}"/>
         </elm:fieldRapido>
         
@@ -19,11 +19,11 @@
             <g:textField name="codigo" maxlength="20" required="" class="form-control  required unique noEspacios" value="${variableInstance?.codigo}"/>
         </elm:fieldRapido>
         
-        <elm:fieldRapido claseLabel="col-sm-2" label="Sql" claseField="col-sm-6">
-            <g:textField name="sql" class="form-control " value="${variableInstance?.sql}"/>
+        <elm:fieldRapido claseLabel="col-sm-2" label="Sql" claseField="col-sm-10">
+            <textarea name="sql" class="form-control " style="height: 200px">${variableInstance?.sql}</textarea>
         </elm:fieldRapido>
         
-        <elm:fieldRapido claseLabel="col-sm-2" label="Valor" claseField="col-sm-2">
+        <elm:fieldRapido claseLabel="col-sm-2" label="Valor" claseField="col-sm-3">
             <g:textField name="valor" value="${fieldValue(bean: variableInstance, field: 'valor')}" class="number form-control  "/>
         </elm:fieldRapido>
         
