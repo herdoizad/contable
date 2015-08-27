@@ -36,4 +36,18 @@ class Rol {
         usuario(size: 1..16)
         estado(size: 1..1)
     }
+
+    def calculaTotal(){
+        def ti = 0
+        def te = 0
+        DetalleRol.findAllByRol(this).each {d->
+            if(d.signo>0)
+                ti+=d.valor
+            else
+                te+=d.valor
+        }
+        this.totalIngresos=ti.toDouble().round(2)
+        this.totalEgresos=te.toDouble().round(2)
+        this.save(flush: true)
+    }
 }

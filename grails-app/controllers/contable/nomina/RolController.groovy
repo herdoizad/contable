@@ -2,14 +2,13 @@ package contable.nomina
 
 import contable.seguridad.Shield
 import groovy.sql.Sql
-
 class RolController extends Shield {
 
     def dataSource
-
+    def mailService
     def index() {
 
-        def meses = MesNomina.findAllByCodigoLessThanEquals(new Date().format("yyyyMM").toInteger(),[sort:"codigo"])
+        def meses = MesNomina.findAllByCodigoLessThanEquals((new Date().format("yyyy")+"13").toInteger(),[sort:"codigo"])
         def empleados = Empleado.list([sort: 'nombre'])
         [meses:meses,empleados:empleados]
 
@@ -18,6 +17,7 @@ class RolController extends Shield {
     def getRolMes_ajax(){
         def mes = MesNomina.get(params.id)
         def roles = []
+        def tipos = ["1":"Ingreso","-1":"Egreso"]
         if(params.empleado=="0"){
             roles = Rol.findAllByMes(mes)
         }else{
@@ -25,7 +25,23 @@ class RolController extends Shield {
             if(rol)
                 roles.add(rol)
         }
-        [roles:roles,emp:params.empleado,mes:mes]
+        [roles:roles,emp:params.empleado,mes:mes,tipos:tipos]
+    }
+
+
+    def addRubro_ajax(){
+        def rol = Rol.get(params.id)
+        def dt= new DetalleRol()
+        dt.valor=params.valor.toDouble()
+        dt.descripcion=params.desc
+        dt.usuario=session.usuario.login
+        dt.signo=params.tipo.toInteger()
+        dt.rol=rol
+        if(!dt.save(flush: true))
+            println "dt error save "+dt.errors
+        rol.calculaTotal()
+        redirect(action: "getRolMes_ajax",params: [id:rol.mes.id,empleado: rol.empleado.id])
+
     }
 
 
@@ -106,12 +122,15 @@ class RolController extends Shield {
         dt.valor=params.valor.toDouble().round(2)
         dt.modificacion=new Date()
         dt.save(flush: true)
+        dt.rol.calculaTotal()
         render "ok"
     }
 
     def deleteRubro_ajax(){
         def dt = DetalleRol.get(params.id)
+        def rol = dt.rol
         dt.delete(flush: true)
+        rol.calculaTotal()
         render "ok"
     }
 
@@ -160,5 +179,55 @@ class RolController extends Shield {
         }
         return res
     }
+
+    def aprobarRoles_ajax(){
+        println "params "+params
+        def mes = MesNomina.get(params.mes)
+        def empleados = []
+        if(params.empleado=="0")
+            empleados=Empleado.list()
+        else
+            empleados.add(Empleado.get(params.empleado))
+        println "empleados "+empleados.id
+        Rol.findAllByMesAndEmpleadoInList(mes,empleados).each {r->
+            println "r "+r.id+" "+r.estado
+            if(r.estado=="N"){
+                r.estado="A"
+                if(!r.save(flush: true))
+                    println "error save rol aprobar "+r.errors
+            }
+        }
+        redirect(action: 'getRolMes_ajax',params: ["id":params.mes,"empleado":params.empleado])
+    }
+
+
+    def enviarEmails_ajax(){
+
+        def mes = MesNomina.get(params.mes)
+        def empleados = []
+        if(params.empleado=="0")
+            empleados=Empleado.list()
+        else
+            empleados.add(Empleado.get(params.empleado))
+
+        Rol.findAllByMesAndEmpleadoInList(mes,empleados).each { r ->
+            def detalle = DetalleRol.findAllByRol(r,[sort:"signo",order:"desc"])
+            mailService.sendMail {
+                multipart true
+                to "valentinsvt@hotmail.com"
+//                to r.empleado.email
+                subject "Rol de pagos"
+                body( view:"mailRol",
+                        model:[rol: r,detalle:detalle,usuario:session.usuario.login])
+                inline 'logo','image/png',grailsApplication.mainContext.getResource('/images/logo-login.png').getFile().readBytes()
+//            inline 'logo','image/png', new File('./web-app///images/logo-login.png').readBytes()
+            }
+        }
+        render "ok"
+
+
+    }
+
+//
 
 }
