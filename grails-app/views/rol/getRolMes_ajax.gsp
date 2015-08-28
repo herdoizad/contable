@@ -19,7 +19,7 @@
         </div>
         <div class="col-md-1">
             <a href="#" class="btn btn-default btn-sm " id="mail" empleado="${emp}" mes="${mes.id}">
-                <i class="fa fa-envelope"></i> Enivar
+                <i class="fa fa-envelope"></i> Enviar
             </a>
         </div>
         <div class="col-md-1">
@@ -34,7 +34,7 @@
     <div class="panel ${r.estado!='A'?'panel-default':'panel-success'}" style="position: relative">
         <i class="fa fa-print print"  style="position: absolute;top: 5px;right: 5px;color: #ffffff;cursor: pointer" rol="${r.id}"></i>
         <div class="panel-heading " style="font-size: 10px;line-height: 10px;padding: 5px">
-            ${r?.empleado}
+            ${r?.empleado.apellido} ${r.empleado.nombre}
 
         </div>
         <div class="panel-body" style="padding-bottom: 0px">
@@ -158,6 +158,7 @@
     $(".panel-heading").css({cursor:"pointer"}).click(function(){
         $(this).parent().find(".panel-body").toggle()
     })
+    $(".panel-heading").click()
     $(".guardar").click(function(){
         var id = $(this).attr("iden")
         var rol = $(".valor-"+id).attr("rol")

@@ -3,8 +3,10 @@ package contable.nomina
 class HorasExtra {
 
     Empleado empleado
-    Double cantidad
-    Double factor
+    Double horas1x = 0
+    Double horas15x = 0
+    Double horas2x = 0
+
     MesNomina mes
 
     static auditable = [ignore: []]
@@ -22,8 +24,9 @@ class HorasExtra {
             id column:'ID'
             empleado column:'EMPLEADO_ID'
             mes column:'MES'
-            cantidad column:'HORAS'
-            factor column:'FACTOR'
+            horas1x column:'HORAS_1'
+            horas15x column:'HORAS_15'
+            horas2x column:'HORAS_2'
         }
     }
 

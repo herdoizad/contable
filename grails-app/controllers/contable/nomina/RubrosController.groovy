@@ -20,8 +20,8 @@ class RubrosController extends Shield {
     }
 
     def getEmpleados_ajax(){
-        def emps = Empleado.list()
-        def meses = MesNomina.findAllByCodigoGreaterThan(new Date().format("yyyy").toInteger())
+        def emps = Empleado.findAllByEstado("A")
+        def meses = MesNomina.findAllByCodigoGreaterThan(new Date().format("yyyy").toInteger(),[sort:"codigo"])
         [emps:emps,meses:meses]
     }
 
@@ -135,7 +135,7 @@ class RubrosController extends Shield {
         if(params.id)
             empleado=Empleado.get(params.id)
         def rubros = Rubro.list([sort: "nombre"])
-        def empleados = Empleado.list([sort: "apellido"])
+        def empleados = Empleado.findAllByEstado("A",[sort: "apellido"])
         [empleado:empleado,rubros:rubros,empleados:empleados]
     }
     

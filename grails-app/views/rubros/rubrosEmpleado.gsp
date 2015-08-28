@@ -20,7 +20,7 @@
                     <label>Empleado</label>
                 </div>
                 <div class="col-md-4">
-                    <g:select name="empleados" id="empleados" from="${empleados}" value="${empleado?.id}" class="form-control input-sm select" optionKey="id"/>
+                    <g:select name="empleados" id="empleados" from="${empleados}" value="${empleado?.id}" noSelection="['':'']" class="form-control input-sm select" optionKey="id"/>
                 </div>
                 <div class="col-md-1">
                     <a href="#" id="ver" class="btn btn-verde btn-sm"><i class="fa fa-search"></i>Ver</a>

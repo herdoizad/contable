@@ -6,7 +6,7 @@
         <g:select name="mes"  id="mes" from="${meses}" class="form-control input-sm" optionKey="id" optionValue="codigo"/>
     </div>
 </div>
-<div class="row fila">
+<div class="row fila" style="height: 450px;overflow-y: auto">
     <div class="col-md-12">
         <table class="table table-darkblue table-bordered table-sm">
             <thead>

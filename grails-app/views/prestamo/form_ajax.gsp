@@ -27,15 +27,15 @@
             <g:textField name="interes" value="${fieldValue(bean: prestamoInstance, field: 'interes')}" class="number form-control   required" required=""/>
         </elm:fieldRapido>
         
-        <elm:fieldRapido claseLabel="col-sm-2" label="Monto" claseField="col-sm-2">
+        <elm:fieldRapido claseLabel="col-sm-2" label="Monto" claseField="col-sm-3">
             <g:textField name="monto" value="${fieldValue(bean: prestamoInstance, field: 'monto')}" class="number form-control   required" required=""/>
         </elm:fieldRapido>
         
-        <elm:fieldRapido claseLabel="col-sm-2" label="Plazo" claseField="col-sm-2">
+        <elm:fieldRapido claseLabel="col-sm-2" label="Plazo" claseField="col-sm-3">
             <g:textField name="plazo" value="${prestamoInstance.plazo}" class="digits form-control  required" required=""/>
         </elm:fieldRapido>
         
-        <elm:fieldRapido claseLabel="col-sm-2" label="Valor Cuota" claseField="col-sm-2">
+        <elm:fieldRapido claseLabel="col-sm-2" label="Valor Cuota" claseField="col-sm-3">
             <g:textField name="valorCuota" value="${fieldValue(bean: prestamoInstance, field: 'valorCuota')}" class="number form-control   required" required=""/>
         </elm:fieldRapido>
         

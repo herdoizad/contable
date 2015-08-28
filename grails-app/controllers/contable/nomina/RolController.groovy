@@ -25,6 +25,7 @@ class RolController extends Shield {
             if(rol)
                 roles.add(rol)
         }
+        roles = roles.sort{it.empleado.apellido}
         [roles:roles,emp:params.empleado,mes:mes,tipos:tipos]
     }
 
@@ -104,6 +105,64 @@ class RolController extends Shield {
                             println "error save dt "+dt.errors
 
                     }
+                    def prestamo = Prestamo.withCriteria {
+                        eq("empleado",e)
+                        le("inicio",inicio)
+                        ge("fin",fin)
+                    }
+                    println "prestamo "+prestamo
+                    if(prestamo.size()>0){
+                        prestamo=prestamo.pop()
+                        def dt = new DetalleRol()
+                        dt.rol=rol
+                        dt.usuario=session.usuario.login
+                        dt.descripcion="Prestamo (${prestamo.monto})"
+                        dt.valor=prestamo.valorCuota.round(2)
+                        dt.signo=-1
+                        totalEgresos+=dt.valor
+                        if(!dt.save(flush: true))
+                            println "error save dt "+dt.errors
+                    }
+//                    def horasExtra = HorasExtra.findByEmpleadoAndMes(e)
+//                    println "horas extra "+horasExtra
+//                    if(horasExtra){
+//                        if(horasExtra.horas1x>0){
+//                            def dt = new DetalleRol()
+//                            dt.rol=rol
+//                            dt.usuario=session.usuario.login
+//                            dt.descripcion="Horas extra 100%: "
+//                            def formula=""
+//                            dt.valor=horasExtra.horas1x*(100)
+//                            dt.signo=1
+//                            totalIngresos+=dt.valor
+//                            if(!dt.save(flush: true))
+//                                println "error save dt "+dt.errors
+//                        }
+//                        if(horasExtra.horas15x>0){
+//                            def dt = new DetalleRol()
+//                            dt.rol=rol
+//                            dt.usuario=session.usuario.login
+//                            dt.descripcion="Horas extra 150%: "
+//                            dt.valor=horasExtra.horas15x*(100)
+//                            dt.signo=1
+//                            totalIngresos+=dt.valor
+//                            if(!dt.save(flush: true))
+//                                println "error save dt "+dt.errors
+//                        }
+//                        if(horasExtra.horas2x>0){
+//                            def dt = new DetalleRol()
+//                            dt.rol=rol
+//                            dt.usuario=session.usuario.login
+//                            dt.descripcion="Horas extra 200%: "
+//                            dt.valor=horasExtra.horas2x*(100)
+//                            dt.signo=1
+//                            totalIngresos+=dt.valor
+//                            if(!dt.save(flush: true))
+//                                println "error save dt "+dt.errors
+//                        }
+//
+//
+//                    }
                     rol.totalEgresos=totalEgresos
                     rol.totalIngresos=totalIngresos
                     rol.save(flush: true)
@@ -227,6 +286,8 @@ class RolController extends Shield {
 
 
     }
+
+
 
 //
 
