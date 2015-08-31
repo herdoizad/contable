@@ -84,7 +84,7 @@
         <div class="panel panel-info" style="border-color:#2F4050 ">
             <div class="panel-heading " style="background:  #2F4050;color: #ffffff">${c.nombre+" "+c.apellido}</div>
             <div class="panel-body">
-                <g:form action="saveCar_ajax" class="frmCar-${c.id}"  >
+                <g:form action="saveCar_ajax" class="frm frmCar-${c.id}"  >
                     <input type="hidden" name="id" value="${c.id}">
                     <input type="hidden" name="empleado.id" value="${empleado.id}">
                     <div class="row">
@@ -113,7 +113,7 @@
                             <label>Cédula</label>
                         </div>
                         <div class="col-md-2">
-                            <input type="text" name="cedula" value="${c.cedula}"  maxlength="10"  class=" form-control input-sm allCaps">
+                            <input type="text" name="cedula"  value="${c.cedula}"  maxlength="10"  class=" form-control input-sm allCaps">
                         </div>
                         <div class="col-md-1">
                             <label>F. Nacimiento</label>
@@ -200,7 +200,7 @@
                         <label>Cédula</label>
                     </div>
                     <div class="col-md-2">
-                        <input type="text" name="cedula"  maxlength="10"  class=" form-control input-sm allCaps">
+                        <input type="text" name="cedula" id="cedula"  maxlength="10"  class=" form-control input-sm allCaps">
                     </div>
                     <div class="col-md-1">
                         <label>F. Nacimiento</label>
@@ -264,8 +264,114 @@
 </div>
 </div>
 <script>
+    function check_cedula( valor ){
+        console.log(valor)
+        if(valor=="")
+            return false
+        var cedula = valor
+        array = cedula.split( "" );
+        num = array.length;
+        if ( num == 10 )
+        {
+            total = 0;
+            digito = (array[9]*1);
+            for( i=0; i < (num-1); i++ )
+            {
+                mult = 0;
+                if ( ( i%2 ) != 0 ) {
+                    total = total + ( array[i] * 1 );
+                }
+                else
+                {
+                    mult = array[i] * 2;
+                    if ( mult > 9 )
+                        total = total + ( mult - 9 );
+                    else
+                        total = total + mult;
+                }
+            }
+            decena = total / 10;
+            decena = Math.floor( decena );
+            decena = ( decena + 1 ) * 10;
+            final = ( decena - total );
+            if ( ( final == 10 && digito == 0 ) || ( final == digito ) ) {
+
+                return true;
+            }
+            else
+            {
+
+                return false;
+            }
+        }
+        else
+        {
+            return false;
+        }
+    }
+    var validator = $(".frm").validate({
+        errorClass     : "help-block",
+        errorPlacement : function (error, element) {
+            if (element.parent().hasClass("input-group")) {
+                error.insertAfter(element.parent());
+            } else {
+                error.insertAfter(element);
+            }
+            element.parents(".grupo").addClass('has-error');
+        },
+        success        : function (label) {
+            label.parents(".grupo").removeClass('has-error');
+            label.remove();
+        }
+
+        , rules          : {
+
+
+
+        },
+        messages : {
+
+
+        }
+
+    });
+    var validator = $(".frmCar").validate({
+        errorClass     : "help-block",
+        errorPlacement : function (error, element) {
+            if (element.parent().hasClass("input-group")) {
+                error.insertAfter(element.parent());
+            } else {
+                error.insertAfter(element);
+            }
+            element.parents(".grupo").addClass('has-error');
+        },
+        success        : function (label) {
+            label.parents(".grupo").removeClass('has-error');
+            label.remove();
+        }
+
+        , rules          : {
+
+
+
+        },
+        messages : {
+
+
+        }
+
+    });
     $("#save-car").click(function(){
-        $(".frmCar").submit()
+        if($("#cedula").val()!=""){
+            if(check_cedula($("#cedula").val())) {
+                $(".frmCar").submit()
+            }else{
+                bootbox.alert("Ingrese una cédula valida")
+            }
+        }else{
+            $(".frmCar").submit()
+        }
+
     })
     $(".save-car").click(function(){
         $(".frmCar-"+$(this).attr("iden")).submit()

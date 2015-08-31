@@ -106,7 +106,7 @@
                 <label>Cédula</label>
             </div>
             <div class="col-md-2">
-                <input type="text" name="cedula"  maxlength="10" value="${empleado?.cedula}" class="required form-control input-sm allCaps">
+                <input type="text" name="cedula" id="cedula" maxlength="10" value="${empleado?.cedula}" class="required form-control input-sm allCaps">
             </div>
             <div class="col-md-1">
                 <label>F. Nacimiento</label>
@@ -270,6 +270,50 @@
 </div>
 </div>
 <script>
+
+    function check_cedula( valor ){
+        var cedula = valor
+        array = cedula.split( "" );
+        num = array.length;
+        if ( num == 10 )
+        {
+            total = 0;
+            digito = (array[9]*1);
+            for( i=0; i < (num-1); i++ )
+            {
+                mult = 0;
+                if ( ( i%2 ) != 0 ) {
+                    total = total + ( array[i] * 1 );
+                }
+                else
+                {
+                    mult = array[i] * 2;
+                    if ( mult > 9 )
+                        total = total + ( mult - 9 );
+                    else
+                        total = total + mult;
+                }
+            }
+            decena = total / 10;
+            decena = Math.floor( decena );
+            decena = ( decena + 1 ) * 10;
+            final = ( decena - total );
+            if ( ( final == 10 && digito == 0 ) || ( final == digito ) ) {
+
+                return true;
+            }
+            else
+            {
+
+                return false;
+            }
+        }
+        else
+        {
+            return false;
+        }
+    }
+
     var validator = $(".frmEmpleado").validate({
         errorClass     : "help-block",
         errorPlacement : function (error, element) {
@@ -299,10 +343,15 @@
     $("#guardar").click(function(){
         var $form = $(".frmEmpleado");
         var $btn = $(this);
-        if ($form.valid()) {
-            $btn.replaceWith(spinner);
-            $form.submit()
+        if(check_cedula($("#cedula").val())){
+            if ($form.valid()) {
+                $btn.replaceWith(spinner);
+                $form.submit()
+            }
+        }else{
+            bootbox.alert("Ingrese una cédula valida")
         }
+
     })
     $("#verHist").click(function(){
         openLoader()

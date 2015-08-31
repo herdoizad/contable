@@ -113,7 +113,7 @@
                                 <div class="panel panel-info" style="border-color:#2F4050 ">
                                     <div class="panel-heading " style="background:  #2F4050;color: #ffffff">${c.numero}</div>
                                     <div class="panel-body">
-                                        <g:form action="saveCon_ajax" class="frmCon-${c.id}" enctype="multipart/form-data" >
+                                        <g:form action="saveCon_ajax" class="frm frmCon-${c.id}" enctype="multipart/form-data" >
                                             <input type="hidden" name="empleado.id" value="${empleado.id}">
                                             <input type="hidden" name="id" value="${c.id}">
                                             <div class="row">
@@ -228,6 +228,60 @@
     </div>
 </div>
 <script>
+
+    var validator = $(".frmCon").validate({
+        errorClass     : "help-block",
+        errorPlacement : function (error, element) {
+            if (element.parent().hasClass("input-group")) {
+                error.insertAfter(element.parent());
+            } else {
+                error.insertAfter(element);
+            }
+            element.parents(".grupo").addClass('has-error');
+        },
+        success        : function (label) {
+            label.parents(".grupo").removeClass('has-error');
+            label.remove();
+        }
+
+        , rules          : {
+
+
+
+        },
+        messages : {
+
+
+        }
+
+    });
+    var validator = $(".frm").validate({
+        errorClass     : "help-block",
+        errorPlacement : function (error, element) {
+            if (element.parent().hasClass("input-group")) {
+                error.insertAfter(element.parent());
+            } else {
+                error.insertAfter(element);
+            }
+            element.parents(".grupo").addClass('has-error');
+        },
+        success        : function (label) {
+            label.parents(".grupo").removeClass('has-error');
+            label.remove();
+        }
+
+        , rules          : {
+
+
+
+        },
+        messages : {
+
+
+        }
+
+    });
+
     function showPdf(div){
         $("#msgNoPDF").show();
         $("#doc").html("")
@@ -257,7 +311,32 @@
         $("#data").hide()
     })
     $("#btn-save-nuevo").click(function(){
-        $(".frmCon").submit()
+        var inicio =$("#inicio_input").val()
+        var fin = $("#fin_input").val()
+        var dateParts
+        if(inicio!="") {
+            dateParts = inicio.split("-");
+            inicio = new Date(dateParts[2], (dateParts[1] - 1), dateParts[0]);
+        }
+        if(fin!="") {
+            dateParts = fin.split("-");
+            fin = new Date(dateParts[2], (dateParts[1] - 1), dateParts[0]);
+        }
+        var msg =""
+        if(inicio=="" && fin!=""){
+            msg+="Ingrese una fecha de inicio <br/>"
+        }
+        if(fin!="" && inicio!=""){
+            if(inicio>fin)
+                msg+="La fecha fin debe ser mayor a la de inicio<br/>"
+        }
+        if(msg=="") {
+            $(".frmCon").submit()
+        }else{
+            bootbox.alert(msg)
+        }
+        return false
+
     })
     $(".btn-save").click(function(){
         $(".frmCon-"+$(this).attr("iden")).submit()
