@@ -91,7 +91,7 @@ class Empleado {
     }
 
     String toString(){
-        return "${this.nombre} ${this.apellido}"
+        return "${this.apellido} ${this.nombre}"
     }
 
 }

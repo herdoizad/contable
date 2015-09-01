@@ -28,8 +28,8 @@
                 <div class="col-md-1">
                     <label>Empleado</label>
                 </div>
-                <div class="col-md-2">
-                    <g:select name="empleado" id="empleado" from="${empleados}" value="${empleado?.id}" noSelection="['0':'TODOS']" class="form-control input-sm select" optionKey="id" />
+                <div class="col-md-4">
+                    <g:select name="empleado" id="empleado" from="${empleados}" value="${emp}" noSelection="['0':'TODOS']" class="form-control input-sm select" optionKey="id" />
                 </div>
             </div>
             <div class="row fila">

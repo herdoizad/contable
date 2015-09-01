@@ -7,10 +7,10 @@ class RolController extends Shield {
     def dataSource
     def mailService
     def index() {
-
         def meses = MesNomina.findAllByCodigoLessThanEquals((new Date().format("yyyy")+"13").toInteger(),[sort:"codigo"])
-        def empleados = Empleado.list([sort: 'nombre'])
-        [meses:meses,empleados:empleados]
+        def empleados = Empleado.findAllByEstado("A",[sort: 'apellido'])
+
+        [meses:meses,empleados:empleados,emp:params.empleado]
 
     }
 

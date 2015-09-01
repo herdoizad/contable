@@ -63,7 +63,7 @@
                             
                             <td><elm:textoBusqueda busca="${params.search}"><g:fieldValue bean="${unidadInstance}" field="jefe"/></elm:textoBusqueda></td>
                             
-                            <td><elm:textoBusqueda busca="${params.search}"><g:fieldValue bean="${unidadInstance}" field="padre"/></elm:textoBusqueda></td>
+                            <td><elm:textoBusqueda busca="${params.search}">${unidadInstance.padre?.nombre}</elm:textoBusqueda></td>
                             
                             <td><elm:textoBusqueda busca="${params.search}"><g:fieldValue bean="${unidadInstance}" field="codigo"/></elm:textoBusqueda></td>
                             

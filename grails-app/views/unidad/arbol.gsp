@@ -1,8 +1,8 @@
-<!DOCTYPE html>
+<%@ page contentType="text/html;charset=UTF-8" %>
 <html>
 <head>
     <meta name="layout" content="main">
-    <title>Plan de cuentas</title>
+    <title></title>
     <imp:js src="${resource(dir: 'js/plugins/jstree-3.0.9/dist', file: 'jstree.min.js')}"/>
     <imp:css src="${resource(dir: 'js/plugins/jstree-3.0.9/dist/themes/default', file: 'style.min.css')}"/>
     <imp:css src="${resource(dir: 'css/custom', file: 'jstree-context.css')}"/>
@@ -11,6 +11,9 @@
 
     <imp:js src="${resource(dir: 'js/plugins/bootstrap-select-1.6.3/dist/js', file: 'bootstrap-select.min.js')}"/>
     <imp:css src="${resource(dir: 'js/plugins/bootstrap-select-1.6.3/dist/css', file: 'bootstrap-select.min.css')}"/>
+    <link href="${g.resource(dir: 'css/custom/', file: 'pdfViewer.css')}" rel="stylesheet" type="text/css">
+    <imp:js src="${resource(dir: 'js/plugins/pdfObject', file: 'pdfobject.min.js')}"/>
+
     <style type="text/css">
 
 
@@ -24,17 +27,43 @@
     }
     </style>
 </head>
-<body>
 
+<body>
+<div class="pdf-viewer" style="width: 46%">
+    <div class="pdf-content" >
+        <div class="pdf-container" id="doc"></div>
+        <div class="pdf-handler" >
+            <i class="fa fa-arrow-right"></i>
+        </div>
+        <div class="pdf-header" id="data">
+            N. Referencia: <span id="referencia-pdf" class="data"></span>
+            Código: <span id="codigo" class="data"></span>
+            Tipo: <span id="tipo" class="data"></span>
+
+
+
+        </div>
+        <div id="msgNoPDF">
+            <p>No tiene configurado el plugin de lectura de PDF en este navegador.</p>
+
+            <p>
+                Puede
+                <a class="text-info" target="_blank" style="color: white" href="http://get.adobe.com/es/reader/">
+                    <u>descargar Adobe Reader aquí</u>
+                </a>
+            </p>
+        </div>
+    </div>
+</div>
 <elm:message tipo="${flash.tipo}" clase="${flash.clase}">${flash.message}</elm:message>
 <div class="row fila">
-    <div class="col-md-12">
-        <div class="panel-completo" style="margin-left: 10px">
+    <div class="col-md-6">
+        <div class="panel-completo" style="margin-left: 10px;min-height: 500px">
             <div class="row">
-                <div class="col-md-9 titulo-panel">
-                    Plan de cuentas
+                <div class="col-md-4 titulo-panel">
+                    Empleados
                 </div>
-                <div class="btn-group pull-right col-md-3 titulo-panel" style="margin-top: -11px">
+                <div class="btn-group pull-right col-md-8 titulo-panel" style="margin-top: -11px">
                     <div class="input-group">
                         <input type="text" id="searchArbol" class="form-control input-search input-sm" placeholder="Buscar" value="${params.search}">
                         <span class="input-group-btn">
@@ -55,10 +84,46 @@
             </div>
         </div>
     </div>
+    <div class="col-md-6">
+        <div class="panel-completo" style="margin-left: 10px;min-height: 500px">
+            <div class="row">
+                <div class="col-md-12 titulo-panel">
+                    Detalle
+                </div>
+            </div>
+            <div class="row fila">
+                <div class="col-md-12" id="detalle">
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 
 <script type="text/javascript">
+    function showPdf(div){
+        $("#msgNoPDF").show();
+        $("#doc").html("")
+        var pathFile = div.data("file")
+        $("#referencia-pdf").html(div.data("ref"))
+        $("#codigo").html(div.data("codigo"))
+        $("#tipo").html(div.data("tipo"))
+        var path = "${resource()}/" + pathFile;
+        var myPDF = new PDFObject({
+            url           : path,
+            pdfOpenParams : {
+                navpanes: 1,
+                statusbar: 0,
+                view: "FitW"
+            }
+        }).embed("doc");
+        $(".pdf-viewer").show("slide",{direction:'right'})
+        $("#data").show()
+    }
+    $(".pdf-handler").click(function(){
+        $(".pdf-viewer").hide("slide",{direction:'right'})
+        $("#data").hide()
+    })
     var searchRes = [];
     var posSearchShow = 0;
     var $treeContainer = $("#tree");
@@ -83,86 +148,49 @@
 
         var nodeStrId = node.id;
         var $node = $("#" + nodeStrId);
-        var movimiento = $node.hasClass("movimiento");
         var nodeId = nodeStrId.split("_")[1];
         var nodeType = $node.data("jstree").type;
-        var estado = $node.hasClass("A");
-        //console.log("estado",estado,$node);
-
         var nodeText = $node.children("a").first().text();
-        var esEditable = $node.hasClass("editable");
-        var cantHijos = parseInt($node.data("hijos"));
-        var esDoc = nodeType == "doc";
-        var verDetalles = {
-            label: "Ver Detalles",
-            icon: "fa fa-search",
-            action: function () {
-                openLoader()
-                $.ajax({
-                    type: "POST",
-                    url: "${createLink(controller:'cuentas', action:'verDetalles_ajax')}",
-                    data: {
-                        id: nodeStrId
-                    },
-                    success: function (msg) {
-                        closeLoader()
-                        var b = bootbox.dialog({
-                            id: "dlgDetalles",
-                            title: "Detalles de la cuenta",
-                            message: msg,
-                            buttons: {
-                                cerrar: {
-                                    label: "Cerrar",
-                                    className: "btn-primary",
-                                    callback: function () {
-
-                                    }
-                                }
-                            } //buttons
-                        }); //dialog
-                    } //success
-                }); //ajax
-                return false
-            }
-        };
-        var editar = {
+        var esDep = nodeType == "emp";
+        var esEmpleado = nodeType == "empleado";
+        var esCarga = nodeType == "carga";
+        var esContrato = nodeType == "contrato";
+        var esCap = nodeType == "capacitacion";
+        var emp = $node.attr("empleado")
+        var editarEmpleado = {
             label: "Editar",
             icon: "fa fa-pencil",
             action: function () {
                 openLoader()
-                $.ajax({
-                    type: "POST",
-                    url: "${createLink(controller:'cuentas', action:'form_ajax')}",
-                    data: {
-                        id: nodeStrId
-                    },
-                    success: function (msg) {
-                        closeLoader()
-                        var b = bootbox.dialog({
-                            id: "dlgDetalles",
-                            title: "Editar cuenta",
-                            message: msg,
-                            buttons: {
-                                cerrar: {
-                                    label: "Cerrar",
-                                    className: "btn-default",
-                                    callback: function () {
-
-                                    }
-                                },
-                                guardar: {
-                                    label: "Guardar",
-                                    className: "btn-success",
-                                    callback: function () {
-                                        openLoader()
-                                        $("#frmCuenta").submit()
-                                    }
-                                }
-                            } //buttons
-                        }); //dialog
-                    } //success
-                }); //ajax
-                return false
+                var id = nodeStrId.replace("e","")
+                location.href="${g.createLink(controller: 'empleado',action: 'nuevoEmpleado')}/"+id
+            }
+        };
+        var editarCarga = {
+            label: "Editar",
+            icon: "fa fa-pencil",
+            action: function () {
+                openLoader()
+                var id = nodeStrId.replace("ca","")
+                location.href="${g.createLink(controller: 'empleado',action: 'cargas')}/"+emp
+            }
+        };
+        var editarContrato = {
+            label: "Editar",
+            icon: "fa fa-pencil",
+            action: function () {
+                openLoader()
+                var id = nodeStrId.replace("co","")
+                location.href="${g.createLink(controller: 'empleado',action: 'contratos')}/"+emp
+            }
+        };
+        var editarCap = {
+            label: "Editar",
+            icon: "fa fa-pencil",
+            action: function () {
+                openLoader()
+                var id = nodeStrId.replace("cp","")
+                location.href="${g.createLink(controller: 'empleado',action: 'capacitacion')}/"+emp
             }
         };
         var hija = {
@@ -210,10 +238,14 @@
             }
         };
         var items = {};
-        items.verDetalles = verDetalles;
-        items.editar = editar;
-        if(!movimiento)
-            items.hija=hija
+        if(esCarga)
+        items.editar=editarCarga
+        if(esContrato)
+            items.editar=editarContrato
+        if(esEmpleado)
+            items.editar=editarEmpleado
+        if(esCap)
+            items.editar=editarCap
         return items;
     }
 
@@ -227,6 +259,25 @@
             var nodeId = selected.selected[0];
             var $node = $("#" + nodeId);
             var nodeType = $node.data("jstree").type;
+            if(nodeType!="pys" && nodeType!="cargas" && nodeType!="contratos" && nodeType!="capacitaciones"){
+                openLoader()
+                $.ajax({
+                    type: "POST",
+                    url: "${createLink(controller:'unidad', action:'detalle_ajax')}",
+                    data: {
+                        id: nodeId,
+                        tipo:nodeType
+                    },
+                    success: function (msg) {
+                        closeLoader()
+                        $("#detalle").html(msg)
+                        $("body").scrollTop(-10000)
+
+                    } //success
+                }); //ajax
+            }
+
+
 
 //                    $('#tree').jstree('toggle_node', selected.selected[0]);
         }).on('search.jstree', function (nodes, str, res) {
@@ -246,9 +297,18 @@
                     async : false,
                     url   : '${createLink(action:"loadTreePart_ajax")}',
                     data  : function (node) {
-                        return {
-                            id    : node.id
-                        };
+                        console.log(node)
+                        if(node.data){
+                            return {
+                                id    : node.id,
+                                tipo: node.data.jstree.type
+                            };
+                        }else{
+                            return {
+                                id    : node.id
+                            };
+                        }
+
                     }
                 }
             },
@@ -263,11 +323,15 @@
                     url     : "${createLink(action:'buscarCuenta')}",
                     success : function (msg) {
                         closeLoader()
+
                         var json = $.parseJSON(msg);
+
                         $.each(json, function (i, obj) {
                             $('#tree').jstree("open_node", obj);
+
                         });
                         setTimeout(function () {
+
                             searchRes = $(".jstree-search");
                             var cantRes = searchRes.length;
                             posSearchShow = 0;
@@ -280,23 +344,20 @@
                 }
             },
             types       : {
-                1 : {
+                dep : {
                     icon : "${resource(dir:'images/tree', file:'Building_16.png')}"
                 },
-                2      : {
-                    icon : "fa fa-credit-card"
+                empleado      : {
+                    icon : "fa fa-user"
                 },
-                3     : {
-                    icon : "fa fa-institution"
+                carga     : {
+                    icon : "fa fa-users"
                 },
-                4    : {
-                    icon : "fa fa-money"
+                capacitacion    : {
+                    icon : "fa fa-graduation-cap"
                 },
-                5    : {
-                    icon : "fa fa-shopping-cart"
-                },
-                6  : {
-                    icon : "fa fa-briefcase"
+                contrato    : {
+                    icon : "fa fa-file-pdf-o "
                 },
                 pys:{
                     icon : "${resource(dir:'images/favicons', file:'favicon-16x16.png')}"
