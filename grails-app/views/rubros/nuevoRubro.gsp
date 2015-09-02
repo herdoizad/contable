@@ -53,7 +53,7 @@
                 </div>
                 <div class="row fila">
                     <div class="col-md-2">
-                        <label>Signo</label>
+                        <label>Tipo</label>
                     </div>
                     <div class="col-md-3">
                         <input type="checkbox" class="chk" id="signo" name="signo_chk" value="1" checked>

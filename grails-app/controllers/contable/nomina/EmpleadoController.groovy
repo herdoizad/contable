@@ -362,4 +362,18 @@ class EmpleadoController extends Shield {
         [sueldos: sueldos,empleado: empleado]
     }
 
+    def desactivar_ajax(){
+        def emp = Empleado.get(params.id.replaceAll("e",""))
+        emp.estado="D"
+        emp.save(flush: true)
+        render "ok"
+    }
+
+    def activar_ajax(){
+        def emp = Empleado.get(params.id.replaceAll("e",""))
+        emp.estado="A"
+        emp.save(flush: true)
+        render "ok"
+    }
+
 }

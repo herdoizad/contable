@@ -25,6 +25,9 @@
         overflow-y : auto;
         height     : 440px;
     }
+    .inactivo{
+        color: red !important;
+    }
     </style>
 </head>
 
@@ -60,10 +63,13 @@
     <div class="col-md-6">
         <div class="panel-completo" style="margin-left: 10px;min-height: 500px">
             <div class="row">
-                <div class="col-md-4 titulo-panel">
+                <div class="col-md-2 titulo-panel">
                     Empleados
                 </div>
-                <div class="btn-group pull-right col-md-8 titulo-panel" style="margin-top: -11px">
+                <div class="col-md-4 titulo-panel" style="margin-top: -7px">
+                    <input type="checkbox" class="chk" id="mostrar" value="1">
+                </div>
+                <div class="btn-group pull-right col-md-6 titulo-panel" style="margin-top: -11px">
                     <div class="input-group">
                         <input type="text" id="searchArbol" class="form-control input-search input-sm" placeholder="Buscar" value="${params.search}">
                         <span class="input-group-btn">
@@ -146,17 +152,20 @@
 
     function createContextMenu(node) {
 
+
         var nodeStrId = node.id;
         var $node = $("#" + nodeStrId);
         var nodeId = nodeStrId.split("_")[1];
         var nodeType = $node.data("jstree").type;
         var nodeText = $node.children("a").first().text();
-        var esDep = nodeType == "emp";
+        var esDep = nodeType == "dep";
+        var esPys = nodeType == "pys";
         var esEmpleado = nodeType == "empleado";
         var esCarga = nodeType == "carga";
         var esContrato = nodeType == "contrato";
         var esCap = nodeType == "capacitacion";
         var emp = $node.attr("empleado")
+        var desactivado = $node.hasClass("inactivo")
         var editarEmpleado = {
             label: "Editar",
             icon: "fa fa-pencil",
@@ -193,14 +202,85 @@
                 location.href="${g.createLink(controller: 'empleado',action: 'capacitacion')}/"+emp
             }
         };
+        var borrar={
+            label: "Borrar",
+            icon: "fa fa-trash",
+            action: function () {
+                bootbox.confirm("Está seguro?",function(result){
+                    if(result){
+                        $.ajax({
+                            type: "POST",
+                            url: "${createLink(controller:'unidad', action:'delete_ajax')}",
+                            data: {
+                                id: nodeStrId
+                            },
+                            success: function (msg) {
+                                if(msg!="ok"){
+                                    bootbox.alert(msg)
+                                }else{
+                                    window.location.reload(true)
+                                }
+                            }});
+                    }
+                })
+            }
+        }
+        var desactivarEmp={
+            label: "Desactivar empleado",
+            icon: "fa fa-user-times",
+            action: function () {
+                bootbox.confirm("Está seguro?",function(result){
+                    if(result){
+                        $.ajax({
+                            type: "POST",
+                            url: "${createLink(controller:'empleado', action:'desactivar_ajax')}",
+                            data: {
+                                id: nodeStrId
+                            },
+                            success: function (msg) {
+                                if(msg!="ok"){
+                                    bootbox.alert(msg)
+                                }else{
+                                    window.location.reload(true)
+                                }
+                            }});
+                    }
+                })
+            }
+        }
+        var activarEmp={
+            label: "Activar empleado",
+            icon: "fa fa-user-plus",
+            action: function () {
+                bootbox.confirm("Está seguro?",function(result){
+                    if(result){
+                        $.ajax({
+                            type: "POST",
+                            url: "${createLink(controller:'empleado', action:'activar_ajax')}",
+                            data: {
+                                id: nodeStrId
+                            },
+                            success: function (msg) {
+                                if(msg!="ok"){
+                                    bootbox.alert(msg)
+                                }else{
+                                    window.location.reload(true)
+                                }
+                            }});
+                    }
+                })
+            }
+        }
         var hija = {
-            label: "Crear cuenta hija",
+
+            label: "Crear un departamento hijo",
             icon: "fa fa-level-down",
             action: function () {
+
                 openLoader()
                 $.ajax({
                     type: "POST",
-                    url: "${createLink(controller:'cuentas', action:'form_ajax')}",
+                    url: "${createLink(controller:'unidad', action:'form_ajax')}",
                     data: {
                         padre: nodeStrId
                     },
@@ -208,7 +288,7 @@
                         closeLoader()
                         var b = bootbox.dialog({
                             id: "dlgDetalles",
-                            title: "Agregar cuanta hija de: "+nodeStrId,
+                            title: "Agregar Unidad",
                             message: msg,
                             buttons: {
                                 cerrar: {
@@ -222,9 +302,55 @@
                                     label: "Guardar",
                                     className: "btn-success",
                                     callback: function () {
-                                        if($("#frmCuenta").valid()){
+                                        if($("#frmUnidad").valid()){
                                             openLoader()
-                                            $("#frmCuenta").submit()
+                                            $("#frmUnidad").submit()
+                                        }
+                                        return false
+
+                                    }
+                                }
+                            } //buttons
+                        }); //dialog
+                    } //success
+                }); //ajax
+                return false
+            }
+        };
+        var editarDep = {
+
+            label: "Editar",
+            icon: "fa fa-pencil",
+            action: function () {
+
+                openLoader()
+                $.ajax({
+                    type: "POST",
+                    url: "${createLink(controller:'unidad', action:'form_ajax')}",
+                    data: {
+                        id: nodeStrId
+                    },
+                    success: function (msg) {
+                        closeLoader()
+                        var b = bootbox.dialog({
+                            id: "dlgDetalles",
+                            title: "Editar Unidad",
+                            message: msg,
+                            buttons: {
+                                cerrar: {
+                                    label: "Cerrar",
+                                    className: "btn-default",
+                                    callback: function () {
+
+                                    }
+                                },
+                                guardar: {
+                                    label: "Guardar",
+                                    className: "btn-success",
+                                    callback: function () {
+                                        if($("#frmUnidad").valid()){
+                                            openLoader()
+                                            $("#frmUnidad").submit()
                                         }
                                         return false
 
@@ -239,28 +365,78 @@
         };
         var items = {};
         if(esCarga)
-        items.editar=editarCarga
+            items.editar=editarCarga
         if(esContrato)
             items.editar=editarContrato
-        if(esEmpleado)
-            items.editar=editarEmpleado
+        if(esEmpleado) {
+            items.editar = editarEmpleado
+            if(!desactivado)
+                items.desactivarEmp=desactivarEmp
+            else
+                items.desactivarEmp=activarEmp
+        }
         if(esCap)
             items.editar=editarCap
+        if(esDep || esPys){
+            items.crear=hija
+            items.editarDep=editarDep
+        }
+        if(esDep){
+            items.borrar=borrar
+        }
         return items;
     }
 
     $(function () {
-
+        $(".chk").bootstrapSwitch({
+            size:'mini',
+            onText:"Activos",
+            offText:"Inactivos",
+            offColor:"primary",
+            state:${params.state=="0"?'false':'true'},
+            onSwitchChange:function(){
+                if($(".chk").bootstrapSwitch("state")){
+                    location.href="${g.createLink(action: 'arbol',params: ['state':1])}"
+                }else{
+                    location.href="${g.createLink(action: 'arbol',params: ['state':0])}"
+                }
+            }
+        });
         $('.select').selectpicker();
         $treeContainer.on("loaded.jstree", function () {
             $("#loading").hide();
             $treeContainer.removeClass("hidden");
+        }).on('move_node.jstree', function (e, data) {
+            if(data.node.type=="empleado"){
+                $.get('?operation=move_node', { 'id' : data.node.id, 'parent' : data.parent })
+                        .done(function (d) {
+                            //data.instance.load_node(data.parent);
+                            $.ajax({
+                                type: "POST",
+                                url: "${createLink(controller:'unidad', action:'cambiaDep_ajax')}",
+                                data: {
+                                    id: data.node.id,
+                                    padre:data.parent
+                                },
+                                success: function (msg) {
+                                    data.instance.refresh();
+                                } //success
+                            }); //ajax
+
+                        })
+                        .fail(function () {
+                            data.instance.refresh();
+                        });
+            }else{
+                data.instance.refresh();
+            }
+
         }).on("select_node.jstree", function (node, selected, event) {
             var nodeId = selected.selected[0];
             var $node = $("#" + nodeId);
             var nodeType = $node.data("jstree").type;
             if(nodeType!="pys" && nodeType!="cargas" && nodeType!="contratos" && nodeType!="capacitaciones"){
-                openLoader()
+//                openLoader()
                 $.ajax({
                     type: "POST",
                     url: "${createLink(controller:'unidad', action:'detalle_ajax')}",
@@ -269,9 +445,9 @@
                         tipo:nodeType
                     },
                     success: function (msg) {
-                        closeLoader()
+//                        closeLoader()
                         $("#detalle").html(msg)
-                        $("body").scrollTop(-10000)
+
 
                     } //success
                 }); //ajax
@@ -289,7 +465,7 @@
             $("#spanSearchRes").text("Resultado " + (posSearchShow + 1) + " de " + cantRes);
             scrollToSearchRes();
         }).jstree({
-            plugins     : ["types", "contextmenu", "search"],
+            plugins     : ["types", "contextmenu", "search","dnd"],
             core        : {
                 multiple       : false,
                 check_callback : true,
@@ -297,15 +473,19 @@
                     async : false,
                     url   : '${createLink(action:"loadTreePart_ajax")}',
                     data  : function (node) {
-                        console.log(node)
+                        var state=1
+                        if(!$(".chk").bootstrapSwitch("state"))
+                            state=0
                         if(node.data){
                             return {
                                 id    : node.id,
-                                tipo: node.data.jstree.type
+                                tipo: node.data.jstree.type,
+                                state:state
                             };
                         }else{
                             return {
-                                id    : node.id
+                                id    : node.id,
+                                state:state
                             };
                         }
 
@@ -320,7 +500,7 @@
                 fuzzy             : false,
                 show_only_matches : false,
                 ajax              : {
-                    url     : "${createLink(action:'buscarCuenta')}",
+                    url     : "${createLink(action:'buscar_ajax')}",
                     success : function (msg) {
                         closeLoader()
 
@@ -419,6 +599,13 @@
             $("#divSearchRes").addClass("hidden");
             $("#spanSearchRes").text("");
         });
+
+        setTimeout(function(){
+            $treeContainer.jstree("select_node", "#" + 1);
+            $treeContainer.jstree("open_node", $("#" + 1));
+        },700)
+
+
 
     });
 </script>

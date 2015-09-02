@@ -28,6 +28,9 @@ class PrevisionGastosController extends Shield {
         params = params.clone()
         params.max = params.max ? Math.min(params.max.toInteger(), 100) : 10
         params.offset = params.offset ?: 0
+        def empleado=null
+        if(params.empleado)
+            empleado =   Empleado.get(params.empleado)
         if (all) {
             params.remove("max")
             params.remove("offset")
@@ -42,7 +45,10 @@ class PrevisionGastosController extends Shield {
                 }
             }
         } else {
-            list = PrevisionGastos.list(params)
+            if(empleado)
+                list=PrevisionGastos.findAllByEmpleado(empleado)
+            else
+                list = PrevisionGastos.list(params)
         }
         if (!all && params.offset.toInteger() > 0 && list.size() == 0) {
             params.offset = params.offset.toInteger() - 1
@@ -57,7 +63,10 @@ class PrevisionGastosController extends Shield {
     def list() {
         def previsionGastosInstanceList = getList(params, false)
         def previsionGastosInstanceCount = getList(params, true).size()
-        return [previsionGastosInstanceList: previsionGastosInstanceList, previsionGastosInstanceCount: previsionGastosInstanceCount]
+        def empleado=null
+        if(params.empleado)
+            empleado =   Empleado.get(params.empleado)
+        return [previsionGastosInstanceList: previsionGastosInstanceList, previsionGastosInstanceCount: previsionGastosInstanceCount,empleado:empleado]
     }
 
     /**
@@ -89,7 +98,11 @@ class PrevisionGastosController extends Shield {
             }
         }
         previsionGastosInstance.properties = params
-        return [previsionGastosInstance: previsionGastosInstance]
+        def empleado = null
+        if(params.empleado && params.empleado!=""){
+            empleado=Empleado.get(params.empleado)
+        }
+        return [previsionGastosInstance: previsionGastosInstance,empleado: empleado]
     } //form para cargar con ajax en un dialog
 
     /**

@@ -4,35 +4,26 @@
 <html>
     <head>
         <meta name="layout" content="main">
-        <title>Lista de Prestamo</title>
+        <title>Lista de Prestamos</title>
     </head>
     <body>
 
         <elm:message tipo="${flash.tipo}" clase="${flash.clase}">${flash.message}</elm:message>
 
     <div class="row fila">
-        <div class="col-md-12">
+        <div class="col-md-11">
             <div class="panel-completo" style="margin-left: 10px">
                 <div class="row">
                     <div class="col-md-8 titulo-panel">
-                        Prestamo
+                        ${empleado?'Prestamos del empleado: '+empleado:'Prestamos'}
+
                     </div>
-                    <div class="col-md-4 titulo-panel" style="margin-top: -11px">
-                        <div class="col-md-4">
+                    <div class="col-md-4 titulo-panel" style="margin-top: -11px;text-align: right">
+
                             <a href="#" class="btn btn-verde btnCrear btn-sm">
                                 <i class="fa fa-file-o"></i> Crear
                             </a>
-                        </div>
-                        <div class="btn-group pull-right col-md-8">
-                            <div class="input-group">
-                                <input type="text" class="form-control input-sm input-search" placeholder="Buscar" value="${params.search}">
-                                <span class="input-group-btn">
-                                    <g:link controller="prestamo" action="list" class="btn btn-default btn-search btn-sm">
-                                        <i class="fa fa-search"></i>&nbsp;
-                                    </g:link>
-                                </span>
-                            </div><!-- /input-group -->
-                        </div>
+
                     </div>
                 </div>
                 <div class="row fila">
@@ -45,34 +36,24 @@
                     <th>Empleado</th>
                     
                     <g:sortableColumn property="fin" title="Fin" />
-                    
                     <g:sortableColumn property="inicio" title="Inicio" />
-                    
-                    <g:sortableColumn property="interes" title="Interes" />
-                    
                     <g:sortableColumn property="monto" title="Monto" />
-                    
                     <g:sortableColumn property="plazo" title="Plazo" />
-                    
+                    <g:sortableColumn property="plazo" title="Cuota" />
+
                 </tr>
             </thead>
             <tbody>
                 <g:if test="${prestamoInstanceCount > 0}">
                     <g:each in="${prestamoInstanceList}" status="i" var="prestamoInstance">
                         <tr data-id="${prestamoInstance.id}">
-                            
                             <td>${prestamoInstance.empleado}</td>
-                            
-                            <td><g:formatDate date="${prestamoInstance.fin}" format="dd-MM-yyyy" /></td>
-                            
-                            <td><g:formatDate date="${prestamoInstance.inicio}" format="dd-MM-yyyy" /></td>
-                            
-                            <td><g:fieldValue bean="${prestamoInstance}" field="interes"/></td>
-                            
-                            <td><g:fieldValue bean="${prestamoInstance}" field="monto"/></td>
-                            
-                            <td><g:fieldValue bean="${prestamoInstance}" field="plazo"/></td>
-                            
+                            <td style="text-align: center"><g:formatDate date="${prestamoInstance.inicio}" format="dd-MM-yyyy" /></td>
+                            <td style="text-align: center"><g:formatDate date="${prestamoInstance.fin}" format="dd-MM-yyyy" /></td>
+                            <td style="text-align: right"><g:formatNumber number="${prestamoInstance.monto}" type="currency" currencySymbol=""/></td>
+                            <td style="text-align: right"><g:fieldValue bean="${prestamoInstance}" field="plazo"/></td>
+                            <td style="text-align: right"><g:formatNumber number="${prestamoInstance.valorCuota}" type="currency" currencySymbol=""/></td>
+
                         </tr>
                     </g:each>
                 </g:if>
@@ -179,7 +160,7 @@
             }
             function createEditPrestamo(id) {
                 var title = id ? "Editar" : "Crear";
-                var data = id ? { id: id } : {};
+                var data = id ? { id: id ,empleado:${empleado?.id}} : {empleado:${empleado?.id}};
                 $.ajax({
                     type    : "POST",
                     url     : "${createLink(controller:'prestamo', action:'form_ajax')}",

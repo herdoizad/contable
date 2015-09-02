@@ -39,6 +39,7 @@ class UnidadController extends Shield {
     }
 
     private String imprimeHijos(params) {
+        println "params arbol "+params
         def txt = ""
 
         def hijos
@@ -69,12 +70,16 @@ class UnidadController extends Shield {
                     txt += "</ul>"
                 }
 
-                def emps = Empleado.findAllByUnidadAndEstado(unidad,"A",[sort:"apellido"])
+                def emps
+                if(!params.state || params.state=="1")
+                    emps= Empleado.findAllByUnidadAndEstado(unidad,"A",[sort:"apellido"])
+                else
+                    emps= Empleado.findAllByUnidadAndEstadoNotEqual(unidad,"A",[sort:"apellido"])
                 if(emps.size()>0){
                     txt += "<ul>"
                 }
                 emps.each {e->
-                    txt += "<li class='hasChildren jstree-closed emp' id='e${e.id}' data-jstree='{\"type\":\"empleado\"}'>"
+                    txt += "<li class='hasChildren jstree-closed emp ${e.estado=='A'?'':'inactivo'}  ' id='e${e.id}' data-jstree='{\"type\":\"empleado\"}'>"
                     txt += "<a href='#' ><span style='color:#006EB7;font-weight: bold'>"
                     txt += e.apellido + " "+e.nombre
                     txt += "</span></a>"
@@ -280,7 +285,11 @@ class UnidadController extends Shield {
             }
         }
         unidadInstance.properties = params
-        return [unidadInstance: unidadInstance]
+        def padre = null
+        if(params.padre){
+            padre=Unidad.get(params.padre)
+        }
+        return [unidadInstance: unidadInstance,padre:padre]
     } //form para cargar con ajax en un dialog
 
     /**
@@ -300,8 +309,7 @@ class UnidadController extends Shield {
             render "ERROR*Ha ocurrido un error al guardar Unidad: " + renderErrors(bean: unidadInstance)
             return
         }
-        render "SUCCESS*${params.id ? 'Actualización' : 'Creación'} de Unidad exitosa."
-        return
+        redirect(action: 'arbol')
     } //save para grabar desde ajax
 
     /**
@@ -316,14 +324,14 @@ class UnidadController extends Shield {
             }
             try {
                 unidadInstance.delete(flush: true)
-                render "SUCCESS*Eliminación de Unidad exitosa."
+                render "ok"
                 return
             } catch (DataIntegrityViolationException e) {
-                render "ERROR*Ha ocurrido un error al eliminar Unidad"
+                render "Ha ocurrido un error al eliminar Unidad"
                 return
             }
         } else {
-            render "ERROR*No se encontró Unidad."
+            render "No se encontró Unidad."
             return
         }
     } //delete para eliminar via ajax
@@ -347,6 +355,51 @@ class UnidadController extends Shield {
             render Unidad.countByCodigoIlike(params.codigo) == 0
             return
         }
+    }
+
+    def cambiaDep_ajax(){
+        def emp = Empleado.get(params.id.replaceAll("e",""))
+        def dep = Unidad.get(params.padre)
+        emp.unidad=dep
+        emp.save(flush: true)
+        render "ok"
+    }
+
+    def buscar_ajax(){
+        println "search "+params
+        def empleados = Empleado.withCriteria {
+            or{
+                ilike("nombre","%"+params.str+"%")
+                ilike("apellido","%"+params.str+"%")
+                ilike("cedula","%"+params.str+"%")
+            }
+        }
+        // println "cuentas "+cuentas
+        def res = []
+        empleados.each {c->
+            //println "cuenta "+c
+            def u = c.unidad
+            if (!res.contains(c.unidad.id))
+                res.add(u.id)
+            while (u.padre!=null){
+                u=u.padre
+                if (!res.contains(u.id))
+                    res.add(u.id)
+
+            }
+        }
+        res=res.sort()
+        def str ='["0"'
+        if(res.size()>0)
+            str+=","
+        res.eachWithIndex {r,i->
+            str+='"'+r+'"'
+            if(i<res.size()-1)
+                str+=","
+        }
+        str+="]"
+        println str
+        render str
     }
 
 }

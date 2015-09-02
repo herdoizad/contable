@@ -11,19 +11,26 @@
             role="form" controller="unidad" action="save_ajax" method="POST">
 
         
-        <elm:fieldRapido claseLabel="col-sm-2" label="Nombre" claseField="col-sm-6">
+        <elm:fieldRapido claseLabel="col-sm-2" label="Nombre" claseField="col-sm-10">
             <g:textField name="nombre" maxlength="100" required="" class="form-control  required" value="${unidadInstance?.nombre}"/>
         </elm:fieldRapido>
         
         <elm:fieldRapido claseLabel="col-sm-2" label="Jefe" claseField="col-sm-6">
-            <g:select id="jefe" name="jefe.id" from="${contable.nomina.Empleado.list()}" optionKey="id" value="${unidadInstance?.jefe?.id}" class="many-to-one form-control " noSelection="['null': '']"/>
+            <g:select id="jefe" name="jefe.id" from="${contable.nomina.Empleado.findAllByEstado('A',[sort: 'apellido'])}" optionKey="id" value="${unidadInstance?.jefe?.id}" class="many-to-one form-control " noSelection="['null': '']"/>
         </elm:fieldRapido>
         
         <elm:fieldRapido claseLabel="col-sm-2" label="Padre" claseField="col-sm-6">
-            <g:select id="padre" name="padre.id" from="${contable.nomina.Unidad.list()}" optionKey="id" value="${unidadInstance?.padre?.id}" class="many-to-one form-control " noSelection="['null': '']"/>
+            <g:if test="${padre}">
+                <input type="hidden" name="padre.id" value="${padre.id}">
+                <input type="text" class="form-control" value="${padre.nombre}" disabled>
+            </g:if>
+            <g:else>
+                <g:select id="padre" name="padre.id" from="${contable.nomina.Unidad.list([sort: 'nombre'])}"  optionValue="nombre" optionKey="id" value="${unidadInstance?.padre?.id}" class="many-to-one form-control " noSelection="['null': '']"/>
+            </g:else>
+
         </elm:fieldRapido>
         
-        <elm:fieldRapido claseLabel="col-sm-2" label="Codigo" claseField="col-sm-6">
+        <elm:fieldRapido claseLabel="col-sm-2" label="Codigo" claseField="col-sm-2">
             <g:textField name="codigo" maxlength="5" required="" class="form-control  required unique noEspacios" value="${unidadInstance?.codigo}"/>
         </elm:fieldRapido>
         
@@ -79,6 +86,7 @@
             }
             return true;
         });
+
     </script>
 
 </g:else>

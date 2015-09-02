@@ -9,7 +9,8 @@ class DetalleRol {
     Date registro = new Date()
     String usuario
     Date modificacion
-
+    Rubro rubro
+    String codigo
     static auditable = [ignore: []]
     /**
      * Define el mapeo entre los campos del dominio y las columnas de la base de datos
@@ -29,13 +30,17 @@ class DetalleRol {
             registro column:'FECHA_REGISTRO'
             usuario column:'USUARIO_CREA'
             modificacion column:'FECHA_MODIFICACION'
+            rubro column: 'RUBRO_ID'
+            codigo column: 'CODIGO'
         }
     }
 
     static constraints = {
         descripcion(size: 1..150)
         usuario(size: 1..15)
+        codigo(size: 1..5,nullable: true)
         modificacion(nullable: true)
+        rubro(nullable: true)
 
     }
 }

@@ -110,6 +110,16 @@
             <i class="fa fa-print"></i> Rol de pagos
         </g:link>
     </div>
+    <div class="col-md-2">
+        <g:link controller="prestamo" action="index" params="${['empleado':empleado.id]}" class="btn btn-verde btn-sm">
+            <i class="fa fa-money"></i> Prestamos
+        </g:link>
+    </div>
+    <div class="col-md-3">
+        <g:link controller="previsionGastos" action="index" params="${['empleado':empleado.id]}" class="btn btn-verde btn-sm">
+            <i class="fa fa-usd"></i> Impuesto a la renta
+        </g:link>
+    </div>
 </div>
 <script>
 

@@ -11,28 +11,19 @@
         <elm:message tipo="${flash.tipo}" clase="${flash.clase}">${flash.message}</elm:message>
 
     <div class="row fila">
-        <div class="col-md-12">
+        <div class="col-md-11">
             <div class="panel-completo" style="margin-left: 10px">
                 <div class="row">
                     <div class="col-md-8 titulo-panel">
-                        Prevision Gastos
+                        ${empleado?'Previsión del empleado: '+empleado:'Previsiones'}
+
                     </div>
-                    <div class="col-md-4 titulo-panel" style="margin-top: -11px">
-                        <div class="col-md-4">
-                            <a href="#" class="btn btn-verde btnCrear btn-sm">
-                                <i class="fa fa-file-o"></i> Crear
-                            </a>
-                        </div>
-                        <div class="btn-group pull-right col-md-8">
-                            <div class="input-group">
-                                <input type="text" class="form-control input-sm input-search" placeholder="Buscar" value="${params.search}">
-                                <span class="input-group-btn">
-                                    <g:link controller="previsionGastos" action="list" class="btn btn-default btn-search btn-sm">
-                                        <i class="fa fa-search"></i>&nbsp;
-                                    </g:link>
-                                </span>
-                            </div><!-- /input-group -->
-                        </div>
+                    <div class="col-md-4 titulo-panel" style="margin-top: -11px;text-align: right">
+
+                        <a href="#" class="btn btn-verde btnCrear btn-sm">
+                            <i class="fa fa-file-o"></i> Crear
+                        </a>
+
                     </div>
                 </div>
                 <div class="row fila">
@@ -60,17 +51,25 @@
                     <g:each in="${previsionGastosInstanceList}" status="i" var="previsionGastosInstance">
                         <tr data-id="${previsionGastosInstance.id}">
                             
-                            <td>${previsionGastosInstance.anio}</td>
+                            <td style="text-align: center">${previsionGastosInstance.anio}</td>
                             
                             <td><elm:textoBusqueda busca="${params.search}"><g:fieldValue bean="${previsionGastosInstance}" field="empleado"/></elm:textoBusqueda></td>
                             
-                            <td><g:fieldValue bean="${previsionGastosInstance}" field="totalAlimentacion"/></td>
+                            <td style="text-align: right">
+                                <g:formatNumber number="${previsionGastosInstance.totalAlimentacion}" type="currency" currencySymbol=""/>
+                            </td>
                             
-                            <td><g:fieldValue bean="${previsionGastosInstance}" field="totalEducacion"/></td>
+                            <td style="text-align: right">
+                                <g:formatNumber number="${previsionGastosInstance.totalEducacion}" type="currency" currencySymbol=""/>
+                            </td>
                             
-                            <td><g:fieldValue bean="${previsionGastosInstance}" field="totalSalud"/></td>
+                            <td style="text-align: right">
+                                <g:formatNumber number="${previsionGastosInstance.totalSalud}" type="currency" currencySymbol=""/>
+                            </td>
                             
-                            <td><g:fieldValue bean="${previsionGastosInstance}" field="totalVestimenta"/></td>
+                            <td style="text-align: right">
+                                <g:formatNumber number="${previsionGastosInstance.totalVestimenta}" type="currency" currencySymbol=""/>
+                            </td>
                             
                         </tr>
                     </g:each>
@@ -178,7 +177,7 @@
             }
             function createEditPrevisionGastos(id) {
                 var title = id ? "Editar" : "Crear";
-                var data = id ? { id: id } : {};
+                var data = id ? { id: id ,empleado:${empleado?.id}} : {empleado:${empleado?.id}};
                 $.ajax({
                     type    : "POST",
                     url     : "${createLink(controller:'previsionGastos', action:'form_ajax')}",

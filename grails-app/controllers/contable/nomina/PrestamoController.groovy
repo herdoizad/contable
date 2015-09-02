@@ -28,6 +28,9 @@ class PrestamoController extends Shield {
         params = params.clone()
         params.max = params.max ? Math.min(params.max.toInteger(), 100) : 10
         params.offset = params.offset ?: 0
+        def empleado=null
+        if(params.empleado)
+            empleado =   Empleado.get(params.empleado)
         if (all) {
             params.remove("max")
             params.remove("offset")
@@ -42,7 +45,10 @@ class PrestamoController extends Shield {
                 }
             }
         } else {
-            list = Prestamo.list(params)
+            if(empleado)
+                list=Prestamo.findAllByEmpleado(empleado)
+            else
+                list = Prestamo.list(params)
         }
         if (!all && params.offset.toInteger() > 0 && list.size() == 0) {
             params.offset = params.offset.toInteger() - 1
@@ -57,7 +63,10 @@ class PrestamoController extends Shield {
     def list() {
         def prestamoInstanceList = getList(params, false)
         def prestamoInstanceCount = getList(params, true).size()
-        return [prestamoInstanceList: prestamoInstanceList, prestamoInstanceCount: prestamoInstanceCount]
+        def empleado=null
+        if(params.empleado)
+            empleado =   Empleado.get(params.empleado)
+        return [prestamoInstanceList: prestamoInstanceList, prestamoInstanceCount: prestamoInstanceCount,empleado:empleado]
     }
 
     /**
@@ -80,6 +89,7 @@ class PrestamoController extends Shield {
      * Acción llamada con ajax que muestra un formaulario para crear o modificar un elemento
      */
     def form_ajax() {
+        println "params "+params
         def prestamoInstance = new Prestamo()
         if (params.id) {
             prestamoInstance = Prestamo.get(params.id)
@@ -89,7 +99,11 @@ class PrestamoController extends Shield {
             }
         }
         prestamoInstance.properties = params
-        return [prestamoInstance: prestamoInstance]
+        def empleado = null
+        if(params.empleado && params.empleado!=""){
+            empleado=Empleado.get(params.empleado)
+        }
+        return [prestamoInstance: prestamoInstance,empleado: empleado]
     } //form para cargar con ajax en un dialog
 
     /**
