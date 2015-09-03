@@ -5,9 +5,11 @@
         <div class="col-md-4">
             <label>No existen roles de pagos para el periodo seleccionado</label>
         </div>
-        <div class="col-md-2">
-            <a href="#" class="btn btn-verde btn-sm" id="generar"><i class="fa fa-copy"></i> Generar rol de pagos</a>
-        </div>
+        <g:if test="${new java.util.Date()>new Date().parse('yyyyMMdd',''+mes.codigo+'01')}">
+            <div class="col-md-2">
+                <a href="#" class="btn btn-verde btn-sm" id="generar"><i class="fa fa-copy"></i> Generar rol de pagos</a>
+            </div>
+        </g:if>
     </div>
 </g:if>
 <g:else>
@@ -27,6 +29,13 @@
                 <i class="fa fa-print"></i> Imprimir
             </a>
         </div>
+        <g:if test="${roles.size()<max}">
+            <g:if test="${new java.util.Date()>new Date().parse('yyyyMMdd',''+mes.codigo+'01')}">
+                <div class="col-md-2">
+                    <a href="#" class="btn btn-verde btn-sm" id="generar"><i class="fa fa-copy"></i> Generar rol de pagos</a>
+                </div>
+            </g:if>
+        </g:if>
     </div>
 </g:else>
 
@@ -69,7 +78,7 @@
                     </tr>
                 </g:if>
                 <g:set var="total" value="${0}"></g:set>
-                <g:each in="${contable.nomina.DetalleRol.findAllByRol(r,[sort:'signo'])}" var="d">
+                <g:each in="${contable.nomina.DetalleRol.findAllByRol(r,[sort:'signo',order:'desc'])}" var="d">
                     <tr>
                         <g:set var="total" value="${total+(d.signo*d.valor)}"></g:set>
                         <td>
@@ -135,7 +144,7 @@
     }
 
     $(".print").click(function(){
-      location.href="${g.createLink(controller: 'reporteRol',action: 'reporteRol')}/"+$(this).attr("rol")
+        location.href="${g.createLink(controller: 'reporteRol',action: 'reporteRol')}/"+$(this).attr("rol")
     })
     $("#generar").click(function(){
         var div = $($("#activo").val())

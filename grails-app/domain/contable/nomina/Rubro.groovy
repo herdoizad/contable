@@ -9,6 +9,7 @@ class Rubro {
     Double valor
     Integer signo
     Cuenta cuenta
+    String codigo
     static auditable = [ignore: []]
 
     /**
@@ -27,13 +28,16 @@ class Rubro {
             valor column:'VALOR'
             signo column:'SIGNO'
             cuenta column: 'CTA_CUENTA'
+            codigo column: 'CODIGO'
         }
     }
 
     static constraints = {
         nombre(size: 1..50)
         formula(nullable: true,size: 1..150)
+        codigo(nullable: true,size: 1..5)
         valor(nullable: true)
         cuenta(nullable: true)
+
     }
 }

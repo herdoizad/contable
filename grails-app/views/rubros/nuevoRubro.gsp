@@ -69,6 +69,14 @@
                                   id="cuenta"  class="form-control input-sm select " noSelection="['':'']" ></g:select>
                     </div>
                 </div>
+                <div class="row fila">
+                    <div class="col-md-2">
+                        <label>Código</label>
+                    </div>
+                    <div class="col-md-3">
+                        <input type="text" id="codigo" maxlength="5" class="form-control input-sm  " name="codigo" value="${rubro?.codigo}">
+                    </div>
+                </div>
             </g:form>
             <div class="row fila">
                 <div class="col-md-2">

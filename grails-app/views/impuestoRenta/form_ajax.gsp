@@ -15,9 +15,7 @@
             <g:textField name="anio" value="${impuestoRentaInstance.anio}" class="digits form-control  required" required=""/>
         </elm:fieldRapido>
         
-        <elm:fieldRapido claseLabel="col-sm-2" label="Base" claseField="col-sm-2">
-            <g:textField name="base" value="${fieldValue(bean: impuestoRentaInstance, field: 'base')}" class="number form-control   required" required=""/>
-        </elm:fieldRapido>
+
         
         <elm:fieldRapido claseLabel="col-sm-2" label="Desde" claseField="col-sm-2">
             <g:textField name="desde" value="${fieldValue(bean: impuestoRentaInstance, field: 'desde')}" class="number form-control   required" required=""/>
@@ -26,7 +24,9 @@
         <elm:fieldRapido claseLabel="col-sm-2" label="Hasta" claseField="col-sm-2">
             <g:textField name="hasta" value="${fieldValue(bean: impuestoRentaInstance, field: 'hasta')}" class="number form-control   required" required=""/>
         </elm:fieldRapido>
-        
+        <elm:fieldRapido claseLabel="col-sm-2" label="Base" claseField="col-sm-2">
+            <g:textField name="base" value="${fieldValue(bean: impuestoRentaInstance, field: 'base')}" class="number form-control   required" required=""/>
+        </elm:fieldRapido>
         <elm:fieldRapido claseLabel="col-sm-2" label="Impuesto" claseField="col-sm-2">
             <g:textField name="impuesto" value="${fieldValue(bean: impuestoRentaInstance, field: 'impuesto')}" class="number form-control   required" required=""/>
         </elm:fieldRapido>

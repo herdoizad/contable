@@ -16,7 +16,7 @@
 </head>
 <body>
 <elm:message tipo="${flash.tipo}" clase="${flash.clase}">${flash.message}</elm:message>
-<div class="row">
+<div class="row fila">
     <div class="col-md-12">
         <div class="panel-completo" style="margin-left: 10px">
             <div class="row">

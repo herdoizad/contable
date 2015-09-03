@@ -37,6 +37,7 @@
                         <thead>
                         <tr>
                             <th>Nombre</th>
+                            <th>Código</th>
                             <th>Tipo</th>
                             <th>Valor</th>
                             <th>Fórmula</th>
@@ -47,6 +48,7 @@
                             <g:each in="${rubros}" status="i" var="r">
                                 <tr data-id="${r.id}">
                                     <td>${r.nombre}</td>
+                                    <td>${r.codigo}</td>
                                     <td style="text-align: center">${r.signo==1?'Ingreso':'Egreso'}</td>
                                     <td style="text-align: right"><g:formatNumber number="${r.valor}" currencySymbol="" type="currency"/></td>
                                     <td>${r.formula}</td>

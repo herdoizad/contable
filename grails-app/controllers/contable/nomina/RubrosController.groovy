@@ -16,7 +16,7 @@ class RubrosController extends Shield {
     def rubros(){
         def rubros = getList(params, false)
         def count = getList(params, true).size()
-        return [rubros: rubros, count: count]
+        return [rubros: rubros, count: count,params:["max":30]]
     }
 
     def getEmpleados_ajax(){
@@ -52,11 +52,19 @@ class RubrosController extends Shield {
 
     def ejecutar_ajax(Variable varaible,Empleado empleado,MesNomina mes){
         def sql = varaible.sql
-        def res = null
+        def res = 0
+        def inicio = new Date().parse("yyyyMMdd",""+mes.codigo+"01")
+        Calendar cal = Calendar.getInstance();
+        cal.set(Calendar.MONTH, inicio.format("MM").toInteger()-1);
+        cal.set(Calendar.YEAR, inicio.format("yyyy").toInteger());
+        cal.set(Calendar.DAY_OF_MONTH, 1);// This is necessary to get proper results
+        cal.set(Calendar.DATE, cal.getActualMaximum(Calendar.DATE));
+        def fin  = cal.getTime();
         if(!sql)
             return varaible.valor
         sql = sql.replaceAll("@empleado",""+empleado.id)
         sql = sql.replaceAll("@mes",""+mes.id)
+        sql = sql.replaceAll("@fecha",""+fin.format("MM-dd-yyyy"))
         def cn = new Sql(dataSource)
         println "sql variable "+sql
 
@@ -152,4 +160,9 @@ class RubrosController extends Shield {
         re.delete(flush: true)
         redirect(action: 'detalleEmpleado_ajax',id: empleado.id)
     }
+
+
+
+
+
 }
