@@ -40,7 +40,7 @@
 </g:else>
 
 <g:each in="${roles}" var="r">
-    <div class="panel ${r.estado!='A'?'panel-default':'panel-success'}" style="position: relative">
+    <div class="panel ${r.estado!='A'?'panel-success':'panel-darkblue'}" style="position: relative">
         <i class="fa fa-print print"  style="position: absolute;top: 5px;right: 5px;color: #ffffff;cursor: pointer" rol="${r.id}"></i>
         <div class="panel-heading " style="font-size: 10px;line-height: 10px;padding: 5px">
             ${r?.empleado.apellido} ${r.empleado.nombre}
@@ -78,7 +78,19 @@
                     </tr>
                 </g:if>
                 <g:set var="total" value="${0}"></g:set>
+                <g:set var="band" value="${true}"></g:set>
+
+                <tr>
+                    <th colspan="5" style="color: #ffffff">Ingresos</th>
+                </tr>
+
                 <g:each in="${contable.nomina.DetalleRol.findAllByRol(r,[sort:'signo',order:'desc'])}" var="d">
+                    <g:if test="${d.signo==-1 && band}">
+                        <tr style="color: #ffffff">
+                            <th colspan="5">Egresos</th>
+                        </tr>
+                        <g:set var="band" value="${false}"></g:set>
+                    </g:if>
                     <tr>
                         <g:set var="total" value="${total+(d.signo*d.valor)}"></g:set>
                         <td>

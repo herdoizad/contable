@@ -253,3 +253,11 @@ h1{
     margin: 0px;
 
 }
+
+.panel-darkblue .panel-heading {
+    background: #2F4050 !important;
+    color: white;
+}
+.panel-darkblue{
+    border: 1px solid  #2F4050;
+}

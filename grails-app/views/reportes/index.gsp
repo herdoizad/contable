@@ -500,7 +500,7 @@
             Su reporte se está generando, por favor espere. Cuando el sistema finalice se iniciará una descarga con el reporte en formato PDF.
         </div>
         <div class="col-md-6 col-md-offset-3" style="text-align: center">
-            <img src="${resource(dir: 'images/spinners',file: 'dolar.GIF')}" width="80px">
+            <img src="${resource(dir: 'images/spinners',file: 'loader_2.GIF')}" width="50px">
         </div>
     </div>
 </div>

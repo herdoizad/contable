@@ -13,6 +13,8 @@
 
 
     </style>
+    <imp:js src="${resource(dir: 'js/plugins/bootstrap-combobox/js', file: 'bootstrap-combobox.js')}"/>
+    <imp:css src="${resource(dir: 'js/plugins/bootstrap-combobox/css', file: 'bootstrap-combobox.css')}"/>
 </head>
 <body>
 <input type="hidden" id="activo">
@@ -29,7 +31,7 @@
                     <label>Empleado</label>
                 </div>
                 <div class="col-md-4">
-                    <g:select name="empleado" id="empleado" from="${empleados}" value="${emp}" noSelection="['0':'TODOS']" class="form-control input-sm select" optionKey="id" />
+                    <g:select name="empleado" id="empleado" from="${empleados}" value="${emp}" noSelection="['0':'TODOS']" class="select form-control input-sm select" optionKey="id" />
                 </div>
             </div>
             <div class="row fila">
@@ -70,7 +72,7 @@
             } //success
         }); //ajax
     })
-
+    $('.select').combobox();
     $("#ver").click(function(){
         if($("#empleados").val()!=""){
             openLoader()

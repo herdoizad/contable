@@ -9,6 +9,8 @@
         font-size: 10px;
     }
     </style>
+    <imp:js src="${resource(dir: 'js/plugins/bootstrap-combobox/js', file: 'bootstrap-combobox.js')}"/>
+    <imp:css src="${resource(dir: 'js/plugins/bootstrap-combobox/css', file: 'bootstrap-combobox.css')}"/>
 </head>
 <body>
 <elm:message tipo="${flash.tipo}" clase="${flash.clase}">${flash.message}</elm:message>
@@ -221,7 +223,7 @@
             </div>
             <div class="col-md-3">
                 <g:select name="cuentaContable.id" from="${contable.core.Cuenta.findAllByNivel(5)}" optionKey="numero"
-                          class="form-control input-sm" noSelection="['':'']"   value="${empleado?.cuentaContable?.getNumeroPad()}"
+                          class="form-control input-sm select" noSelection="['':'']"   value="${empleado?.cuentaContable?.getNumeroPad()}"
                 />
             </div>
         </div>
@@ -340,6 +342,7 @@
         }
 
     });
+    $('.select').combobox();
     $("#guardar").click(function(){
         var $form = $(".frmEmpleado");
         var $btn = $(this);
