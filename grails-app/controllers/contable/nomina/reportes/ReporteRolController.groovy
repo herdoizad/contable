@@ -16,6 +16,8 @@ import contable.nomina.Empleado
 import contable.nomina.Rol
 import contable.seguridad.Shield
 
+import javax.swing.GroupLayout
+
 class ReporteRolController extends Shield {
 
     def reporte() {
@@ -39,7 +41,7 @@ class ReporteRolController extends Shield {
         p = new Paragraph("Ruc: 1791282299001 ", contenido);
         p.setAlignment(Element.ALIGN_RIGHT);
         document.add(p);
-        p = new Paragraph(" Dirección: Av. 6 de Diciembre \n" +
+        p = new Paragraph(" Direcciï¿½n: Av. 6 de Diciembre \n" +
                 "    N30-182 y Alpallana, Quito" , contenido);
         p.setAlignment(Element.ALIGN_RIGHT);
         document.add(p);
@@ -105,15 +107,15 @@ class ReporteRolController extends Shield {
                 w++
             }*/
             //println "empleado: " +  r.empleado.nombre + " Ingreso: " + tmo + " Ingreso: " + dr.valor + " egresos : " + r.totalEgresos
-            //+ "tamaño descripcion" + dr.descripcion.size() + "tamaño valor" + dr.valor.size()
-           // lo anterior imprime en consola resultado
+            //+ "tamaï¿½o descripcion" + dr.descripcion.size() + "tamaï¿½o valor" + dr.valor.size()
+            // lo anterior imprime en consola resultado
             cell = new PdfPCell(new Paragraph(r.empleado.nombre + " " + r.empleado.apellido, contenido));
             table.addCell(cell);
             cell = new PdfPCell(new Paragraph(formatNumber(number: r.totalIngresos,maxFractionDigits: 2,format: "###,##0",minFractionDigits: 2 ), contenido));
             table.addCell(cell);
             //cell = new PdfPCell(new Paragraph(r.totalIngresos, contenido));
-           cell = new PdfPCell(new Paragraph(formatNumber(number: r.totalEgresos,maxFractionDigits: 2,format: "###,##0",minFractionDigits: 2 ), contenido));
-           table.addCell(cell);
+            cell = new PdfPCell(new Paragraph(formatNumber(number: r.totalEgresos,maxFractionDigits: 2,format: "###,##0",minFractionDigits: 2 ), contenido));
+            table.addCell(cell);
             cell = new PdfPCell(new Paragraph(formatNumber(number: s.sueldo,maxFractionDigits: 2,format: "###,##0",minFractionDigits: 2 ), contenido));
             table.addCell(cell);
             def x = 0
@@ -133,9 +135,9 @@ class ReporteRolController extends Shield {
 
 
 
-           // detrol.each {dr->
-           //cell = new PdfPCell(new Paragraph(dr.descripcion, contenido)); //-31082015
-           //table.addCell(cell); //-31082015
+            // detrol.each {dr->
+            //cell = new PdfPCell(new Paragraph(dr.descripcion, contenido)); //-31082015
+            //table.addCell(cell); //-31082015
             //}
             //sueld.each {sld->
             //cell = new PdfPCell(new Paragraph(formatNumber(number:sld.sueldo,maxFractionDigits: 2,format: "###,##0",minFractionDigits: 2 ), contenido));
@@ -163,14 +165,18 @@ class ReporteRolController extends Shield {
     def reporteRol(){
         Document document = new Document();
         def fecha = new Date()
-        def nombre ="rolEmpleado-${fecha.format('ddMMyyyy')}.pdf"
+        def rol = Rol.get(params.id)
+        def ingresos = DetalleRol.findAllByRolAndSigno(rol,1)
+        def egresos = DetalleRol.findAllByRolAndSigno(rol,-1)
+        def meses = ["0":"Todos","1":"Enero","2":"Febero","3":"Marzo","4":"Abril","5":"Mayo","6":"Junio","7":"Juilo","8":"Agosto","9":"Septiembre","10":"Octubre","11":"Noviembre","12":"Diciembre"]
+        def nombre ="rolEmpleado-${rol.empleado.nombre}-${fecha.format('ddMMyyyy')}.pdf"
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         def writer = PdfWriter.getInstance(document, baos);
         def img = grailsApplication.mainContext.getResource('/images/logo-login.png').getFile()
         writer.setPageEvent(new contable.HeaderFooter(img.readBytes(), fecha, session.usuario.login,""));
         Font header = new Font(Font.FontFamily.HELVETICA, 12, Font.UNDERLINE | Font.BOLD);
-        Font titulo = new Font(Font.FontFamily.HELVETICA, 7, Font.BOLD);
-        Font contenido = new Font(Font.FontFamily.HELVETICA, 6);
+        Font titulo = new Font(Font.FontFamily.HELVETICA, 9, Font.BOLD);
+        Font contenido = new Font(Font.FontFamily.HELVETICA, 8);
         document.open();
         Image image = Image.getInstance(img.readBytes());
         image.setAbsolutePosition(40f, 738f);
@@ -181,7 +187,7 @@ class ReporteRolController extends Shield {
         p = new Paragraph("Ruc: 1791282299001 ", contenido);
         p.setAlignment(Element.ALIGN_RIGHT);
         document.add(p);
-        p = new Paragraph(" Dirección: Av. 6 de Diciembre \n" +
+        p = new Paragraph(" DirecciÃ³n: Av. 6 de Diciembre \n" +
                 "    N30-182 y Alpallana, Quito" , contenido);
         p.setAlignment(Element.ALIGN_RIGHT);
         document.add(p);
@@ -190,71 +196,67 @@ class ReporteRolController extends Shield {
         document.add(p);
         document.add(new Paragraph("\n"));
         document.add(new Paragraph("\n"));
-        p = new Paragraph("Rol Empleado", titulo);
-        p.setAlignment(Element.ALIGN_CENTER);
-        document.add(p);
-        p = new Paragraph("INGRESO", titulo);
-        p.setAlignment(Element.ALIGN_CENTER);
+
+        document.add(new Paragraph("ROL DEL PAGOS MES DE "+meses[new Date().parse("yyyyMMdd",""+rol.mes.codigo+"01").format("M")].toUpperCase()));
+        document.add(new Paragraph("\n"));
+        p = new Paragraph("Detalle de ingresos y descuentos", contenido);
+        document.add(p)
+        p = new Paragraph("Apellidos y nombres: "+rol.empleado, contenido);
+        document.add(p)
+        document.add(new Paragraph("\n"));
+        p = new Paragraph("INGRESOS", titulo);
+        p.setAlignment(Element.ALIGN_LEFT);
         document.add(p);
         def table = new PdfPTable(2);
-        table.setWidthPercentage(95.toFloat())//EL PORCENTAJE DE PAG 95
-        int[] anchos = [40,40];
+        table.setWidthPercentage(60.toFloat())//EL PORCENTAJE DE PAG 95
+        table.setHorizontalAlignment(Element.ALIGN_LEFT)
+        int[] anchos = [70,30];
         table.setWidths(anchos)
         def cell
-        cell = new PdfPCell(new Paragraph("RUBRO", contenido));
-        cell.setBorder(0)
-        cell.setHorizontalAlignment(Element.ALIGN_CENTER)
-        table.addCell(cell);
-       cell = new PdfPCell(new Paragraph("VALOR", contenido));
-        cell.setBorder(0)
-        cell.setHorizontalAlignment(Element.ALIGN_CENTER)
-        table.addCell(cell);
-        def rol = Rol.get(params.id)
-        //def det = DetalleRol.findAllByRolAndSigno(rol, +1)
-        def det = DetalleRol.findAllByRol(rol)
-        det.each{d->
+        p = new Paragraph("\n", titulo);
+        document.add(p);
+        ingresos.each{d->
             cell = new PdfPCell(new Paragraph(d.descripcion, contenido));
+            cell.setBorder(0)
             table.addCell(cell);
             cell = new PdfPCell(new Paragraph(formatNumber(number: d.valor,maxFractionDigits: 2,format: "###,##0",minFractionDigits: 2 ), contenido));
+            cell.setHorizontalAlignment(Element.ALIGN_RIGHT)
+            cell.setBorder(0)
             table.addCell(cell);
         }
+        document.add(table)
+        p = new Paragraph("\n", titulo);
+        document.add(p);
+        p = new Paragraph("\n", titulo);
+        document.add(p);
+        p = new Paragraph("EGRESOS", titulo);
+        p.setAlignment(Element.ALIGN_LEFT);
+        document.add(p);
+        p = new Paragraph("\n", titulo);
+        document.add(p);
+        table = new PdfPTable(2);
+        table.setWidthPercentage(60.toFloat())//EL PORCENTAJE DE PAG 95
+        table.setHorizontalAlignment(Element.ALIGN_LEFT)
+        anchos = [70,30];
+        table.setWidths(anchos)
 
-        /*document.add(new Paragraph("\n"));
-        document.add(new Paragraph("\n"));
-        p = new Paragraph("EGRESO", titulo);
-        p.setAlignment(Element.ALIGN_CENTER);
+        egresos.each{d->
+            cell = new PdfPCell(new Paragraph(d.descripcion, contenido));
+            cell.setBorder(0)
+            table.addCell(cell);
+            cell = new PdfPCell(new Paragraph(formatNumber(number: d.valor,maxFractionDigits: 2,format: "###,##0",minFractionDigits: 2 ), contenido));
+            cell.setHorizontalAlignment(Element.ALIGN_RIGHT)
+            cell.setBorder(0)
+            table.addCell(cell);
+        }
+        document.add(table)
+        p = new Paragraph("\n", titulo);
+        document.add(p);
+        p = new Paragraph("Total a recibir: "+g.formatNumber(number:  rol.totalIngresos-rol.totalEgresos,type: "currency",currencySymbol: ""), titulo);
+        p.setAlignment(Element.ALIGN_LEFT);
         document.add(p);
 
-        document.add(new Paragraph("\n"));
-        document.add(new Paragraph("\n"));
 
-        def table2 = new PdfPTable(2);
-        table2.setWidthPercentage(95.toFloat())//EL PORCENTAJE DE PAG 95
-        int[] anchose = [40,40];
-        table2.setWidths(anchose)
-        def celle
-        celle = new PdfPCell(new Paragraph("RUBRO", contenido));
-        celle.setBorder(0)
-        celle.setHorizontalAlignment(Element.ALIGN_CENTER)
-        table2.addCell(cell);
-        celle = new PdfPCell(new Paragraph("VALOR", contenido));
-        celle.setBorder(0)
-        celle.setHorizontalAlignment(Element.ALIGN_CENTER)
-        table2.addCell(cell);
-        def det2 = DetalleRol.findAllByRolAndSigno(rol, -1)
-        det2.each{d2->
-            celle = new PdfPCell(new Paragraph(d2.descripcion, contenido));
-            table2.addCell(celle);
-            celle = new PdfPCell(new Paragraph(formatNumber(number: d2.valor,maxFractionDigits: 2,format: "###,##0",minFractionDigits: 2 ), contenido));
-            table2.addCell(celle);
-
-
-        }*/
-
-        //ROL
-        //DETALLE
-        document.add(table)
-        //document.add(table2)
         document.close();
         def b = baos.toByteArray()
         response.setContentType("application/pdf")
