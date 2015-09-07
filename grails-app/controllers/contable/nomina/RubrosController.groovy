@@ -150,8 +150,15 @@ class RubrosController extends Shield {
     def detalleEmpleado_ajax(){
         def empleado = Empleado.get(params.id)
         def rubros = RubroEmpleado.findAllByEmpleado(empleado)
+        def fijos = RubroFijoEmpleado.withCriteria {
+            eq("empleado",empleado)
+            or{
+                isNull("fin")
+                ge("fin",new Date())
+            }
+        }
         def meses = ["0":"Todos","1":"Enero","2":"Febero","3":"Marzo","4":"Abril","5":"Mayo","6":"Junio","7":"Juilo","8":"Agosto","9":"Septiembre","10":"Octubre","11":"Noviembre","12":"Diciembre"]
-        [empleado:empleado,rubros: rubros,meses:meses]
+        [empleado:empleado,rubros: rubros,meses:meses,fijos:fijos]
     }
 
     def borrarRubroEmpleado_ajax(){
@@ -162,7 +169,44 @@ class RubrosController extends Shield {
     }
 
 
+    def rubrosFijosEmpleado(){
+        def empleado = null
+        if(params.id)
+            empleado=Empleado.get(params.id)
+        def rubros = Rubro.list([sort: "nombre"])
+        def empleados = Empleado.findAllByEstado("A",[sort: "apellido"])
+        [empleado:empleado,rubros:rubros,empleados:empleados]
+    }
 
+    def detalleFijosEmpleado_ajax(){
+        def empleado = Empleado.get(params.id)
+        def rubros = RubroFijoEmpleado.findAllByEmpleado(empleado)
+        def meses = ["0":"Todos","1":"Enero","2":"Febero","3":"Marzo","4":"Abril","5":"Mayo","6":"Junio","7":"Juilo","8":"Agosto","9":"Septiembre","10":"Octubre","11":"Noviembre","12":"Diciembre"]
+        [empleado:empleado,rubros: rubros,meses:meses]
+    }
 
+    def borrarFijosRubroEmpleado_ajax(){
+        def re = RubroFijoEmpleado.get(params.id)
+        def empleado = re.empleado
+        re.delete(flush: true)
+        redirect(action: 'detalleFijosEmpleado_ajax',id: empleado.id)
+    }
+
+    def addRubroFijoEmpleado_ajax(){
+        def empleado = Empleado.get(params.empleado)
+        def re = new RubroFijoEmpleado()
+        re.empleado=empleado
+        re.descripcion=params.rubro
+        re.mes=params.mes.toInteger()
+        re.valor=params.valor.toDouble()
+        re.signo=params.signo.toDouble()
+        if(params.inicio!="")
+            re.inicio=new Date().parse("dd-MM-yyyy",params.inicio)
+        if(params.fin!="")
+            re.fin=new Date().parse("dd-MM-yyyy",params.fin)
+        if(!re.save(flush: true))
+            println "error save rubro "+re.errors
+        redirect(action: 'detalleFijosEmpleado_ajax',id: empleado.id)
+    }
 
 }

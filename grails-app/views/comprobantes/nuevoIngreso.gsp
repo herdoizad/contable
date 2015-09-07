@@ -84,7 +84,7 @@
                 <input type="hidden" name="mes" value="${mes}">
                 <input type="hidden" name="mesSolo" value="${mesSolo}">
                 <input type="hidden" name="tipo" value="${tipo}">
-
+                <input type="hidden" name="numero" value="${comp?.numero}">
                 <div class="row fila">
                     <div class="col-md-1">
                         <label>Número:</label>
@@ -96,7 +96,7 @@
                         <label>Fecha:</label>
                     </div>
                     <div class="col-md-2">
-                        <elm:datepicker name="fecha" class="form-control input-sm" minDate="${inicio}" maxDate="${fin}" value="${inicio}"></elm:datepicker>
+                        <elm:datepicker name="fecha" class="form-control input-sm" minDate="${inicio}" maxDate="${fin}" value="${comp?.fecha?comp.fecha:inicio}"></elm:datepicker>
                     </div>
                 </div>
                 <div class="row fila" style="position:relative;">
@@ -104,7 +104,7 @@
                         <label>Concepto:</label>
                     </div>
                     <div class="col-md-9">
-                        <input type="text" name="concepto" id="concepto" class="form-control input-sm">
+                        <input type="text" name="concepto" id="concepto" class="form-control input-sm" value="${comp?.concepto}">
                     </div>
                     <div class="total-hover">
                         <div class="row">
@@ -122,7 +122,7 @@
                         <label>Recibido:</label>
                     </div>
                     <div class="col-md-6">
-                        <input type="text" name="recibi" id="recibido" class="form-control input-sm">
+                        <input type="text" name="recibi" id="recibido" class="form-control input-sm" value="${ingreso?.recibi}">
                     </div>
                 </div>
                 <div class="row fila">
@@ -130,19 +130,19 @@
                             <label>Efectivo:</label>
                         </div>
                         <div class="col-md-1" style="width: 128px">
-                            <input type="text"  style="text-align: right" class=" valores form-control input-sm number" name="efectivo" value="0.00" >
+                            <input type="text"  style="text-align: right" class=" valores form-control input-sm number" name="efectivo" value="${ingreso?.efectivo?:'0.00'}" >
                         </div>
                     <div class="col-md-1">
                         <label>Cheques:</label>
                     </div>
                     <div class="col-md-1" style="width: 128px">
-                        <input type="text"  style="text-align: right" class=" valores form-control input-sm number" name="cheques" value="0.00" >
+                        <input type="text"  style="text-align: right" class=" valores form-control input-sm number" name="cheques" value="${ingreso?.cheques?:'0.00'}" >
                     </div>
                     <div class="col-md-1">
                         <label>N. Crédito:</label>
                     </div>
                     <div class="col-md-1" style="width: 128px">
-                        <input type="text"  style="text-align: right" class=" valores form-control input-sm number" name="notas" value="0.00" >
+                        <input type="text"  style="text-align: right" class=" valores form-control input-sm number" name="notas" value="${ingreso?.notas?:'0.00'}" >
                     </div>
 
 
@@ -186,7 +186,27 @@
                         </tr>
                         </thead>
                         <tbody id="detalles">
+                        <g:each in="${detalles}" var="d">
+                            <tr class="tr-info" debe="${d.signo>0?d.valor:0}" haber="${d.signo<0?d.valor:0}">
+                                <td style="text-align: center" class='secuencial'>${d.secuencial}</td>
+                                <td class="cuenta ${d.cuenta}">${d.cuenta.numero}</td>
+                                <td  class=''>
+                                    <input type='text' class='desc allCaps form-control input-sm readOnly' disabled  maxlength='35' value='${d.descripcion}'>
+                                </td>
+                                <g:if test="${d.signo>0}">
+                                    <td style="text-align: right" class="num debe" debe="${d.valor}">${d.valor}</td>
+                                    <td class="num haber" haber="0"></td>
+                                </g:if>
+                                <g:else>
+                                    <td style="text-align: right" class="num debe" debe="0"></td>
+                                    <td style="text-align: right"  class="num haber" haber="${d.valor}">${d.valor}</td>
+                                </g:else>
 
+                                <td style="text-align: center">
+                                    <a href='#' class='btn btn-danger btn-xsm borrar'><i class='fa fa-trash'></i></a>
+                                </td>
+                            </tr>
+                        </g:each>
                         </tbody>
                         <tfoot>
                         <tr>
@@ -218,8 +238,8 @@
             haber+=$(this).attr("haber")*1
         })
         $("#tot_debe").html(number_format(debe,2,".",","))
-        $("#tot_debe").attr("valor",debe)
-        $("#tot_haber").attr("valor",haber)
+        $("#tot_debe").attr("valor",debe.toFixed(2))
+        $("#tot_haber").attr("valor",haber.toFixed(2))
         $("#tot_haber").html(number_format(haber,2,".",","))
     }
 
@@ -328,6 +348,8 @@
             bootbox.alert(msg)
         }
     })
+    calcularTotales()
+    $(".valores").blur()
 </script>
 </body>
 </html>

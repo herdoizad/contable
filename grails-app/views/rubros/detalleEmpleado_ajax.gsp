@@ -68,55 +68,88 @@
             </tbody>
         </table>
     </div>
-    <script>
-        $(".chk").bootstrapSwitch({
-            size:'mini',
-            onText:"Si",
-            offText:"No",
-            offColor:"primary"
-        });
-        $("#agregar").click(function(){
-            var descuenta = "S"
-            if(!$("#signo").bootstrapSwitch("state"))
-                descuenta="N"
-            var cant = $(".r-"+$("#rubros").val()).size()
-            if(cant>0)
-                bootbox.alert("El rubro seleccionado ya esta asignado al empleado")
-            else{
-                openLoader()
-                $.ajax({
-                    type: "POST",
-                    url: "${createLink(controller:'rubros', action:'addRubroEmpleado_ajax')}",
-                    data: {
-                        empleado:"${empleado.id}",
-                        rubro:$("#rubros").val(),
-                        descuenta:descuenta,
-                        mes:$("#mes").val(),
-                        inicio:$("#inicio_input").val(),
-                        fin:$("#fin_input").val()
-                    },
-                    success: function (msg) {
-                        closeLoader()
-                        $("#detalle").html(msg)
-                    } //success
-                }); //ajax
-            }
 
+</div>
+<div class="row fila">
+    <div class="col-md-11">
+        <table class="table table-darkblue table-sm table-bordered">
+            <thead>
+            <tr>
+                <th colspan="6">Rubros fijos</th>
+            </tr>
+            <tr>
+                <th>Rubro</th>
+                <th>Tipo</th>
+                <th style="width: 30px">Mes</th>
+                <th>Valor</th>
+                <th>Inicio</th>
+                <th>Fin</th>
+            </tr>
+            </thead>
+            <tbody>
+            <g:each in="${fijos}" status="i" var="r">
+                <tr data-id="${r.id}" class="r-${r.id}">
+                    <td>${r.descripcion}</td>
+                    <td style="text-align: center">${r.signo==1?'Ingreso':'Egreso'}</td>
+                    <td style="text-align: center">${meses[""+r.mes]}</td>
+                    <td style="text-align: right">${g.formatNumber(number: r.valor,type: 'currency',currencySymbol: '' ) }</td>
+                    <td style="text-align: center">${r.inicio?.format("dd-MM-yyyy")}</td>
+                    <td style="text-align: center">${r.fin?.format("dd-MM-yyyy")}</td>
 
-        })
-        $(".borrar").click(function(){
+                </tr>
+            </g:each>
+            </tbody>
+        </table>
+    </div>
+</div>
+<script>
+    $(".chk").bootstrapSwitch({
+        size:'mini',
+        onText:"Si",
+        offText:"No",
+        offColor:"primary"
+    });
+    $("#agregar").click(function(){
+        var descuenta = "S"
+        if(!$("#signo").bootstrapSwitch("state"))
+            descuenta="N"
+        var cant = $(".r-"+$("#rubros").val()).size()
+        if(cant>0)
+            bootbox.alert("El rubro seleccionado ya esta asignado al empleado")
+        else{
             openLoader()
             $.ajax({
                 type: "POST",
-                url: "${createLink(controller:'rubros', action:'borrarRubroEmpleado_ajax')}",
+                url: "${createLink(controller:'rubros', action:'addRubroEmpleado_ajax')}",
                 data: {
-                    id:$(this).attr("iden")
+                    empleado:"${empleado.id}",
+                    rubro:$("#rubros").val(),
+                    descuenta:descuenta,
+                    mes:$("#mes").val(),
+                    inicio:$("#inicio_input").val(),
+                    fin:$("#fin_input").val()
                 },
                 success: function (msg) {
                     closeLoader()
                     $("#detalle").html(msg)
                 } //success
             }); //ajax
-        })
-    </script>
-</div>
+        }
+
+
+    })
+    $(".borrar").click(function(){
+        openLoader()
+        $.ajax({
+            type: "POST",
+            url: "${createLink(controller:'rubros', action:'borrarRubroEmpleado_ajax')}",
+            data: {
+                id:$(this).attr("iden")
+            },
+            success: function (msg) {
+                closeLoader()
+                $("#detalle").html(msg)
+            } //success
+        }); //ajax
+    })
+</script>

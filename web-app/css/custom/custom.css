@@ -172,8 +172,9 @@ body{
 
 
 .btn-xsm{
-    padding: 1px;
+    padding: 2px;
     font-size: 5px;
+    border-radius:2px;
 }
 .resaltado{
     background: rgba(246, 240, 0, 0.49) !important;

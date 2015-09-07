@@ -6,7 +6,9 @@ class RubroFijoEmpleado {
     Date inicio
     Date fin
     Double valor
+    Double signo
     String descripcion
+    Integer mes
 
     static auditable = [ignore: []]
 
@@ -25,7 +27,9 @@ class RubroFijoEmpleado {
             inicio column:'FECHA_INICIO'
             fin column:'FECHA_FIN'
             valor column:'VALOR'
+            signo column:'SIGNO'
             descripcion column:'DESCRIPCION'
+            mes column: 'MES'
         }
     }
 

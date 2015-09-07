@@ -71,6 +71,7 @@
                 <input type="hidden" name="mes" value="${mes}">
                 <input type="hidden" name="mesSolo" value="${mesSolo}">
                 <input type="hidden" name="tipo" value="${tipo}">
+                <input type="hidden" name="numero" value="${comp?.numero}">
 
                 <div class="row fila">
                     <div class="col-md-1">
@@ -83,7 +84,7 @@
                         <label>Fecha:</label>
                     </div>
                     <div class="col-md-2">
-                        <elm:datepicker name="fecha" class="form-control input-sm" minDate="${inicio}" maxDate="${fin}" value="${inicio}"></elm:datepicker>
+                        <elm:datepicker name="fecha" class="form-control input-sm" minDate="${inicio}" maxDate="${fin}" value="${comp?.fecha?comp.fecha:inicio}"></elm:datepicker>
                     </div>
                 </div>
                 <div class="row fila">
@@ -91,7 +92,7 @@
                         <label>Concepto:</label>
                     </div>
                     <div class="col-md-9">
-                        <input type="text" name="concepto" id="concepto" class="form-control input-sm">
+                        <input type="text" name="concepto" id="concepto" value="${comp?.concepto}" class="form-control input-sm">
                     </div>
                 </div>
             </g:form>
@@ -110,7 +111,7 @@
                     <label>Valor:</label>
                 </div>
                 <div class="col-md-2">
-                    <input type="text" id="valor" class="form-control input-sm number">
+                    <input type="text" id="valor" style="text-align: right          " class="form-control input-sm number">
                 </div>
                 <div class="col-md-1">
                     <a href="#" class="btn btn-verde btn-sm" id="agregar" title="agregar">
@@ -133,7 +134,27 @@
                         </tr>
                         </thead>
                         <tbody id="detalles">
+                        <g:each in="${detalles}" var="d">
+                            <tr class="tr-info" debe="${d.signo>0?d.valor:0}" haber="${d.signo<0?d.valor:0}">
+                                <td style="text-align: center" class='secuencial'>${d.secuencial}</td>
+                                <td class="cuenta ${d.cuenta}">${d.cuenta.numero}</td>
+                                <td  class=''>
+                                    <input type='text' class='desc allCaps form-control input-sm readOnly' disabled  maxlength='35' value='${d.descripcion}'>
+                                </td>
+                                <g:if test="${d.signo>0}">
+                                    <td style="text-align: right" class="num debe" debe="${d.valor}">${d.valor}</td>
+                                    <td class="num haber" haber="0"></td>
+                                </g:if>
+                                <g:else>
+                                    <td style="text-align: right" class="num debe" debe="0"></td>
+                                    <td style="text-align: right"  class="num haber" haber="${d.valor}">${d.valor}</td>
+                                </g:else>
 
+                                <td style="text-align: center">
+                                    <a href='#' class='btn btn-danger btn-xsm borrar'><i class='fa fa-trash'></i></a>
+                                </td>
+                            </tr>
+                        </g:each>
                         </tbody>
                         <tfoot>
                         <tr>
@@ -209,7 +230,7 @@
             var tr = $("<tr class='tr-info'>")
             tr.append("<td style='text-align: center' class='secuencial'>"+secuencial+"</td>")
             tr.append("<td class=' cuenta "+cuenta+"'>"+cuenta+"</td>")
-            tr.append("<td><input type='text' class='desc allCaps form-control input-sm' maxlength='35' value='"+desc+"'></td>")
+            tr.append("<td><input type='text' class='desc allCaps form-control input-sm ' disabled maxlength='35' value='"+desc+"'></td>")
             var btn = $("<a href='#' class='btn btn-danger btn-xsm borrar'><i class='fa fa-trash'></a>")
             if(signo) {
                 tr.attr("debe",valor)
@@ -268,6 +289,7 @@
             bootbox.alert(msg)
         }
     })
+    calcularTotales()
 </script>
 </body>
 </html>

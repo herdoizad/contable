@@ -27,7 +27,8 @@ class ComprobantesController extends Shield {
     def getComprobantesMes_ajax(){
         def anio = new Date().format("yyyy")
         def comps = Comprobante.findAll("from Comprobante where mes=${(anio+params.mes).toInteger()} and empresa='${session.empresa.codigo}' and tipo=${params.tipo} order by fecha desc ,numero asc")
-        [anio:anio,comps:comps,numero: params.numero,mes:params.mes]
+        def mes = Mes.findByCodigo((anio+params.mes).toInteger())
+        [anio:anio,comps:comps,numero: params.numero,mes:params.mes,mesObj:mes]
     }
 
     def getDetalle_ajax(){
@@ -67,7 +68,14 @@ class ComprobantesController extends Shield {
     def nuevo(){
         def mesSolo = params.mes
         def anio = session.empresa.anio
-        def mes =""+anio+params.mes
+        def mes
+        if(params.mes.size()==2)
+            mes =""+anio+params.mes
+        else
+            mes=params.mes
+        def mesObj = Mes.findByCodigo(mes.toInteger())
+        if(mesObj.estado=="C")
+            response.sendError(403)
         def tipoString
         switch (params.tipo){
             case "1":
@@ -86,7 +94,6 @@ class ComprobantesController extends Shield {
         }
         def ultimo = Comprobante.findAll("from Comprobante where empresa='${session.empresa.codigo}' and tipo=${params.tipo} and mes=${mes} and tipoProcesamiento=2 order by numero desc",["max":1])
         def siguiente=1
-        def siguiente2=1
         if(ultimo.size()>0) {
             ultimo = ultimo.pop()
             siguiente=ultimo.numero+1
@@ -98,8 +105,19 @@ class ComprobantesController extends Shield {
         cal.set(Calendar.DAY_OF_MONTH, 1);// This is necessary to get proper results
         cal.set(Calendar.DATE, cal.getActualMaximum(Calendar.DATE));
         def fin  = cal.getTime();
+        def comp = null
+        def detalles = []
+        if(params.numero) {
+            comp=Comprobante.findAll("from Comprobante where empresa='${session.empresa.codigo}' and tipo=${params.tipo} and mes=${mes}and numero=${params.numero} order by numero desc",["max":1])
+            if(comp.size()>0) {
+                comp = comp.pop()
+                siguiente=comp.numero
+                detalles = DetalleComprobante.findAll("from DetalleComprobante where empresa='${comp.empresa.codigo}' and numero=${params.numero} and tipo=${params.tipo} and mes=${mes}")
+            }else
+                comp=null
+        }
 //        println "inicio "+inicio+"  fin "+fin
-        [mes:mes,mesSolo:mesSolo,tipo:params.tipo,tipoString:tipoString,siguiente:siguiente,inicio: inicio,fin:fin]
+        [mes:mes,mesSolo:mesSolo,tipo:params.tipo,tipoString:tipoString,siguiente:siguiente,inicio: inicio,fin:fin,comp:comp,detalles: detalles]
     }
 
 
@@ -151,7 +169,14 @@ class ComprobantesController extends Shield {
     def nuevoIngreso(){
         def mesSolo = params.mes
         def anio = session.empresa.anio
-        def mes =""+anio+params.mes
+        def mes
+        if(params.mes.size()==2)
+            mes =""+anio+params.mes
+        else
+            mes=params.mes
+        def mesObj = Mes.findByCodigo(mes.toInteger())
+        if(mesObj.estado=="C")
+            response.sendError(403)
         def tipoString
         switch (params.tipo){
             case "1":
@@ -175,6 +200,23 @@ class ComprobantesController extends Shield {
             ultimo = ultimo.pop()
             siguiente=ultimo.numero+1
         }
+        def comp = null
+        def detalles = []
+        def ingreso = null
+        if(params.numero) {
+            comp=Comprobante.findAll("from Comprobante where empresa='${session.empresa.codigo}' and tipo=${params.tipo} and mes=${mes}and numero=${params.numero} order by numero desc",["max":1])
+            if(comp.size()>0) {
+                comp = comp.pop()
+                siguiente=comp.numero
+                detalles = DetalleComprobante.findAll("from DetalleComprobante where empresa='${comp.empresa.codigo}' and numero=${params.numero} and tipo=${params.tipo} and mes=${mes}")
+                ingreso = Ingreso.findAll("from Ingreso where empresa='${comp.empresa.codigo}' and numero=${params.numero} and tipo=${params.tipo} and mes=${mes}")
+                if(ingreso.size()>0)
+                    ingreso=ingreso.pop()
+                else
+                    ingreso=null
+            }else
+                comp=null
+        }
         def inicio = new Date().parse("yyyyMMdd",mes+"01")
         Calendar cal = Calendar.getInstance();
         cal.set(Calendar.MONTH, inicio.format("MM").toInteger()-1);
@@ -183,7 +225,7 @@ class ComprobantesController extends Shield {
         cal.set(Calendar.DATE, cal.getActualMaximum(Calendar.DATE));
         def fin  = cal.getTime();
 //        println "inicio "+inicio+"  fin "+fin
-        [mes:mes,mesSolo:mesSolo,tipo:params.tipo,tipoString:tipoString,siguiente:siguiente,inicio: inicio,fin:fin]
+        [mes:mes,mesSolo:mesSolo,tipo:params.tipo,tipoString:tipoString,siguiente:siguiente,inicio: inicio,fin:fin,comp:comp,detalles: detalles,ingreso:ingreso]
     }
 
     def save(){
@@ -195,7 +237,17 @@ class ComprobantesController extends Shield {
             ultimo = ultimo.pop()
             numero=ultimo.numero+1
         }
-        def comp = new Comprobante()
+        def comp
+        comp=Comprobante.findAll("from Comprobante where empresa='${session.empresa.codigo}' and tipo=${params.tipo} and mes=${mes}and numero=${params.numero} order by numero desc",["max":1])
+        if(comp.size()>0) {
+            comp = comp.pop()
+            numero = comp.numero
+            DetalleComprobante.findAll("from DetalleComprobante where empresa='${comp.empresa.codigo}' and numero=${numero} and tipo=${params.tipo} and mes=${mes}").each {d->
+                d.delete(flush: true)
+            }
+        }else{
+            comp = new Comprobante()
+        }
         comp.mes=mes
         comp.numero=numero
         comp.empresa=session.empresa
@@ -225,7 +277,12 @@ class ComprobantesController extends Shield {
                 }catch (e){
                     params.notas=0
                 }
-                def ingreso = new Ingreso()
+                def ingreso
+                ingreso = Ingreso.findAll("from Ingreso where empresa='${comp.empresa.codigo}' and numero=${params.numero} and tipo=${params.tipo} and mes=${mes}")
+                if(ingreso.size()>0)
+                    ingreso=ingreso.pop()
+                else
+                    ingreso== new Ingreso()
                 ingreso.tipo=1
                 ingreso.numero=comp.numero
                 ingreso.empresa=comp.empresa

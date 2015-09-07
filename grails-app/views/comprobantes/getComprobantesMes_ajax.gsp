@@ -8,6 +8,7 @@
         <th>Fecha</th>
         <th>Concepto</th>
         <th></th>
+        <th></th>
     </tr>
     </thead>
     <tbody>
@@ -23,6 +24,26 @@
                 <a href="#" class="btn btn-info btn-xsm ver ${mes}-${g.formatNumber(number:  c.numero,maxFractionDigits: 0)}" title="Ver" mes="${c.mes}" empresa="${c.empresa.codigo}" tipo="${c.tipo}" numero="${c.numero}">
                     <i class="fa fa-search"></i>
                 </a>
+            </td>
+            <td style="text-align: center">
+                <g:if test="${mesObj.estado!='C'}">
+                    <g:if test="${c.tipo==3}">
+                        <a href="${g.createLink(controller: 'comprobantes',action: 'nuevo',params: [mes:c.mes,tipo:c.tipo,numero:c.numero])}" class="btn btn-info btn-xsm editar ${mes}-${g.formatNumber(number:  c.numero,maxFractionDigits: 0)}" title="Editar" mes="${c.mes}" empresa="${c.empresa.codigo}" tipo="${c.tipo}" numero="${c.numero}">
+                            <i class="fa fa-pencil"></i>
+                        </a>
+                    </g:if>
+                    <g:if test="${c.tipo==2}">
+                        <a href="${g.createLink(controller: 'comprobantes',action: 'nuevoEgreso',params: [mes:c.mes,tipo:c.tipo,numero:c.numero])}" class="btn btn-info btn-xsm editar ${mes}-${g.formatNumber(number:  c.numero,maxFractionDigits: 0)}" title="Editar" mes="${c.mes}" empresa="${c.empresa.codigo}" tipo="${c.tipo}" numero="${c.numero}">
+                            <i class="fa fa-pencil"></i>
+                        </a>
+                    </g:if>
+                    <g:if test="${c.tipo==1}">
+                        <a href="${g.createLink(controller: 'comprobantes',action: 'nuevoIngreso',params: [mes:c.mes,tipo:c.tipo,numero:c.numero])}" class="btn btn-info btn-xsm editar ${mes}-${g.formatNumber(number:  c.numero,maxFractionDigits: 0)}" title="Editar" mes="${c.mes}" empresa="${c.empresa.codigo}" tipo="${c.tipo}" numero="${c.numero}">
+                            <i class="fa fa-pencil"></i>
+                        </a>
+                    </g:if>
+
+                </g:if>
             </td>
         </tr>
     </g:each>
@@ -133,6 +154,7 @@
                         message: msg,
 
                         buttons: {
+                            <g:if test="${mesObj.estado!='C'}">
                             anular:{
                                 label:"Anular",
                                 className: "btn-danger btn-sm",
@@ -170,6 +192,7 @@
                                 }
 
                             },
+                            </g:if>
                             imprimir:{
                                 label:"Imprimir",
                                 className: "btn-info btn-sm",
@@ -199,7 +222,7 @@
     })
 
     <g:if test="${numero && numero!=''}">
-       verComp('${mes}',${numero})
+    verComp('${mes}',${numero})
     </g:if>
 
 </script>

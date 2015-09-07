@@ -160,7 +160,7 @@
     })
     $("#generar").click(function(){
         var div = $($("#activo").val())
-        bootbox.confirm("Está seguro?",function(result){
+        bootbox.confirm("Está seguro? Los roles generados previamente de este mes serán borrados",function(result){
             if(result){
                 openLoader()
                 $.ajax({
@@ -179,7 +179,7 @@
     $(".panel-heading").css({cursor:"pointer"}).click(function(){
         $(this).parent().find(".panel-body").toggle()
     })
-    $(".panel-heading").click()
+//    $(".panel-heading").click()
     $(".guardar").click(function(){
         var id = $(this).attr("iden")
         var rol = $(".valor-"+id).attr("rol")
@@ -193,7 +193,7 @@
             msg+="Ingrese un valor valido<br/>"
         }else{
             valor=valor*1
-            if(valor<=0)
+            if(valor<0)
                 msg+="El valor debe ser un número positivo<br/>"
         }
         if(msg==""){

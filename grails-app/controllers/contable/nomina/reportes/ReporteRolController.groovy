@@ -20,6 +20,8 @@ import javax.swing.GroupLayout
 
 class ReporteRolController extends Shield {
 
+    def qrCodeService
+
     def reporte() {
         Document document = new Document();
         def fecha = new Date()
@@ -164,37 +166,43 @@ class ReporteRolController extends Shield {
 
     def reporteRol(){
         Document document = new Document();
+
         def fecha = new Date()
         def rol = Rol.get(params.id)
         def ingresos = DetalleRol.findAllByRolAndSigno(rol,1)
         def egresos = DetalleRol.findAllByRolAndSigno(rol,-1)
         def meses = ["0":"Todos","1":"Enero","2":"Febero","3":"Marzo","4":"Abril","5":"Mayo","6":"Junio","7":"Juilo","8":"Agosto","9":"Septiembre","10":"Octubre","11":"Noviembre","12":"Diciembre"]
         def nombre ="rolEmpleado-${rol.empleado.nombre}-${fecha.format('ddMMyyyy')}.pdf"
+        ByteArrayOutputStream bs = new ByteArrayOutputStream()
+        qrCodeService.renderPng(getVcard("Rol de pagos de ${rol.empleado}, mes de ${rol.mes.descripcion}"), 65, bs)
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         def writer = PdfWriter.getInstance(document, baos);
-        def img = grailsApplication.mainContext.getResource('/images/logo-login.png').getFile()
+        def img = grailsApplication.mainContext.getResource('/images/favicons/apple-touch-icon-60x60.png').getFile()
         writer.setPageEvent(new contable.HeaderFooter(img.readBytes(), fecha, session.usuario.login,""));
         Font header = new Font(Font.FontFamily.HELVETICA, 12, Font.UNDERLINE | Font.BOLD);
         Font titulo = new Font(Font.FontFamily.HELVETICA, 9, Font.BOLD);
         Font contenido = new Font(Font.FontFamily.HELVETICA, 8);
         document.open();
         Image image = Image.getInstance(img.readBytes());
-        image.setAbsolutePosition(40f, 738f);
+        image.setAbsolutePosition(40f, 740f);
+        document.add(image);
+        image = Image.getInstance(bs.toByteArray());
+        image.setAbsolutePosition(500f, 738f);
         document.add(image);
         Paragraph p = new Paragraph("PETROLEOS Y SERVICIOS", header);
-        p.setAlignment(Element.ALIGN_RIGHT);
+        p.setAlignment(Element.ALIGN_LEFT);
+        p.setIndentationLeft(94)
         document.add(p);
-        p = new Paragraph("Ruc: 1791282299001 ", contenido);
-        p.setAlignment(Element.ALIGN_RIGHT);
-        document.add(p);
-        p = new Paragraph(" Dirección: Av. 6 de Diciembre \n" +
-                "    N30-182 y Alpallana, Quito" , contenido);
-        p.setAlignment(Element.ALIGN_RIGHT);
+
+        p = new Paragraph("Dirección: Av. 6 de Diciembre \n" +
+                "N30-182 y Alpallana, Quito" , contenido);
+        p.setAlignment(Element.ALIGN_LEFT);
+        p.setIndentationLeft(94)
         document.add(p);
         p = new Paragraph("Telefono: (593) (2) 381-9680", contenido);
-        p.setAlignment(Element.ALIGN_RIGHT);
+        p.setAlignment(Element.ALIGN_LEFT);
+        p.setIndentationLeft(94)
         document.add(p);
-        document.add(new Paragraph("\n"));
         document.add(new Paragraph("\n"));
 
         document.add(new Paragraph("ROL DEL PAGOS MES DE "+meses[new Date().parse("yyyyMMdd",""+rol.mes.codigo+"01").format("M")].toUpperCase()));
@@ -265,7 +273,25 @@ class ReporteRolController extends Shield {
         response.getOutputStream().write(b)
         println "lLlego"
     }
+    String getVcard(title) {
+        def s = new StringBuilder()
+        s << "BEGIN:VCARD\n"
+        s << "VERSION:3.0\n"
+        s << "N:${session.usuario.login};;;\n"
+        s << "FN: Generado por: ${session.usuario.login}\n"
+        s << "ORG:Petroleos y Servicios\n"
+        s << "TITLE:${title ? title.replace(',', '\\,') : ''}\n"
+        s << "TEL;TYPE=work,voice,pref:381-9680\n"
+        s << "REV:${new Date().format('dd-MM-yyyy HH:mm')}\n"
+        s << "END:VCARD\n"
+        return s.toString()
+    }
+
 }
+
+
+
+
 
 //detallerol.finfallbyrolandcodigoInList(r, ["H100", "H200, H150])
 

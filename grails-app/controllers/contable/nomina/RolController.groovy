@@ -70,6 +70,19 @@ class RolController extends Shield {
         empleados.each {e->
             println "empleado "+e
             def rol = Rol.findByMesAndEmpleado(mes,e)
+            if(rol){
+                try{
+                    def det = DetalleRol.findAllByRol(rol)
+                    det.each {
+                        it.delete(flush: true)
+                    }
+                    rol.delete(flush: true)
+                    rol=null
+                }catch (er){
+                    println "error delete rol "+er.printStackTrace()
+                }
+
+            }
             if(!rol){
                 rol = new Rol()
                 rol.empleado=e
@@ -82,6 +95,14 @@ class RolController extends Shield {
                     println "error save rol "+rol.errors
                 else{
                     def rubros = RubroEmpleado.withCriteria {
+                        eq("empleado",e)
+                        le("inicio",inicio)
+                        or{
+                            ge("fin",fin)
+                            isNull("fin")
+                        }
+                    }
+                    def fijos = RubroFijoEmpleado.withCriteria {
                         eq("empleado",e)
                         le("inicio",inicio)
                         or{
@@ -116,10 +137,12 @@ class RolController extends Shield {
 
                         }else{
                             /*Impuesto a la renta*/
+                            println "impuesto a la renta"
                             def v = procesaFormula_ajax(r.rubro.formula,e,mes,inicio,fin,variables,resultados)
-                            def renta = ImpuestoRenta.findAll("from ImpuestoRenta where anio=${fin.format('yyyy')} and desde>= ${v} and hasta<=${v} order by desde")
+                            println "v "+v
+                            def renta = ImpuestoRenta.findAll("from ImpuestoRenta where anio=${fin.format('yyyy')} and desde<= ${v} and hasta>=${v} order by desde")
                             if(renta.size()==0)
-                                renta = ImpuestoRenta.findAll("from ImpuestoRenta where anio=${fin.format('yyyy').toInteger()-1} and desde>= ${v} and hasta<=${v} order by desde")
+                                renta = ImpuestoRenta.findAll("from ImpuestoRenta where anio=${fin.format('yyyy').toInteger()-1} and desde<= ${v} and hasta>=${v} order by desde")
                             println "renta ${e.cedula} "+renta
                             if(renta.size()>0){
                                 renta=renta.pop()
@@ -131,7 +154,7 @@ class RolController extends Shield {
                                 dt.descripcion=r.rubro.nombre
                                 dt.rubro=r.rubro
                                 dt.codigo=r.rubro.codigo
-                                dt.valor=pagar
+                                dt.valor=pagar/12
                                 dt.valor=dt.valor.round(2)
                                 dt.signo=-1
                                 totalEgresos+=dt.valor
@@ -142,6 +165,25 @@ class RolController extends Shield {
 
                         }
 
+                    }
+                    fijos.each {r->
+                        if(r.mes==0 || r.mes==mesNum){
+                            def dt = new DetalleRol()
+                            dt.rol=rol
+                            dt.usuario=session.usuario.login
+                            dt.descripcion=r.descripcion
+                            dt.rubro=null
+                            dt.codigo="OTRO"
+                            dt.valor=r.valor
+                            dt.valor=dt.valor.round(2)
+                            dt.signo=r.signo
+                            if(dt.signo>0)
+                                totalIngresos+=dt.valor
+                            else
+                                totalEgresos+=dt.valor
+                            if(!dt.save(flush: true))
+                                println "error save dt "+dt.errors
+                        }
                     }
                     def prestamo = Prestamo.withCriteria {
                         eq("empleado",e)
