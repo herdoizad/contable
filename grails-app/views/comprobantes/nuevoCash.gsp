@@ -1,7 +1,7 @@
 <%@ page import="contable.core.Tabla" contentType="text/html;charset=UTF-8" %>
 <html>
 <head>
-    <title>Nuevo comprobante de ${tipoString}</title>
+    <title>Nuevo comprobante de ${tipoString} Cash</title>
     <meta name="layout" content="main">
 
     <style>
@@ -63,7 +63,7 @@
     <div class="col-md-8 titulo-panel">
         <h1 style="color:  #2F4050;margin-top: 0px;margin-bottom: 0px">PS-${mes}-${tipo}</h1>
     </div>
-    <div class="col-md-4 titulo-panel" style="margin-top: -6px">
+    <div class="col-md-4 titulo-panel" style="margin-top: -6px;text-align: right">
         <a href="#" class="btn btn-verde" id="guardar">
             <i class="fa fa-save"></i> Guardar
         </a>
@@ -72,26 +72,27 @@
         </a>
     </div>
 </div>
-<g:form name="frm" class="frm-comprobante" action="saveEgreso" controller="comprobantes">
+<g:form name="frm" class="frm-comprobante" action="saveCash" controller="comprobantes">
     <input type="hidden" id="data" name="data">
     <input type="hidden" id="data2" name="data2">
     <input type="hidden" name="mes" value="${mes}">
     <input type="hidden" name="mesSolo" value="${mesSolo}">
     <input type="hidden" name="tipo" value="${tipo}">
-    %{--<input type="hidden" name="numero" value="${comp?.numero}">--}%
+%{--<input type="hidden" name="numero" value="${comp?.numero}">--}%
     <div class="row fila">
         <div class="col-md-1">
             <label>Número:</label>
         </div>
         <div class="col-md-1">
-            <input type="text" name="numero" id="numero" class="form-control input-sm"  value="${g.formatNumber(number: siguiente,maxFractionDigits: 0)}">
-            <input type="hidden" id="numero_manual" value="${g.formatNumber(number: siguiente,maxFractionDigits: 0)}">
+            <input type="text" name="numero-txt" id="numero"  disabled class="form-control input-sm"  value="${g.formatNumber(number: siguiente,maxFractionDigits: 0)}">
+            <input type="hidden" name="numero" id="numero_manual" value="${g.formatNumber(number: siguiente,maxFractionDigits: 0)}">
         </div>
         <div class="col-md-1">
-            <label>Tipo egreso:</label>
+            <label>Tipo:</label>
         </div>
-        <div class="col-md-2">
-            <g:select name="tipoEgreso" id="modo" from="${tipos}" optionKey="key" optionValue="value" value="${comp?.tipoProcesamiento}" class="form-control input-sm"/>
+        <div class="col-md-1">
+            <input type="hidden" name="tipoProcesamiento" value="4" id="modo">
+            Transferencia
         </div>
         <div class="col-md-1">
             <label>Fecha:</label>
@@ -99,22 +100,39 @@
         <div class="col-md-2">
             <elm:datepicker name="fecha" class="form-control input-sm" minDate="${inicio}" maxDate="${fin}" value="${comp?.fecha?:inicio}"></elm:datepicker>
         </div>
+
     </div>
     <div class="row fila">
         <div class="col-md-1">
             <label>Concepto:</label>
         </div>
-        <div class="col-md-5">
-            <input type="text" name="concepto" id="concepto" class="form-control input-sm" value="${comp?.concepto}">
+        <div class="col-md-6">
+            <input type="text" name="concepto" maxlength="255" id="concepto" class="form-control input-sm" value="${comp?.concepto}">
         </div>
+    </div>
+    <div class="row fila" style="">
         <div class="col-md-1">
             <label>Beneficiario:</label>
         </div>
-        <div class="col-md-5" >
+        <div class="col-md-4" >
             <g:select name="cheque.cliente" id="cliente" from="${clientes}"  noSelection="['':'']"
                       class="form-control input-sm select"    optionKey="codigo" optionValue="cp" value="${cliente?.codigo}"/>
         </div>
-
+        <div class="col-md-2">
+            <label>Cuenta del beneficiario:</label>
+        </div>
+        <div class="col-md-2">
+            <g:select name="bancoCliente" id="bancoCliente" noSelection="['':'Seleccione']" from="${contable.core.BancoOcp.list([sort: 'descripcion'])}"
+            optionValue="descripcion" optionKey="codigo" class="form-control input-sm" value="${comp.bancoCliente.codigo}"
+            />
+        </div>
+        <div class="col-md-1">
+            <g:select name="tipoCuenta" id="tipoCuenta" from="${tipos}" class="form-control  input-sm "
+                      optionValue="value" optionKey="key" value="${comp.tipoCuenta}"/>
+        </div>
+        <div class="col-md-2">
+            <input type="text" id="cuentaCliente" class="form-control input-sm digits" style="text-align: right" value="${comp.cuentaTransferencia}" name="cuentaTransferencia">
+        </div>
     </div>
     <div class="row fila">
         <div class="col-md-1">
@@ -134,7 +152,7 @@
             </select>
         </div>
         <div class="col-md-1" >
-            <label>Cuenta:</label>
+            <label>Cuenta PYS:</label>
         </div>
         <div class="col-md-1" >
             <input type="text" class="form-control input-sm" id="cuenta_cheque" readonly value="${cheque?.cuenta}">
@@ -457,10 +475,14 @@
         var valor = $("#valor_cheque").val()
         var numero = $("#numero").val()
         var cliente = $("#cliente").val()
+        var cuenta = $("#cuentaCliente").val()
         if($("#graba").bootstrapSwitch("state"))
             graba=1
         if(concepto==""){
             msg+="<br>Ingrese un concepto"
+        }
+        if(cuenta==""){
+            msg+="<br>Ingrese una cuenta para efectuar la transferencia"
         }
         if(debe=="0" && haber=="0"){
             msg+="<br>Ingrese cuentas en la sección de detalle"
@@ -656,6 +678,39 @@
                     calcularTotales()
                 } //success
             }); //ajax
+        }
+
+    })
+    $("#cliente").change(function(){
+
+        if($("#cliente").val()!=""){
+            openLoader()
+            $.ajax({
+                type: "POST",
+                url: "${createLink(controller:'comprobantes', action:'getDatosCliente_ajax')}",
+                data: {
+                    cliente:$("#cliente").val()
+                },
+                success: function (msg) {
+                    closeLoader()
+                    if(msg=="null;null;null"){
+                        $("#bancoCliente").val("")
+                        $("#tipoCuenta").val("")
+                        $("#cuentaCliente").val("")
+                        bootbox.alert("El cliente seleccionado no tiene una cuenta bancaria registrada en el sistema. Asegurese de ingresarla.")
+                    }else{
+                        var parts = msg.split(";")
+                        $("#bancoCliente").val(parts[0].trim())
+                        $("#tipoCuenta").val(parts[1].trim())
+                        $("#cuentaCliente").val(parts[2].trim())
+                    }
+
+                } //success
+            }); //ajax
+        }else{
+            $("#bancoCliente").val("")
+            $("#tipoCuenta").val("")
+            $("#cuentaCliente").val("")
         }
 
     })

@@ -18,6 +18,9 @@ class Comprobante  implements Serializable{
     Integer ocp
     String tipoOcp
     Date fechaOcp
+    String cuentaTransferencia
+    BancoOcp bancoCliente
+    String  tipoCuenta
     static auditable = [ignore: []]
 
     /**
@@ -47,6 +50,9 @@ class Comprobante  implements Serializable{
             ocp column: 'COM_OCP'
             tipoOcp column: 'COM_TIPO_OCP'
             fechaOcp column: 'COM_FECHA_OCP'
+            cuentaTransferencia column: 'CUENTA_TRANSFERENCIA'
+            bancoCliente column: 'BANCO_CLIENTE'
+            tipoCuenta column: 'TIPO_CUENTA_CLIENTE'
         }
     }
     static constraints = {
@@ -59,7 +65,9 @@ class Comprobante  implements Serializable{
         ocp(nullable: true,blank:true)
         tipoOcp(nullable: true,blank:true,size: 1..2)
         fechaOcp(nullable: true,blank:true)
-
+        cuentaTransferencia(nullable: true,blank:true,size: 1..25)
+        bancoCliente(nullable: true)
+        tipoCuenta(nullable: true,blank:true,size: 1..5)
     }
 
     def getTipoString(){

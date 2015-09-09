@@ -1,7 +1,7 @@
 <%@ page import="contable.core.Tabla" contentType="text/html;charset=UTF-8" %>
 <html>
 <head>
-    <title>Egreso PS-${comp.mes}-${comp.tipo}-<g:formatNumber number="${comp.numero}" maxFractionDigits="0"/></title>
+    <title>${comp.tipo==2?'Egreso':'Diario'} PS-${comp.mes}-${comp.tipo}-<g:formatNumber number="${comp.numero}" maxFractionDigits="0"/></title>
     <meta name="layout" content="main">
     <style>
     .pestania{
@@ -20,7 +20,7 @@
         <div class="panel-completo" style="margin-left: 10px;min-height: 60px">
             <div class="row">
                 <div class="col-md-8 titulo-panel">
-                    Comprobande de egreso PS-${comp.mes}-${comp.tipo}-<g:formatNumber number="${comp.numero}" maxFractionDigits="0"/>
+                    Comprobande de ${comp.tipo==2?'Egreso':'Diario'} PS-${comp.mes}-${comp.tipo}-<g:formatNumber number="${comp.numero}" maxFractionDigits="0"/>
                 </div>
                 <div class="col-md-4 titulo-panel" style="margin-top: -12px;padding-bottom:7px;text-align: right">
                     <a href="#" id="imprimir" class="btn btn-verde">

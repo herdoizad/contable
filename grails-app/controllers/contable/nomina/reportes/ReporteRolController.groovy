@@ -43,11 +43,11 @@ class ReporteRolController extends Shield {
         p = new Paragraph("Ruc: 1791282299001 ", contenido);
         p.setAlignment(Element.ALIGN_RIGHT);
         document.add(p);
-        p = new Paragraph(" Direcci�n: Av. 6 de Diciembre \n" +
+        p = new Paragraph(" Dirección: Av. 6 de Diciembre \n" +
                 "    N30-182 y Alpallana, Quito" , contenido);
         p.setAlignment(Element.ALIGN_RIGHT);
         document.add(p);
-        p = new Paragraph("Telefono: (593) (2) 381-9680", contenido);
+        p = new Paragraph("Teléfono: (593) (2) 381-9680", contenido);
         p.setAlignment(Element.ALIGN_RIGHT);
         document.add(p);
         document.add(new Paragraph("\n"));

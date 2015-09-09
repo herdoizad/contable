@@ -24,7 +24,7 @@
                         Seleccione el perfil
                 </div>
                 <div class="col-md-2 titulo-panel" style="margin-top: -11px">
-                    <g:select name="usuario" id="usuario" class="form-control input-sm" from="${Usuario.list([sort: 'nombre'])}"
+                    <g:select name="usuario" id="usuario" class="form-control input-sm" from="${Usuario.findAllByEstado('A',[sort: 'nombre'])}"
                               optionKey="login" optionValue="nombre" style="font-weight:normal"/>
                 </div>
             </div>

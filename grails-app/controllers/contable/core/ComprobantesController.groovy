@@ -65,6 +65,80 @@ class ComprobantesController extends Shield {
             render "error"
     }
 
+    def nuevoCash(){
+        def mesSolo = params.mes
+        def anio = session.empresa.anio
+        def mes
+        if(params.mes.size()==2)
+            mes =""+anio+params.mes
+        else
+            mes=params.mes
+        def mesObj = Mes.findByCodigo(mes.toInteger())
+        if(mesObj.estado=="C") {
+            flash.message="El mes ${mesObj.descripcion} está cerrado"
+            response.sendError(403)
+        }
+        def tipoString
+        switch (params.tipo){
+            case "1":
+                tipoString="Ingreso"
+                break;
+            case "2":
+                tipoString="Egreso"
+                break;
+            case "3":
+                tipoString="Diario"
+                break;
+            case "4":
+                tipoString="Ajuste"
+                break;
+
+        }
+
+        def inicio = new Date().parse("yyyyMMdd",mes+"01")
+        Calendar cal = Calendar.getInstance();
+        cal.set(Calendar.MONTH, inicio.format("MM").toInteger()-1);
+        cal.set(Calendar.YEAR, anio.toInteger());
+        cal.set(Calendar.DAY_OF_MONTH, 1);// This is necessary to get proper results
+        cal.set(Calendar.DATE, cal.getActualMaximum(Calendar.DATE));
+        def fin  = cal.getTime();
+        def comp = null
+        def detalles = []
+        def rets = []
+        def cheque = null
+        def cliente=null
+        def ultimo = Comprobante.findAll("from Comprobante where empresa='${session.empresa.codigo}' and tipo=${params.tipo} and mes=${mes} and tipoProcesamiento=4 order by numero desc",["max":1])
+        def siguiente=(""+inicio.format("yyMM")+"01").toInteger()
+        if(ultimo.size()>0) {
+            ultimo = ultimo.pop()
+            siguiente=ultimo.numero+1
+        }
+        if(params.numero) {
+            comp=Comprobante.findAll("from Comprobante where empresa='${session.empresa.codigo}' and tipo=${params.tipo} and mes=${mes}and numero=${params.numero} order by numero desc",["max":1])
+            if(comp.size()>0) {
+                comp = comp.pop()
+                siguiente=comp.numero
+                detalles = DetalleComprobante.findAll("from DetalleComprobante where empresa='${comp.empresa.codigo}' and numero=${params.numero} and tipo=${params.tipo} and mes=${mes}")
+                rets = DetalleFacturaEgresos.findAll("from DetalleFacturaEgresos where empresa='${comp.empresa.codigo}' and comprobante=${params.numero} and tipo=${params.tipo} and mes=${mes}")
+                cheque = Cheque.findAll("from Cheque where empresa='${comp.empresa.codigo}' and comprobante=${params.numero} and tipo=${params.tipo} and mes=${mes}")
+                if(cheque.size()>0) {
+                    cheque = cheque.pop()
+                    cliente=Cliente.findByCp(cheque.beneficiario)
+                }else
+                    cheque=null
+            }else
+                comp=null
+        }
+        def tipos = ["01":"Ahorros","00":"Corriente"]
+        def tiposRet = Tabla.findAllByPadre("PS01")
+        def tipoIva = Tabla.findAllByPadre("PS02")
+        def tipoComp = TipoDocumento.findAllByDescripcionNotEqual("----------")
+        def cuentas = Cuenta.findAllByAgrupa(1)
+        def clientes = Cliente.list([sort: 'cp'])
+        [mes:mes,mesSolo:mesSolo,tipo:params.tipo,tipoString:tipoString,siguiente:siguiente,inicio: inicio,fin:fin,tipos:tipos,tiposRet:tiposRet,tipoIva:tipoIva,tipoComp:tipoComp,cuentas:cuentas,clientes:clientes,comp:comp,cheque:cheque,detalles:detalles,rets:rets,cliente:cliente]
+    }
+
+
     def nuevo(){
         def mesSolo = params.mes
         def anio = session.empresa.anio
@@ -74,8 +148,10 @@ class ComprobantesController extends Shield {
         else
             mes=params.mes
         def mesObj = Mes.findByCodigo(mes.toInteger())
-        if(mesObj.estado=="C")
+        if(mesObj.estado=="C") {
+            flash.message="El mes ${mesObj.descripcion} está cerrado"
             response.sendError(403)
+        }
         def tipoString
         switch (params.tipo){
             case "1":
@@ -124,7 +200,16 @@ class ComprobantesController extends Shield {
     def nuevoEgreso(){
         def mesSolo = params.mes
         def anio = session.empresa.anio
-        def mes =""+anio+params.mes
+        def mes
+        if(params.mes.size()==2)
+            mes =""+anio+params.mes
+        else
+            mes=params.mes
+        def mesObj = Mes.findByCodigo(mes.toInteger())
+        if(mesObj.estado=="C") {
+            flash.message="El mes ${mesObj.descripcion} está cerrado"
+            response.sendError(403)
+        }
         def tipoString
         switch (params.tipo){
             case "1":
@@ -155,15 +240,35 @@ class ComprobantesController extends Shield {
         cal.set(Calendar.DAY_OF_MONTH, 1);// This is necessary to get proper results
         cal.set(Calendar.DATE, cal.getActualMaximum(Calendar.DATE));
         def fin  = cal.getTime();
+        def comp = null
+        def detalles = []
+        def rets = []
+        def cheque = null
+        def cliente=null
+
+        if(params.numero) {
+            comp=Comprobante.findAll("from Comprobante where empresa='${session.empresa.codigo}' and tipo=${params.tipo} and mes=${mes}and numero=${params.numero} order by numero desc",["max":1])
+            if(comp.size()>0) {
+                comp = comp.pop()
+                siguiente=comp.numero
+                detalles = DetalleComprobante.findAll("from DetalleComprobante where empresa='${comp.empresa.codigo}' and numero=${params.numero} and tipo=${params.tipo} and mes=${mes}")
+                rets = DetalleFacturaEgresos.findAll("from DetalleFacturaEgresos where empresa='${comp.empresa.codigo}' and comprobante=${params.numero} and tipo=${params.tipo} and mes=${mes}")
+                cheque = Cheque.findAll("from Cheque where empresa='${comp.empresa.codigo}' and comprobante=${params.numero} and tipo=${params.tipo} and mes=${mes}")
+                if(cheque.size()>0) {
+                    cheque = cheque.pop()
+                    cliente=Cliente.findByCp(cheque.beneficiario)
+                }else
+                    cheque=null
+            }else
+                comp=null
+        }
         def tipos = [2:"Manual",1:"Automático"]
-        println "antes de los tipos"
         def tiposRet = Tabla.findAllByPadre("PS01")
         def tipoIva = Tabla.findAllByPadre("PS02")
         def tipoComp = TipoDocumento.findAllByDescripcionNotEqual("----------")
         def cuentas = Cuenta.findAllByAgrupa(1)
         def clientes = Cliente.list([sort: 'nombre'])
-        println "termino controller "
-        [mes:mes,mesSolo:mesSolo,tipo:params.tipo,tipoString:tipoString,siguiente:siguiente,inicio: inicio,fin:fin,tipos:tipos,tiposRet:tiposRet,tipoIva:tipoIva,tipoComp:tipoComp,cuentas:cuentas,clientes:clientes]
+        [mes:mes,mesSolo:mesSolo,tipo:params.tipo,tipoString:tipoString,siguiente:siguiente,inicio: inicio,fin:fin,tipos:tipos,tiposRet:tiposRet,tipoIva:tipoIva,tipoComp:tipoComp,cuentas:cuentas,clientes:clientes,comp:comp,cheque:cheque,detalles:detalles,rets:rets,cliente:cliente]
     }
 
     def nuevoIngreso(){
@@ -175,8 +280,10 @@ class ComprobantesController extends Shield {
         else
             mes=params.mes
         def mesObj = Mes.findByCodigo(mes.toInteger())
-        if(mesObj.estado=="C")
+        if(mesObj.estado=="C") {
+            flash.message="El mes ${mesObj.descripcion} está cerrado"
             response.sendError(403)
+        }
         def tipoString
         switch (params.tipo){
             case "1":
@@ -237,8 +344,10 @@ class ComprobantesController extends Shield {
             ultimo = ultimo.pop()
             numero=ultimo.numero+1
         }
-        def comp
-        comp=Comprobante.findAll("from Comprobante where empresa='${session.empresa.codigo}' and tipo=${params.tipo} and mes=${mes}and numero=${params.numero} order by numero desc",["max":1])
+        def comp=[]
+        if(params.numero){
+            comp=Comprobante.findAll("from Comprobante where empresa='${session.empresa.codigo}' and tipo=${params.tipo} and mes=${mes} and numero=${params.numero} order by numero desc",["max":1])
+        }
         if(comp.size()>0) {
             comp = comp.pop()
             numero = comp.numero
@@ -277,12 +386,13 @@ class ComprobantesController extends Shield {
                 }catch (e){
                     params.notas=0
                 }
-                def ingreso
-                ingreso = Ingreso.findAll("from Ingreso where empresa='${comp.empresa.codigo}' and numero=${params.numero} and tipo=${params.tipo} and mes=${mes}")
+                def ingreso = []
+                if(params.numero)
+                    ingreso = Ingreso.findAll("from Ingreso where empresa='${comp.empresa.codigo}' and numero=${params.numero} and tipo=${params.tipo} and mes=${mes}")
                 if(ingreso.size()>0)
                     ingreso=ingreso.pop()
                 else
-                    ingreso== new Ingreso()
+                    ingreso= new Ingreso()
                 ingreso.tipo=1
                 ingreso.numero=comp.numero
                 ingreso.empresa=comp.empresa
@@ -325,7 +435,7 @@ class ComprobantesController extends Shield {
                     det.creacion=new Date()
                     det.secuencial=parts[0].toDouble()
                     det.usuario = session.usuario.login
-                    println "cuenta "+det.cuenta+"  "+det.valor+"  "+det.tipo
+//                    println "cuenta "+det.cuenta+"  "+det.valor+"  "+det.tipo
                     if(!det.save(flush: true))
                         println "error save det "+det.errors
                 }
@@ -353,11 +463,26 @@ class ComprobantesController extends Shield {
         def mes = params.mes.toInteger()
         def ultimo = Comprobante.findAll("from Comprobante where empresa='${session.empresa.codigo}' and tipo=${params.tipo} and mes=${mes} and tipoProcesamiento=2 order by numero desc",["max":1])
         def numero =1
+        def cq = null
         if(ultimo.size()>0) {
             ultimo = ultimo.pop()
             numero=ultimo.numero+1
         }
-        def comp = new Comprobante()
+        def comp = []
+        if(params.numero)
+            comp=Comprobante.findAll("from Comprobante where empresa='${session.empresa.codigo}' and tipo=${params.tipo} and mes=${mes} and numero=${params.numero} order by numero desc",["max":1])
+        if(comp.size()>0) {
+            comp = comp.pop()
+            numero = comp.numero
+            DetalleComprobante.findAll("from DetalleComprobante where empresa='${comp.empresa.codigo}' and numero=${numero} and tipo=${params.tipo} and mes=${mes}").each {d->
+                d.delete(flush: true)
+            }
+            DetalleFacturaEgresos.findAll("from DetalleFacturaEgresos where empresa='${comp.empresa.codigo}' and comprobante=${params.numero} and tipo=${params.tipo} and mes=${mes}").each {
+                it.delete(flush: true)
+            }
+        }else{
+            comp = new Comprobante()
+        }
         comp.mes=mes
         comp.numero=numero
         comp.empresa=session.empresa
@@ -376,16 +501,25 @@ class ComprobantesController extends Shield {
 
             def banco =  Banco.findByCodigoAndEmpresa(params.cheque.banco,session.empresa)
             def cliente = Cliente.findByCodigoAndEmpresa(params.cheque.cliente,session.empresa)
-            def cheque = new Cheque()
+            def cheque = []
+            if(params.numero)
+                cheque = Cheque.findAll("from Cheque where empresa='${comp.empresa.codigo}' and comprobante=${params.numero} and tipo=${params.tipo} and mes=${mes}")
+            if(cheque.size()>0)
+                cheque=cheque.pop()
+            else {
+                cheque = new Cheque()
+                banco.ultimoCheque=banco.ultimoCheque+1
+                cheque.numero=banco.ultimoCheque.toInteger()
+
+                if(!banco.save(flush: true))
+                    println "error update banco "+banco.errors
+
+            }
             cheque.empresa=comp.empresa
             cheque.tipo=comp.tipo
             cheque.mes=comp.mes
             cheque.comprobante = comp.numero
             cheque.banco =banco
-            cheque.numero=banco.ultimoCheque+1
-            banco.ultimoCheque++
-            if(!banco.save(flush: true))
-                println "error update banco "+banco.errors
             cheque.beneficiario =cliente.cp
             cheque.cuenta=banco.numero.trim()
             cheque.emision=new Date().parse("dd-MM-yyyy",params.chequefecha_input)
@@ -411,7 +545,8 @@ class ComprobantesController extends Shield {
                     det.mes=comp.mes
                     det.tipoDocumento=TipoDocumento.findByCodigo(parts[0].toInteger())
                     det.numeroFactura=parts[1]
-                    det.fechaDocumento=new Date().parse("dd-MM-yyyy",parts[2])
+                    if(parts[2]!="")
+                        det.fechaDocumento=new Date().parse("dd-MM-yyyy",parts[2])
                     det.valor=parts[3].toDouble()
                     det.secuencialRetencion=cont
                     cont++
@@ -483,6 +618,176 @@ class ComprobantesController extends Shield {
         redirect(action: "showEgreso")
     }
 
+
+    def saveCash(){
+        println "params "+params
+        def mes = params.mes.toInteger()
+        def inicio = new Date().parse("yyyyMMdd",mes+"01")
+        def ultimo = Comprobante.findAll("from Comprobante where empresa='${session.empresa.codigo}' and tipo=${params.tipo} and mes=${mes} and tipoProcesamiento=4 order by numero desc",["max":1])
+        def numero =(""+inicio.format("yyMM")+"01").toInteger()
+        if(ultimo.size()>0) {
+            ultimo = ultimo.pop()
+            numero=ultimo.numero+1
+        }
+        def comp
+        comp=Comprobante.findAll("from Comprobante where empresa='${session.empresa.codigo}' and tipo=${params.tipo} and mes=${mes} and numero=${params.numero} order by numero desc",["max":1])
+        if(comp.size()>0) {
+            comp = comp.pop()
+            numero = comp.numero
+            DetalleComprobante.findAll("from DetalleComprobante where empresa='${comp.empresa.codigo}' and numero=${numero} and tipo=${params.tipo} and mes=${mes}").each {d->
+                d.delete(flush: true)
+            }
+            DetalleFacturaEgresos.findAll("from DetalleFacturaEgresos where empresa='${comp.empresa.codigo}' and comprobante=${params.numero} and tipo=${params.tipo} and mes=${mes}").each {
+                it.delete(flush: true)
+            }
+        }else{
+            comp = new Comprobante()
+        }
+        comp.mes=mes
+        comp.numero=numero
+        comp.empresa=session.empresa
+        comp.tipo=params.tipo.toInteger()
+        comp.concepto=params.concepto
+        comp.fecha=new Date().parse("dd-MM-yyyy",params.fecha_input)
+        comp.usuario=session.usuario.login
+        comp.control=9
+        comp.numeroCheque=0
+        comp.bancoCliente=BancoOcp.findByCodigo(params.bancoCliente)
+        comp.cuentaTransferencia=params.cuentaTransferencia
+        comp.tipoCuenta=params.tipoCuenta
+        comp.tipoProcesamiento=4
+
+        if(!comp.save(flush: true))
+            println "error save comp "+comp.errors
+        else{
+
+
+            def banco =  Banco.findByCodigoAndEmpresa(params.cheque.banco,session.empresa)
+            def cliente = Cliente.findByCodigoAndEmpresa(params.cheque.cliente,session.empresa)
+            if(!cliente.numeroCuenta || cliente.numeroCuenta==""){
+                cliente.banco=BancoOcp.findByCodigo(params.bancoCliente)
+                cliente.tipoCuenta=params.tipoCuenta
+                cliente.numeroCuenta=params.cuentaTransferencia
+                cliente.save(flush: true)
+            }
+            def cheque
+            cheque = Cheque.findAll("from Cheque where empresa='${comp.empresa.codigo}' and comprobante=${params.numero} and tipo=${params.tipo} and mes=${mes}")
+            if(cheque.size()>0)
+                cheque=cheque.pop()
+            else {
+                cheque = new Cheque()
+                banco.ultimoCheque=banco.ultimoCheque+1
+                cheque.numero=banco.ultimoCheque.toInteger()
+
+                if(!banco.save(flush: true))
+                    println "error update banco "+banco.errors
+
+            }
+            println "cheque "+cheque
+            cheque.empresa=comp.empresa
+            cheque.tipo=comp.tipo
+            cheque.mes=comp.mes
+            cheque.comprobante = comp.numero
+            cheque.banco =banco
+            cheque.beneficiario =cliente.cp
+            cheque.cuenta=banco.numero.trim()
+            cheque.emision=new Date().parse("dd-MM-yyyy",params.chequefecha_input)
+            cheque.usuario=comp.usuario
+            cheque.codigoBeneficiario=cliente.codigo
+            session.cheque=cheque
+            cheque.valor=params.cheque.valor.toDouble()
+            if(!cheque.save(flush: true)){
+                println "error save cliente "+cheque.errors
+            }
+            def data = params.data2.split("W")
+            def cont = 1
+            data.each {d->
+                if(d!=""){
+                    def parts = d.split(";")
+                    println "parts d2 "+parts
+                    def det = new DetalleFacturaEgresos()
+                    det.empresa=comp.empresa
+                    det.usuario=comp.usuario
+                    det.creacion=new Date()
+                    det.comprobante=comp.numero
+                    det.tipo=comp.tipo
+                    det.mes=comp.mes
+                    det.tipoDocumento=TipoDocumento.findByCodigo(parts[0].toInteger())
+                    det.numeroFactura=parts[1]
+                    if(parts[2]!="")
+                        det.fechaDocumento=new Date().parse("dd-MM-yyyy",parts[2])
+                    det.valor=parts[3].toDouble()
+                    det.secuencialRetencion=cont
+                    cont++
+                    if(parts[4]!="" && parts[4]!=" " ){
+                        det.tipoRetencion=parts[4]
+                        det.retencion=parts[5].toDouble()
+                    }else{
+                        det.retencion=0
+                    }
+                    if(parts[6]!="" && parts[6]!=" " ){
+                        det.tipoIva=parts[6]
+                        if(parts[8]=="1"){
+                            det.valorIva=parts[7].toDouble()
+                            det.retencionIva = 1
+                        }else{
+                            det.valorIva=0
+                            det.retencionIva=0
+                        }
+                    }else{
+                        det.valorIva=0
+                        det.retencionIva=0
+                    }
+                    det.pagar=parts[9].toDouble()
+                    if(!det.save(flush: true)){
+                        println "error save det "+det.errors
+                    }
+                }
+            }
+
+
+            data = params.data.split("\\|")
+            cont=1
+            // println "data "+data
+            data.each {d->
+                if(d!=""){
+                    def parts = d.split(";")
+                    //println "parts "+parts
+                    def det = new DetalleComprobante()
+                    def valor = 0
+                    det.numero=comp.numero
+                    det.empresa=session.empresa
+                    det.tipo=params.tipo.toInteger()
+                    det.mes=mes
+                    def cuenta =  Cuenta.findByNumeroAndEmpresa(parts[1],session.empresa)
+                    det.cuenta = cuenta
+                    if(parts[4].size()>35)
+                        parts[4]=parts[4][1..33]
+                    det.descripcion=parts[4].toUpperCase()
+                    if(parts[2].toDouble()>0){
+                        valor=parts[2].toDouble()
+                        det.signo=1
+                    }else{
+                        valor=parts[3].toDouble()
+                        det.signo=-1
+                    }
+                    det.valor=valor
+                    det.creacion=new Date()
+                    det.secuencial=cont
+                    cont++
+                    det.usuario = session.usuario.login
+                    println "cuenta "+det.cuenta+"  "+det.valor+"  "+det.tipo
+                    if(!det.save(flush: true))
+                        println "error save det "+det.errors
+                }
+            }
+        }
+        session.comprobante=comp
+
+        redirect(action: "showEgreso")
+    }
+
+
     def showEgreso(){
 
         def comp = session.comprobante
@@ -532,5 +837,15 @@ class ComprobantesController extends Shield {
     }
 
 
+    def getDatosCliente_ajax(){
+        def cli = Cliente.findByCodigo(params.cliente)
+        render ""+cli.banco?.codigo+";"+cli.tipoCuenta+";"+cli.numeroCuenta
+    }
+
+    def aplicarPrototipo_ajax(){
+        def p = Prototipo.get(params.id)
+        def dets = DetallePrototipo.findAllByCodigo(p.id)
+        [dets:dets]
+    }
 
 }

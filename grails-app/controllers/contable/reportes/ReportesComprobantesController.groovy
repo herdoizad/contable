@@ -20,6 +20,9 @@ import contable.seguridad.Shield
 class ReportesComprobantesController extends Shield {
     def meses =["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"]
 
+    def qrCodeService
+    def reportesService
+
     def imprimeComprobante(){
 //        println "imprime comprobante "+params
         def  comp = Comprobante.findAll("from Comprobante where empresa='${params.empresa}' and numero=${params.numero} and tipo=${params.tipo} and mes=${params.mes}")
@@ -31,52 +34,80 @@ class ReportesComprobantesController extends Shield {
             Document document = new Document();
             def nombre = "PS-${comp.mes}-${comp.tipo}-${comp.numero}.pdf"
             def fecha = new Date()
+            ByteArrayOutputStream bs = new ByteArrayOutputStream()
+            qrCodeService.renderPng(reportesService.getVcardComprobante(session.usuario.login,g.formatNumber(number:  comp.numero,minFractionDigits: 0,maxFractionDigits: 0),comp.tipo,comp.mes), 70, bs)
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             def writer = PdfWriter.getInstance(document, baos);
-            def img = grailsApplication.mainContext.getResource('/images/logo-login.png').getFile()
-            writer.setPageEvent(new contable.HeaderFooter(img.readBytes(), fecha, session.usuario.login,", Comprobante: "+"No: PS-${comp.mes}-${comp.tipo}-${g.formatNumber(number: comp.numero,maxFractionDigits: 0)}"));
-            Font header = new Font(Font.FontFamily.HELVETICA, 12, Font.UNDERLINE | Font.BOLD);
-            Font titulo = new Font(Font.FontFamily.HELVETICA, 7, Font.BOLD);
-            Font contenido = new Font(Font.FontFamily.HELVETICA, 6);
+            def img = grailsApplication.mainContext.getResource('/images/favicons/apple-touch-icon-57x57.png').getFile()
+
+            Font header = new Font(Font.FontFamily.HELVETICA, 12, Font.BOLD);
+            Font titulo = new Font(Font.FontFamily.HELVETICA, 9, Font.BOLD);
+            Font contenido = new Font(Font.FontFamily.HELVETICA, 8);
+            document.setMargins(40,40,20,50)
+
+            PdfPTable table
+            PdfPTable tabla = new PdfPTable(3);
+            tabla.setWidthPercentage(95.toFloat())
+            int[] anchos = [15, 35, 50];
+            tabla.setWidths(anchos)
+            def cell = new PdfPCell(new Paragraph("Fecha", titulo));
+            cell.setBorder(0)
+            tabla.addCell(cell);
+            cell = new PdfPCell(new Paragraph(comp.fecha.format("dd-MM-yyyy"), contenido));
+            cell.setBorder(0)
+            tabla.addCell(cell);
+            cell = new PdfPCell(new Paragraph("Comprobante de "+comp.getTipoString(), titulo));
+            cell.setBorder(0)
+            tabla.addCell(cell);
+            cell = new PdfPCell(new Paragraph("", titulo));
+            cell.setBorder(0)
+            tabla.addCell(cell);
+            cell = new PdfPCell(new Paragraph("", titulo));
+            cell.setBorder(0)
+            tabla.addCell(cell);
+            cell = new PdfPCell(new Paragraph("No: PS-${comp.mes}-${comp.tipo}-${g.formatNumber(number: comp.numero,maxFractionDigits: 0)}", titulo));
+            cell.setBorder(0)
+            tabla.addCell(cell);
+            writer.setPageEvent(new contable.HeaderFooter(img.readBytes(),bs, fecha, session.usuario.login,"",tabla));
+
             document.open();
-            String imageUrl = "/images/logo-login.png";
-//            String imageUrl = "./web-app//images/logo-login.png";
             Image image = Image.getInstance(img.readBytes());
-//            Image image = Image.getInstance( new File('./web-app//images/logo-login.png').readBytes());
-            image.setAbsolutePosition(40f, 738f);
+            image.setAbsolutePosition(40f, 765f);
+            document.add(image);
+            image = Image.getInstance(bs.toByteArray());
+            image.setAbsolutePosition(500f, 750f);
             document.add(image);
             Paragraph p = new Paragraph("PETROLEOS Y SERVICIOS", header);
-            p.setAlignment(Element.ALIGN_RIGHT);
+            p.setAlignment(Element.ALIGN_LEFT);
+            p.setIndentationLeft(94)
             document.add(p);
-            p = new Paragraph("Ruc: 1791282299001 ", contenido);
-            p.setAlignment(Element.ALIGN_RIGHT);
-            document.add(p);
-            p = new Paragraph(" Dirección: Av. 6 de Diciembre \n" +
-                    "    N30-182 y Alpallana, Quito" , contenido);
-            p.setAlignment(Element.ALIGN_RIGHT);
+            p = new Paragraph("Dirección: Av. 6 de Diciembre \n" +
+                    "N30-182 y Alpallana, Quito" , contenido);
+            p.setAlignment(Element.ALIGN_LEFT);
+            p.setIndentationLeft(94)
             document.add(p);
             p = new Paragraph("Telefono: (593) (2) 381-9680", contenido);
-            p.setAlignment(Element.ALIGN_RIGHT);
+            p.setAlignment(Element.ALIGN_LEFT);
+            p.setIndentationLeft(94)
             document.add(p);
             document.add(new Paragraph("\n"));
-            document.add(new Paragraph("\n"));
             def cheque
-            if(comp.tipo==2) {
-
+            if(comp.tipo==2 ) {
+                document.add(new Paragraph("\n"));
                 cheque = Cheque.findAll("from Cheque where mes=${comp.mes} and comprobante=${comp.numero} and tipo=${comp.tipo} and empresa='${session.empresa.codigo}'")
                 if(cheque.size()>0) {
                     cheque = cheque.pop()
                     PdfContentByte cb = writer.getDirectContent();
                     cb.saveState();
                     cb.setColorStroke(BaseColor.BLACK);
-                    cb.rectangle(38, 654, 520, 62);
+                    cb.rectangle(38, 661, 520, 70);
                     cb.stroke();
                     cb.restoreState();
-                    PdfPTable table = new PdfPTable(5);
+                    table = new PdfPTable(5);
                     table.setWidthPercentage(95.toFloat())
-                    int[] anchos = [15,35,20, 10, 20];
+                    anchos = [15,35,20, 10, 20];
                     table.setWidths(anchos)
-                    def cell = new PdfPCell(new Paragraph("CHEQUE", titulo));
+                    cell = new PdfPCell(new Paragraph("CHEQUE", titulo));
                     cell.setBorder(0)
                     cell.setColspan(5)
                     cell.setBorderWidthBottom(1);
@@ -138,30 +169,62 @@ class ReportesComprobantesController extends Shield {
                 }
 
             }
+            if(comp.tipoProcesamiento==4){
+                cheque = Cheque.findAll("from Cheque where mes=${comp.mes} and comprobante=${comp.numero} and tipo=${comp.tipo} and empresa='${session.empresa.codigo}'")
+                if(cheque.size()>0) {
+                    cheque = cheque.pop()
+                    p=new Paragraph("TRANSFERENCIA", titulo)
+                    p.setAlignment(Element.ALIGN_CENTER)
+                    document.add(p)
+                    document.add(new Paragraph("\n", titulo))
+                    table = new PdfPTable(6);
+                    table.setWidthPercentage(95.toFloat())
+                    anchos = [15, 10, 35, 13, 13, 13];
+                    table.setWidths(anchos)
+                    cell = new PdfPCell(new Paragraph("Banco", titulo));
+                    cell.setHorizontalAlignment(Element.ALIGN_CENTER)
+                    table.addCell(cell);
+                    cell = new PdfPCell(new Paragraph("No. Cuenta", titulo));
+                    cell.setHorizontalAlignment(Element.ALIGN_CENTER)
+                    table.addCell(cell);
+                    cell = new PdfPCell(new Paragraph("Beneficiario", titulo));
+                    cell.setHorizontalAlignment(Element.ALIGN_CENTER)
+                    table.addCell(cell);
+                    cell = new PdfPCell(new Paragraph("No. Transf", titulo));
+                    cell.setHorizontalAlignment(Element.ALIGN_CENTER)
+                    table.addCell(cell);
+                    cell = new PdfPCell(new Paragraph("Fecha", titulo));
+                    cell.setHorizontalAlignment(Element.ALIGN_CENTER)
+                    table.addCell(cell);
+                    cell = new PdfPCell(new Paragraph("Valor", titulo));
+                    cell.setHorizontalAlignment(Element.ALIGN_CENTER)
+                    table.addCell(cell);
+                    cell = new PdfPCell(new Paragraph(cheque.banco.descripcion, contenido));
+                    table.addCell(cell);
+                    cell = new PdfPCell(new Paragraph(cheque.banco.numero, contenido));
+                    table.addCell(cell);
+                    cell = new PdfPCell(new Paragraph(cheque.beneficiario, contenido));
+                    table.addCell(cell);
+                    cell = new PdfPCell(new Paragraph(formatNumber(number: comp.numero, maxFractionDigits: 0), contenido));
+                    table.addCell(cell);
+                    cell = new PdfPCell(new Paragraph(cheque.emision.format("dd-MM-yyyy"), contenido));
+                    table.addCell(cell);
+                    cell = new PdfPCell(new Paragraph(formatNumber(number: cheque.valor, type: "currency", currencySymbol: ""), contenido));
+                    cell.setHorizontalAlignment(Element.ALIGN_RIGHT)
+                    table.addCell(cell);
+                    cell = new PdfPCell(new Paragraph("Total", titulo));
+                    cell.setHorizontalAlignment(Element.ALIGN_RIGHT)
+                    cell.setColspan(5)
+                    table.addCell(cell);
+                    cell = new PdfPCell(new Paragraph(formatNumber(number: cheque.valor, type: "currency", currencySymbol: ""), titulo));
+                    cell.setHorizontalAlignment(Element.ALIGN_RIGHT)
+                    table.addCell(cell);
+                    document.add(table)
+                    document.add(new Paragraph("\n", titulo))
+                }
+            }
 
-            PdfPTable table = new PdfPTable(3);
-            table.setWidthPercentage(95.toFloat())
-            int[] anchos = [15, 35, 50];
-            table.setWidths(anchos)
-            def cell = new PdfPCell(new Paragraph("Fecha", titulo));
-            cell.setBorder(0)
-            table.addCell(cell);
-            cell = new PdfPCell(new Paragraph(comp.fecha.format("dd-MM-yyyy"), contenido));
-            cell.setBorder(0)
-            table.addCell(cell);
-            cell = new PdfPCell(new Paragraph("Comprobante de "+comp.getTipoString(), titulo));
-            cell.setBorder(0)
-            table.addCell(cell);
-            cell = new PdfPCell(new Paragraph("", titulo));
-            cell.setBorder(0)
-            table.addCell(cell);
-            cell = new PdfPCell(new Paragraph("", titulo));
-            cell.setBorder(0)
-            table.addCell(cell);
-            cell = new PdfPCell(new Paragraph("No: PS-${comp.mes}-${comp.tipo}-${g.formatNumber(number: comp.numero,maxFractionDigits: 0)}", titulo));
-            cell.setBorder(0)
-            table.addCell(cell);
-            document.add(table)
+            document.add(tabla)
             table = new PdfPTable(2);
             table.setWidthPercentage(95.toFloat())
             anchos = [14, 76];
@@ -228,36 +291,246 @@ class ReportesComprobantesController extends Shield {
             table.addCell(cell);
             document.add(table)
             document.add(new Paragraph("\n"));
-            table = new PdfPTable(3);
-            table.setWidthPercentage(95.toFloat())
-            anchos = [33,33,34];
-            table.setWidths(anchos)
-            cell = new PdfPCell(new Paragraph("\n\n\n\n", titulo));
-            cell.setHorizontalAlignment(Element.ALIGN_RIGHT)
-            table.addCell(cell);
-            cell = new PdfPCell(new Paragraph("", titulo));
-            cell.setHorizontalAlignment(Element.ALIGN_RIGHT)
-            table.addCell(cell);
-            cell = new PdfPCell(new Paragraph("", titulo));
-            cell.setHorizontalAlignment(Element.ALIGN_RIGHT)
-            table.addCell(cell);
-            cell = new PdfPCell(new Paragraph("Elaborado por", titulo));
-            cell.setHorizontalAlignment(Element.ALIGN_CENTER)
-            table.addCell(cell);
-            cell = new PdfPCell(new Paragraph("Contador", titulo));
-            cell.setHorizontalAlignment(Element.ALIGN_CENTER)
-            table.addCell(cell);
-            cell = new PdfPCell(new Paragraph("Jefe financiero", titulo));
-            cell.setHorizontalAlignment(Element.ALIGN_CENTER)
-            table.addCell(cell);
-            document.add(table)
+            if(comp.tipoProcesamiento==4) {
+                def detFac = DetalleFacturaEgresos.findAll("from DetalleFacturaEgresos  where mes=${comp.mes} and comprobante=${comp.numero} and tipo=${comp.tipo} and empresa='${session.empresa.codigo}'")
+                detFac.each {d->
+//                    document.add(new Paragraph("\n", titulo))
+                    def cliente =Cliente.findByCodigo(cheque.codigoBeneficiario)
+                    table = new PdfPTable(5);
+                    table.setWidthPercentage(95.toFloat())
+                    anchos = [15,35,20, 10, 20];
+                    table.setWidths(anchos)
+                    cell = new PdfPCell(new Paragraph("COMPROBANTE DE RETENCIÓN", titulo));
+                    cell.setBorder(0)
+                    cell.setColspan(5)
+                    cell.setHorizontalAlignment(Element.ALIGN_CENTER)
+                    table.addCell(cell);
+
+
+                    cell = new PdfPCell(new Paragraph("Ejercicio fiscal:", titulo));
+                    cell.setBorder(0)
+                    table.addCell(cell);
+                    cell = new PdfPCell(new Paragraph(d.creacion?.format("yyyy"), contenido));
+                    cell.setBorder(0)
+                    cell.setColspan(2)
+                    table.addCell(cell);
+                    cell = new PdfPCell(new Paragraph("No. Diario:", titulo));
+                    cell.setBorder(0)
+                    cell.setColspan(1)
+                    table.addCell(cell);
+                    cell = new PdfPCell(new Paragraph(" PS-${comp.mes}-${comp.tipo}-${g.formatNumber(number: comp.numero,maxFractionDigits: 0)}", contenido));
+                    cell.setBorder(0)
+                    cell.setColspan(1)
+                    table.addCell(cell);
+
+                    cell = new PdfPCell(new Paragraph("Contribuyente:", titulo));
+                    cell.setBorder(0)
+                    table.addCell(cell);
+                    cell = new PdfPCell(new Paragraph(cheque.beneficiario, contenido));
+                    cell.setBorder(0)
+                    cell.setColspan(2)
+                    table.addCell(cell);
+                    cell = new PdfPCell(new Paragraph("R.U.C.: ", titulo));
+                    cell.setBorder(0)
+                    table.addCell(cell);
+                    cell = new PdfPCell(new Paragraph(cliente?.ruc, contenido));
+                    cell.setBorder(0)
+                    cell.setColspan(1)
+                    table.addCell(cell);
+                    cell = new PdfPCell(new Paragraph("Dirección: ", titulo));
+                    cell.setBorder(0)
+                    table.addCell(cell);
+                    cell = new PdfPCell(new Paragraph(cliente?.direccion, contenido));
+                    cell.setBorder(0)
+                    cell.setColspan(2)
+                    table.addCell(cell);
+                    cell = new PdfPCell(new Paragraph("Fecha:", titulo));
+                    cell.setBorder(0)
+                    cell.setColspan(1)
+                    table.addCell(cell);
+                    cell = new PdfPCell(new Paragraph(d.creacion?.format("dd-MM-yyyy"), contenido));
+                    cell.setBorder(0)
+                    table.addCell(cell);
+
+
+//                    cell = new PdfPCell(new Paragraph("Tipo de comprobante ", titulo));
+//                    cell.setBorder(0)
+//                    cell.setColspan(2)
+//                    table.addCell(cell);
+//                    cell = new PdfPCell(new Paragraph(d.tipoDocumento.descripcion, contenido));
+//                    cell.setBorder(0)
+//                    table.addCell(cell);
+//
+//
+//
+//                    cell = new PdfPCell(new Paragraph("Numero de comprobante ", titulo));
+//                    cell.setBorder(0)
+//                    cell.setColspan(2)
+//                    table.addCell(cell);
+//                    cell = new PdfPCell(new Paragraph(d.numeroFactura, contenido));
+//                    cell.setBorder(0)
+//                    table.addCell(cell);
+
+                    document.add(table)
+                    document.add(new Paragraph("\n", titulo))
+                    table = new PdfPTable(5);
+                    table.setWidthPercentage(95.toFloat())
+                    anchos = [17,17,32, 17, 17];
+                    table.setWidths(anchos)
+                    cell = new PdfPCell(new Paragraph("Ejercicio fiscal", titulo))
+                    cell.setHorizontalAlignment(Element.ALIGN_CENTER)
+                    table.addCell(cell);
+                    cell = new PdfPCell(new Paragraph("Base imponible para la retención", titulo));
+                    cell.setHorizontalAlignment(Element.ALIGN_CENTER)
+                    table.addCell(cell);
+                    cell = new PdfPCell(new Paragraph("Impuesto", titulo));
+                    cell.setHorizontalAlignment(Element.ALIGN_CENTER)
+                    table.addCell(cell);
+                    cell = new PdfPCell(new Paragraph("% de Retención", titulo));
+                    cell.setHorizontalAlignment(Element.ALIGN_CENTER)
+                    table.addCell(cell);
+                    cell = new PdfPCell(new Paragraph("Valor retenido", titulo));
+                    cell.setHorizontalAlignment(Element.ALIGN_CENTER)
+                    table.addCell(cell);
+
+                    if(d.retencion>0){
+                        def rentencion = Tabla.findByCodigo(d.tipoRetencion)
+                        cell = new PdfPCell(new Paragraph(d.creacion.format("yyyy"), contenido))
+                        cell.setHorizontalAlignment(Element.ALIGN_CENTER)
+                        table.addCell(cell);
+                        cell = new PdfPCell(new Paragraph(g.formatNumber(number:  d.valor,type: "currency",currencySymbol: ""), contenido))
+                        cell.setHorizontalAlignment(Element.ALIGN_RIGHT)
+                        table.addCell(cell);
+                        cell = new PdfPCell(new Paragraph(rentencion.descripcion, contenido))
+                        table.addCell(cell);
+                        cell = new PdfPCell(new Paragraph(""+rentencion.porcentaje, contenido))
+                        cell.setHorizontalAlignment(Element.ALIGN_RIGHT)
+                        table.addCell(cell);
+                        cell = new PdfPCell(new Paragraph(g.formatNumber(number:  d.retencion,type: "currency",currencySymbol: ""), contenido))
+                        cell.setHorizontalAlignment(Element.ALIGN_RIGHT)
+                        table.addCell(cell);
+
+                    }
+
+                    if(d.valorIva>0){
+                        def rentencion = Tabla.findByCodigo(d.tipoIva)
+                        cell = new PdfPCell(new Paragraph(d.creacion.format("yyyy"), contenido))
+                        cell.setHorizontalAlignment(Element.ALIGN_CENTER)
+                        table.addCell(cell);
+                        cell = new PdfPCell(new Paragraph(g.formatNumber(number:  d.valor*0.12,type: "currency",currencySymbol: ""), contenido))
+                        cell.setHorizontalAlignment(Element.ALIGN_RIGHT)
+                        table.addCell(cell);
+                        cell = new PdfPCell(new Paragraph(rentencion.descripcion, contenido))
+                        table.addCell(cell);
+                        cell = new PdfPCell(new Paragraph(""+rentencion.porcentaje, contenido))
+                        cell.setHorizontalAlignment(Element.ALIGN_RIGHT)
+                        table.addCell(cell);
+                        cell = new PdfPCell(new Paragraph(g.formatNumber(number:  d.valorIva,type: "currency",currencySymbol: ""), contenido))
+                        cell.setHorizontalAlignment(Element.ALIGN_RIGHT)
+                        table.addCell(cell);
+
+                    }
+                    document.add(table)
+                    document.add(new Paragraph("\n", titulo))
+
+
+                }
+            }
+            if(comp.tipo!=2 && comp.tipoProcesamiento!=4) {
+                table = new PdfPTable(3);
+                table.setWidthPercentage(95.toFloat())
+                anchos = [33,33,34];
+                table.setWidths(anchos)
+                cell = new PdfPCell(new Paragraph("\n\n\n\n", titulo));
+                cell.setHorizontalAlignment(Element.ALIGN_RIGHT)
+                table.addCell(cell);
+                cell = new PdfPCell(new Paragraph("", titulo));
+                cell.setHorizontalAlignment(Element.ALIGN_RIGHT)
+                table.addCell(cell);
+                cell = new PdfPCell(new Paragraph("", titulo));
+                cell.setHorizontalAlignment(Element.ALIGN_RIGHT)
+                table.addCell(cell);
+                cell = new PdfPCell(new Paragraph("Elaborado por", titulo));
+                cell.setHorizontalAlignment(Element.ALIGN_CENTER)
+                table.addCell(cell);
+                cell = new PdfPCell(new Paragraph("Contador", titulo));
+                cell.setHorizontalAlignment(Element.ALIGN_CENTER)
+                table.addCell(cell);
+                cell = new PdfPCell(new Paragraph("Jefe financiero", titulo));
+                cell.setHorizontalAlignment(Element.ALIGN_CENTER)
+                table.addCell(cell);
+                document.add(table)
+            }else{
+                if(comp.tipo==2){
+                    table = new PdfPTable(4);
+                    table.setWidthPercentage(95.toFloat())
+                    anchos = [25,25,25,25];
+                    table.setWidths(anchos)
+                    cell = new PdfPCell(new Paragraph("\n\n\n\n", titulo));
+                    cell.setHorizontalAlignment(Element.ALIGN_RIGHT)
+                    table.addCell(cell);
+                    cell = new PdfPCell(new Paragraph("", titulo));
+                    cell.setHorizontalAlignment(Element.ALIGN_RIGHT)
+                    table.addCell(cell);
+                    cell = new PdfPCell(new Paragraph("", titulo));
+                    cell.setHorizontalAlignment(Element.ALIGN_RIGHT)
+                    table.addCell(cell);
+                    cell = new PdfPCell(new Paragraph("", titulo));
+                    cell.setHorizontalAlignment(Element.ALIGN_RIGHT)
+                    table.addCell(cell);
+                    cell = new PdfPCell(new Paragraph("Auditoría interna", titulo));
+                    cell.setHorizontalAlignment(Element.ALIGN_CENTER)
+                    table.addCell(cell);
+                    cell = new PdfPCell(new Paragraph("Presidente ejecutivo", titulo));
+                    cell.setHorizontalAlignment(Element.ALIGN_CENTER)
+                    table.addCell(cell);
+                    cell = new PdfPCell(new Paragraph("Presidente de directorio", titulo));
+                    cell.setHorizontalAlignment(Element.ALIGN_CENTER)
+                    table.addCell(cell);
+                    cell = new PdfPCell(new Paragraph("Recibí conforme", titulo));
+                    cell.setHorizontalAlignment(Element.ALIGN_CENTER)
+                    table.addCell(cell);
+                    document.add(table)
+                }else{
+                    table = new PdfPTable(4);
+                    table.setWidthPercentage(95.toFloat())
+                    anchos = [25,25,25,25];
+                    table.setWidths(anchos)
+                    cell = new PdfPCell(new Paragraph("\n\n\n\n", titulo));
+                    cell.setHorizontalAlignment(Element.ALIGN_RIGHT)
+                    table.addCell(cell);
+                    cell = new PdfPCell(new Paragraph("", titulo));
+                    cell.setHorizontalAlignment(Element.ALIGN_RIGHT)
+                    table.addCell(cell);
+                    cell = new PdfPCell(new Paragraph("", titulo));
+                    cell.setHorizontalAlignment(Element.ALIGN_RIGHT)
+                    table.addCell(cell);
+                    p =new Paragraph("Transferido a:\n${cheque.beneficiario}\nCta: ${comp.cuentaTransferencia}\n${comp.bancoCliente.descripcion}", contenido)
+                    p.setAlignment(Element.ALIGN_LEFT)
+                    cell = new PdfPCell(p);
+                    table.addCell(cell);
+                    cell = new PdfPCell(new Paragraph("Auditoría interna", titulo));
+                    cell.setHorizontalAlignment(Element.ALIGN_CENTER)
+                    table.addCell(cell);
+                    cell = new PdfPCell(new Paragraph("Presidente ejecutivo", titulo));
+                    cell.setHorizontalAlignment(Element.ALIGN_CENTER)
+                    table.addCell(cell);
+                    cell = new PdfPCell(new Paragraph("Presidente de directorio", titulo));
+                    cell.setHorizontalAlignment(Element.ALIGN_CENTER)
+                    table.addCell(cell);
+                    cell = new PdfPCell(new Paragraph("Recibí conforme", titulo));
+                    cell.setHorizontalAlignment(Element.ALIGN_CENTER)
+                    table.addCell(cell);
+                    document.add(table)
+                }
+            }
+
 
             if(comp.tipo==2) {
                 def detFac = DetalleFacturaEgresos.findAll("from DetalleFacturaEgresos  where mes=${comp.mes} and comprobante=${comp.numero} and tipo=${comp.tipo} and empresa='${session.empresa.codigo}'")
                 detFac.each {d->
                     document.add(new Paragraph("\n", titulo))
                     def cliente =Cliente.findByCodigo(cheque.codigoBeneficiario)
-                    println " codigo "+cheque.codigoBeneficiario
                     table = new PdfPTable(5);
                     table.setWidthPercentage(95.toFloat())
                     anchos = [15,35,20, 10, 20];
@@ -450,9 +723,9 @@ class ReportesComprobantesController extends Shield {
 
                 }
             }
-
-
-
+            p=new Paragraph("Impreso el "+new Date().format("dd-MM-yyyy HH:mm")+", Generado por: "+session.usuario.login,contenido)
+            p.setAlignment(Element.ALIGN_CENTER)
+            document.add(p)
             document.close();
             def b = baos.toByteArray()
             response.setContentType("application/pdf")
@@ -464,4 +737,6 @@ class ReportesComprobantesController extends Shield {
             println "error pdf "+e.printStackTrace()
         }
     }
+
+
 }

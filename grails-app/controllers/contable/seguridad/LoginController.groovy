@@ -59,12 +59,14 @@ class LoginController {
                     session.usuario = user
                     session.usuarioKerberos = user.login
                     session.empresa = Empresa.findByPrincipal("S")
+                    session.color=""
                     doLogin()
                 }else{
                     flash.message = "No puede ingresar al sistema"
                     flash.tipo = "error"
                     flash.icon = "icon-warning"
                     session.usuario = null
+                    session.color=""
                     redirect(controller: 'login', action: "login")
                     return
                 }
@@ -138,6 +140,14 @@ class LoginController {
 
         session.permisos = hp
         println "session permisos "+session.permisos
+    }
+
+    def cambiaColor_ajax(){
+        if(session.color=="-1")
+            session.color=""
+        else
+            session.color="-1"
+        redirect(uri: "/")
     }
 
 }

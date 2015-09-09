@@ -34,7 +34,7 @@
     </div>
 </div>
 <div class="row fila">
-<div class="col-md-3 reporte 10">
+<div class="col-md-4 reporte 10">
     <div class="panel-completo"  style="margin-left: 10px">
         <div class="row">
             <div class="col-md-12 titulo-panel">
@@ -77,7 +77,7 @@
     </div>
 </div>
 
-<div class="col-md-3 reporte 4">
+<div class="col-md-4 reporte 4">
     <div class="panel-completo" style="margin-left: 10px">
         <div class="row">
             <div class="col-md-12 titulo-panel">
@@ -120,7 +120,7 @@
     </div>
 </div>
 
-<div class="col-md-3 reporte 1" >
+<div class="col-md-4 reporte 1" >
     <div class="panel-completo" style="margin-left: 10px">
         <div class="row">
             <div class="col-md-12 titulo-panel">
@@ -162,7 +162,7 @@
         </div>
     </div>
 </div>
-<div class="col-md-3 reporte 2" >
+<div class="col-md-4 reporte 2" >
     <div class="panel-completo" style="margin-left: 10px">
         <div class="row">
             <div class="col-md-12 titulo-panel">
@@ -205,7 +205,7 @@
         </div>
     </div>
 </div>
-<div class="col-md-3 reporte 8" >
+<div class="col-md-4 reporte 8" >
     <div class="panel-completo" style="margin-left: 10px">
         <div class="row">
             <div class="col-md-12 titulo-panel">
@@ -248,7 +248,7 @@
         </div>
     </div>
 </div>
-<div class="col-md-3 reporte 6">
+<div class="col-md-4 reporte 6">
     <div class="panel-completo" style="margin-left: 10px">
         <div class="row">
             <div class="col-md-12 titulo-panel">
@@ -294,7 +294,7 @@
 
 
 
-<div class="col-md-3 reporte 7">
+<div class="col-md-4 reporte 7">
     <div class="panel-completo" style="margin-left: 10px">
         <div class="row">
             <div class="col-md-12 titulo-panel">
@@ -329,7 +329,7 @@
         </div>
     </div>
 </div>
-<div class="col-md-3 reporte 9">
+<div class="col-md-4 reporte 9">
     <div class="panel-completo" style="margin-left: 10px">
         <div class="row">
             <div class="col-md-12 titulo-panel">
@@ -376,7 +376,7 @@
 
 
 
-<div class="col-md-3 reporte 5">
+<div class="col-md-4 reporte 5">
     <div class="panel-completo" style="margin-left: 10px">
         <div class="row">
             <div class="col-md-12 titulo-panel">
@@ -429,7 +429,7 @@
         </div>
     </div>
 </div>
-<div class="col-md-3 reporte 3">
+<div class="col-md-4 reporte 3">
     <div class="panel-completo" style="margin-left: 10px">
         <div class="row">
             <div class="col-md-12 titulo-panel">

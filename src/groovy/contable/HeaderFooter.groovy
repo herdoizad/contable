@@ -29,15 +29,18 @@ class HeaderFooter implements PdfPageEvent{
     def helv
     def r
     def img
+    def qr
     def fecha
-    Font header = new Font(Font.FontFamily.HELVETICA  , 12,Font.UNDERLINE | Font.BOLD);
+    def tabla
+    Font header = new Font(Font.FontFamily.HELVETICA  , 12,Font.BOLD);
     Font titulo = new Font(Font.FontFamily.HELVETICA    , 10,Font.BOLD);
     Font contenido = new Font(Font.FontFamily.HELVETICA, 8);
-    public HeaderFooter(img,fecha,usuario,extra) {
+    public HeaderFooter(img,qr,fecha,usuario,extra,tabla) {
 
         this.img=img
+        this.qr=qr
         this.fecha=fecha
-
+        this.tabla=tabla
         footer = new PdfPTable(1);
         footer.setTotalWidth(500);
         footer.getDefaultCell().setHorizontalAlignment(Element.ALIGN_LEFT);
@@ -51,36 +54,79 @@ class HeaderFooter implements PdfPageEvent{
     public void onEndPage(PdfWriter writer, Document document) {
         PdfContentByte cb = writer.getDirectContent();
         if (document.getPageNumber() > 1) {
+
             Image image = Image.getInstance(this.img);
-            image.setAbsolutePosition(40f, 738f);
+            image.setAbsolutePosition(40f, 765f);
             document.add(image);
-            ColumnText.showTextAligned(cb,
-                    Element.ALIGN_RIGHT,new Phrase("PETROLEOS Y SERVICIOS",header),
-                    (float)(document.right()-20),
-                    (float) (document.top()+85 ),
-                    (float) 0);
-            ColumnText.showTextAligned(cb,
-                    Element.ALIGN_RIGHT,new Phrase("Ruc: 1791282299001 ", contenido),
-                    (float)(document.right()-20),
-                    (float) (document.top() +70),
-                    (float) 0);
-            ColumnText.showTextAligned(cb,
-                    Element.ALIGN_RIGHT,new Phrase(" Dirección: Av. 6 de Diciembre \n" +
-                    "    N30-182 y Alpallana, Quito" , contenido),
-                    (float)(document.right()-20),
-                    (float) (document.top() +55),
-                    (float) 0);
-            ColumnText.showTextAligned(cb,
-                    Element.ALIGN_RIGHT,new Phrase("Telefono: (593) (2) 381-9680" , contenido),
-                    (float)(document.right()-20),
-                    (float) (document.top() +40),
-                    (float) 0);
+            Image im = Image.getInstance(this.qr.toByteArray());
+            im.setAbsolutePosition(500f, 750f);
+            document.add(im);
+            if(tabla) {
+
+                ColumnText.showTextAligned(cb,
+                        Element.ALIGN_LEFT,new Phrase("PETROLEOS Y SERVICIOS",header),
+                        (float)(document.left()+100),
+                        (float) (document.top()+100 ),
+                        (float) 0);
+
+                ColumnText.showTextAligned(cb,
+                        Element.ALIGN_LEFT,new Phrase("Dirección: Av. 6 de Diciembre" +
+                        "    N30-182 y Alpallana, Quito" , contenido),
+                        (float)(document.left()+100),
+                        (float) (document.top() +85),
+                        (float) 0);
+                ColumnText.showTextAligned(cb,
+                        Element.ALIGN_LEFT,new Phrase("N30-182 y Alpallana, Quito", contenido),
+                        (float)(document.left()+100),
+                        (float) (document.top() +74),
+                        (float) 0);
+                ColumnText.showTextAligned(cb,
+                        Element.ALIGN_LEFT,new Phrase("Telefono: (593) (2) 381-9680" , contenido),
+                        (float)(document.left()+100),
+                        (float) (document.top() +63),
+                        (float) 0);
+
+                tabla.writeSelectedRows(0, 3,
+                        (float)(document.left()+10),
+                        (float) (document.top() + 40), cb);
+
+            }else{
+
+                ColumnText.showTextAligned(cb,
+                        Element.ALIGN_LEFT,new Phrase("PETROLEOS Y SERVICIOS",header),
+                        (float)(document.left()+100),
+                        (float) (document.top()+60 ),
+                        (float) 0);
+
+                ColumnText.showTextAligned(cb,
+                        Element.ALIGN_LEFT,new Phrase("Dirección: Av. 6 de Diciembre" +
+                        "    N30-182 y Alpallana, Quito" , contenido),
+                        (float)(document.left()+100),
+                        (float) (document.top() +45),
+                        (float) 0);
+                ColumnText.showTextAligned(cb,
+                        Element.ALIGN_LEFT,new Phrase("N30-182 y Alpallana, Quito", contenido),
+                        (float)(document.left()+100),
+                        (float) (document.top() +34),
+                        (float) 0);
+                ColumnText.showTextAligned(cb,
+                        Element.ALIGN_LEFT,new Phrase("Telefono: (593) (2) 381-9680" , contenido),
+                        (float)(document.left()+100),
+                        (float) (document.top() +23),
+                        (float) 0);
+
+            }
+        }
+        if(tabla){
+            document.setMargins(25,25,140,40)
+        }else{
+            document.setMargins(25,25,93,40)
         }
         footer.writeSelectedRows(0, -1,
                 (float)((document.right() - document.left() - 300) /2
                         + document.leftMargin()),
                 (float) (document.bottom() - 10), cb);
-        document.setMargins(25,25,140,40)
+
 
     }
     public void onOpenDocument(PdfWriter writer, Document document) {

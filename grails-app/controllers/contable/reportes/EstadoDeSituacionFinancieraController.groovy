@@ -14,7 +14,8 @@ import com.itextpdf.text.pdf.PdfWriter
 class EstadoDeSituacionFinancieraController extends Shield {
 
     def dataSource
-
+    def qrCodeService
+    def reportesService
     def estado(){
 //        println "esf "+params
         def inicio = new Date().parse("dd-MM-yyyy",params.inicio)

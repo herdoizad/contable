@@ -14,6 +14,8 @@ import com.itextpdf.text.pdf.PdfWriter
 
 class ResultadoIntegralController extends Shield {
     def dataSource
+    def qrCodeService
+    def reportesService
     def reporte(){
         def inicio = new Date().parse("dd-MM-yyyy",params.inicio)
         def fin = new Date().parse("dd-MM-yyyy",params.fin)

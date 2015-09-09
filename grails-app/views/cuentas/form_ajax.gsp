@@ -43,7 +43,7 @@
             </g:else>
 
             <elm:fieldRapido claseLabel="col-sm-2" label="Descripcion" claseField="col-sm-7">
-                <g:textField name="descripcion" maxlength="60" required="" class="form-control  input-sm required" value="${cuentaInstance?.descripcion?.trim()}"/>
+                <g:textField name="descripcion" maxlength="60" required="" class="form-control  input-sm required"  disabled="${cuentaInstance.agrupa==1}" value="${cuentaInstance?.descripcion?.trim()}"/>
             </elm:fieldRapido>
 
             <elm:fieldRapido claseLabel="col-sm-2" label="Clase" claseField="col-sm-7">

@@ -14,6 +14,8 @@ import groovy.sql.Sql
 
 class CarteraVencidaController extends Shield {
     def dataSource
+    def qrCodeService
+    def reportesService
     def index() {
         println "params "+params
         def inicio = new Date().parse("dd-MM-yyyy",params.inicio)

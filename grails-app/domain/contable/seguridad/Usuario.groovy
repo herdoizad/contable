@@ -7,6 +7,7 @@ class Usuario {
     String nombre
     String descripcion
     String password
+    String estado
 
     static auditable = false
     static mapping = {
@@ -21,6 +22,7 @@ class Usuario {
             nombre column: 'NOMBRE'
             descripcion column: 'DESCRIPCION'
             password column: 'PASSWORD'
+            estado column: 'ESTADO_EMPLEADO'
         }
     }
 

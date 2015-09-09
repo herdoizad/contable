@@ -13,6 +13,8 @@ import groovy.sql.Sql
 
 class AuxiliarRangoController {
     def dataSource
+    def qrCodeService
+    def reportesService
     def index() {
         def inicio = new Date().parse("dd-MM-yyyy",params.inicio)
         def fin = new Date().parse("dd-MM-yyyy",params.fin)

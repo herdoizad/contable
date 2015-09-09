@@ -11,6 +11,15 @@ body{
     color: #ffffff;
     background-color: transparent;
     position: absolute;
+    height: 100%;
+}
+
+.menu-1{
+    width: 180px;
+    color: #ffffff;
+    background-color: #2F4050;
+    position: absolute;
+    height: 100%;
 }
 
 .contenido{
@@ -30,7 +39,7 @@ body{
     padding-bottom: 5px;
     min-height: 30px;
     margin-bottom: 0px;
-    color: #A1ACBE !important;
+    color: #2F4050 !important;
     border-radius: 0px;
 }
 .buscar-header{
@@ -47,7 +56,7 @@ body{
 .titulo{
     text-align: center;
     font-size: 18px;
-    color: #8B8888;
+    color: #2F4050;
     margin-top: 5px;
 }
 .default a.item{
@@ -62,6 +71,14 @@ body{
 
     /*padding: 20px;*/
 }
+.menu-vertical-1{
+    padding: 5px;
+    padding-bottom: 5px;
+    background: transparent;
+    list-style: none;
+
+    /*padding: 20px;*/
+}
 .menu-vertical a{
     text-decoration: none;
     background: transparent;
@@ -69,9 +86,24 @@ body{
     padding: 0px;
     margin: 0px;
 }
+.menu-vertical-1 a{
+    text-decoration: none;
+    background: transparent;
+    color: inherit;
+    padding: 0px;
+    margin: 0px;
+}
 .menu-vertical li{
-    padding: 5px;
+    padding: 10px;
     color: #8095A8;
+    font-weight: normal;
+    cursor: pointer;
+    background: transparent;
+    padding-left: 15px;
+}
+.menu-vertical-1 li{
+    padding: 10px;
+    color: #ddd;
     font-weight: normal;
     cursor: pointer;
     background: transparent;
@@ -79,6 +111,14 @@ body{
 }
 
 .submenu{
+    display: none;
+    list-style: none;
+    background: transparent;
+    color: inherit;
+    margin-left: 0px;
+    padding: 0px;
+}
+.submenu-1{
     display: none;
     list-style: none;
     background: transparent;
@@ -97,7 +137,28 @@ body{
     padding-left: 5px;
     margin: 0px;
 }
+.submenu-1 a{
+    width: 100%;
+    background: transparent;
+    color: inherit;
+}
+.submenu-1 li{
+    background: transparent;
+    color: #8095A8;
+    padding-left: 5px;
+    margin: 0px;
+}
+.submenu-1 li{
+    background: transparent;
+    color: #8095A8;
+    padding-left: 5px;
+    margin: 0px;
+}
 .submenu li:hover{
+    background: transparent;
+    color: inherit;
+}
+.submenu-1 li:hover{
     background: transparent;
     color: inherit;
 }
@@ -261,4 +322,8 @@ h1{
 }
 .panel-darkblue{
     border: 1px solid  #2F4050;
+}
+.cambiar-color{
+    width: 20px;
+    height: 20px;
 }

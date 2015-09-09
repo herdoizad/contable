@@ -13,7 +13,8 @@ import com.itextpdf.text.pdf.PdfPTable
 import com.itextpdf.text.pdf.PdfWriter
 
 class AuxiliarController extends Shield  {
-
+    def qrCodeService
+    def reportesService
     def dataSource
     def reporte(){
         //println "params "+params

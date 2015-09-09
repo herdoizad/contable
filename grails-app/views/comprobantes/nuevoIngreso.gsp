@@ -98,6 +98,19 @@
                     <div class="col-md-2">
                         <elm:datepicker name="fecha" class="form-control input-sm" minDate="${inicio}" maxDate="${fin}" value="${comp?.fecha?comp.fecha:inicio}"></elm:datepicker>
                     </div>
+                    <div class="col-md-1">
+                        <label>Usar prototipo:</label>
+                    </div>
+                    <div class="col-md-3">
+                        <g:select name="prototipo" id="prototipo" from="${contable.core.Prototipo.list([sort: 'descripcion'])}"
+                                  optionKey="id" optionValue="descripcion" class="form-control input-sm"
+                        />
+                    </div>
+                    <div class="col-md-1">
+                        <a href="#" class="btn btn-verde btn-sm" id="usar">
+                            <i class="fa fa-check"></i>
+                        </a>
+                    </div>
                 </div>
                 <div class="row fila" style="position:relative;">
                     <div class="col-md-1">
@@ -203,7 +216,7 @@
                                 </g:else>
 
                                 <td style="text-align: center">
-                                    <a href='#' class='btn btn-danger btn-xsm borrar'><i class='fa fa-trash'></i></a>
+                                    <a href='#' class='btn btn-danger btn-sm borrar'><i class='fa fa-trash'></i></a>
                                 </td>
                             </tr>
                         </g:each>
@@ -290,7 +303,7 @@
             tr.append("<td style='text-align: center' class='secuencial'>"+secuencial+"</td>")
             tr.append("<td class=' cuenta "+cuenta+"'>"+cuenta+"</td>")
             tr.append("<td><input type='text' class='desc allCaps form-control input-sm' maxlength='35' value='"+desc+"'></td>")
-            var btn = $("<a href='#' class='btn btn-danger btn-xsm borrar'><i class='fa fa-trash'></a>")
+            var btn = $("<a href='#' class='btn btn-danger btn-sm borrar'><i class='fa fa-trash'></a>")
             if(signo) {
                 tr.attr("debe",valor)
                 tr.attr("haber",0)
@@ -350,6 +363,21 @@
     })
     calcularTotales()
     $(".valores").blur()
+    $("#usar").click(function(){
+        openLoader()
+        $.ajax({
+            type: "POST",
+            url: "${createLink(controller:'comprobantes', action:'aplicarPrototipo_ajax')}",
+            data: {
+                id:$("#prototipo").val()
+            },
+            success: function (msg) {
+                closeLoader()
+                $("#detalles").append(msg)
+                calcularTotales()
+            } //success
+        }); //ajax
+    })
 </script>
 </body>
 </html>

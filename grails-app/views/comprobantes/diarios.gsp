@@ -21,13 +21,17 @@
     <div class="col-md-12">
         <div class="panel-completo" style="margin-left: 10px">
             <div class="row">
-                <div class="col-md-8 titulo-panel">
+                <div class="col-md-7 titulo-panel">
                     Comprobantes de diario del  ${anio}
                 </div>
-                <div class="col-md-2 titulo-panel" style="margin-top: -11px">
+                <div class="col-md-3 titulo-panel" style="margin-top: -11px">
                     <a href="#" class="btn btn-sm btn-verde" id="nuevo" activo="00">
                         <i class="fa fa-plus"></i>
                         Nuevo
+                    </a>
+                    <a href="#" class="btn btn-sm btn-verde" id="nuevo-cash" activo="00">
+                        <i class="fa fa-plus"></i>
+                        Diario cash
                     </a>
                     <a href="#" class="btn btn-sm btn-verde">
                         <i class="fa fa-file-excel-o"></i>
@@ -105,6 +109,7 @@
         var btn = $(".m-"+mes)
         var div = $(btn.attr("href"))
         $("#nuevo").attr("activo",mes)
+        $("#nuevo-cash").attr("activo",mes)
         openLoader()
         $.ajax({
             type: "POST",
@@ -130,6 +135,8 @@
         var div = $($(this).attr("href"))
         var mes = $(this).attr("mes")
         $("#nuevo").attr("activo",mes)
+        $("#nuevo-cash").attr("activo",mes)
+
         openLoader()
         $.ajax({
             type: "POST",
@@ -233,6 +240,9 @@
     })
     $("#nuevo").click(function(){
         location.href="${g.createLink(controller: 'comprobantes',action: 'nuevo')}/?mes="+$(this).attr("activo")+"&tipo=3"
+    })
+    $("#nuevo-cash").click(function(){
+        location.href="${g.createLink(controller: 'comprobantes',action: 'nuevoCash')}/?mes="+$(this).attr("activo")+"&tipo=3"
     })
     $("#fs").click(function(){
         document.getElementById("contenedor").webkitRequestFullscreen();

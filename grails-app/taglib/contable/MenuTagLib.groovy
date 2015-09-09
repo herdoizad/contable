@@ -22,7 +22,7 @@ class MenuTagLib {
                 '          <img src="'+resource(dir: 'images/favicons',file: 'favicon-32x32.png')+'">\n' +
                 '            <span style="color: #006EB7">Petroleos y Servicios</span>\n' +
                 '        </div>\n' +
-                '        <div class="col-md-5 titulo hidden-sm hidden-xs ">\n' +titulo+
+                '        <div class="col-md-4 titulo hidden-sm hidden-xs ">\n' +titulo+
                 '        </div>\n' +
                 '        <div class="col-md-2 hidden-xs text-right" style="margin-top: 10px">\n' +
                 '          <li class="fa fa-user"></li> ' +session.usuario.login+
@@ -35,6 +35,11 @@ class MenuTagLib {
                 '        <div class="col-md-1 col-xs-2 col-sm-2 " style="margin-top: 10px">\n' +
                 '            <a href="'+g.createLink(controller: 'login',action: 'logout')+'" class="item" >\n' +
                 '                <i class="fa fa-sign-out"></i> Salir\n' +
+                '            </a>\n' +
+                '        </div>\n' +
+                '        <div class="col-md-1 col-xs-2 col-sm-2 " style="margin-top: 10px;text-align:rigth">\n' +
+                '            <a href="'+g.createLink(controller: 'login',action: 'cambiaColor_ajax')+'" class="item cambiar-color"  >\n' +
+                '                <i class="fa fa-desktop"></i>' +
                 '            </a>\n' +
                 '        </div>\n' +
                 '    </div>\n' +
@@ -88,7 +93,7 @@ class MenuTagLib {
 
         }
         session.menu = menu
-        def html = '<ul class=" menu-vertical">\n'
+        def html = "<ul class=' menu-vertical${session.color}'>\n"
         session.menu.each{m->
             def acciones = ''
             def active =""
@@ -101,12 +106,12 @@ class MenuTagLib {
                     acciones += ' <li class=""><a href="' + g.createLink(controller: a.control.nombre, action: a.nombre) + '" class=""> <i class="fa-menu ' + a.icono + '"></i> ' + a.descripcion + '</a></li>\n'
                 }
             }
-            html+=  '        <li class="menu-item  dropdown '+active+'">\n'
+            html+=  '        <li class="menu-item'+session.color+'  dropdown '+active+'">\n'
             html+=  '            <a href="#" class="dropdown-toggle '+active+' " style="width:150px">\n'
             html+=  '                <i class="fa-menu '+m.value["icono"]+'"></i>\n'
             html+=  '                <span class="toggle-menu">'+m.key+'</span>\n'
             html+=  '                <span class="caret toggle-menu"></span></a>\n'
-            html+=  '            <ul class="submenu " style="margin-top: 0px">\n'
+            html+=  '            <ul class="submenu'+session.color+' " style="margin-top: 0px">\n'
             html+=acciones
             html+=  '            </ul>\n'
             html+=  '        </li>\n'

@@ -21,16 +21,23 @@
             <td class="buscar" style="text-align: center">${c.fecha.format("dd-MM-yyyy")}</td>
             <td class="buscar">${c.concepto}</td>
             <td style="text-align: center">
-                <a href="#" class="btn btn-info btn-xsm ver ${mes}-${g.formatNumber(number:  c.numero,maxFractionDigits: 0)}" title="Ver" mes="${c.mes}" empresa="${c.empresa.codigo}" tipo="${c.tipo}" numero="${c.numero}">
+                <a href="#" class="btn btn-info btn-xsm ver ${mes}-${g.formatNumber(number:  c.numero,maxFractionDigits: 0)}" title="Ver" mes="${c.mes}" empresa="${c.empresa.codigo}" tipo="${c.tipo}" proc="${c.tipoProcesamiento}" numero="${c.numero}">
                     <i class="fa fa-search"></i>
                 </a>
             </td>
             <td style="text-align: center">
                 <g:if test="${mesObj.estado!='C'}">
                     <g:if test="${c.tipo==3}">
-                        <a href="${g.createLink(controller: 'comprobantes',action: 'nuevo',params: [mes:c.mes,tipo:c.tipo,numero:c.numero])}" class="btn btn-info btn-xsm editar ${mes}-${g.formatNumber(number:  c.numero,maxFractionDigits: 0)}" title="Editar" mes="${c.mes}" empresa="${c.empresa.codigo}" tipo="${c.tipo}" numero="${c.numero}">
-                            <i class="fa fa-pencil"></i>
-                        </a>
+                        <g:if test="${c.tipoProcesamiento!=4}">
+                            <a href="${g.createLink(controller: 'comprobantes',action: 'nuevo',params: [mes:c.mes,tipo:c.tipo,numero:c.numero])}" class="btn btn-info btn-xsm editar ${mes}-${g.formatNumber(number:  c.numero,maxFractionDigits: 0)}" title="Editar" mes="${c.mes}" empresa="${c.empresa.codigo}" tipo="${c.tipo}" numero="${c.numero}">
+                                <i class="fa fa-pencil"></i>
+                            </a>
+                        </g:if>
+                        <g:else>
+                            <a href="${g.createLink(controller: 'comprobantes',action: 'nuevoCash',params: [mes:c.mes,tipo:c.tipo,numero:c.numero])}" class="btn btn-info btn-xsm editar ${mes}-${g.formatNumber(number:  c.numero,maxFractionDigits: 0)}" title="Editar" mes="${c.mes}" empresa="${c.empresa.codigo}" tipo="${c.tipo}" numero="${c.numero}">
+                                <i class="fa fa-pencil"></i>
+                            </a>
+                        </g:else>
                     </g:if>
                     <g:if test="${c.tipo==2}">
                         <a href="${g.createLink(controller: 'comprobantes',action: 'nuevoEgreso',params: [mes:c.mes,tipo:c.tipo,numero:c.numero])}" class="btn btn-info btn-xsm editar ${mes}-${g.formatNumber(number:  c.numero,maxFractionDigits: 0)}" title="Editar" mes="${c.mes}" empresa="${c.empresa.codigo}" tipo="${c.tipo}" numero="${c.numero}">
@@ -133,7 +140,7 @@
 
 
     $(".ver").click(function(){
-        if($(this).attr("tipo")=="2"){
+        if($(this).attr("tipo")=="2" || $(this).attr("proc")=="4"){
             location.href="${g.createLink(controller: 'comprobantes',action: 'showEgreso')}/?mes="+$(this).attr("mes")+"&tipo="+$(this).attr("tipo")+"&numero="+$(this).attr("numero")
         }else{
             openLoader()
