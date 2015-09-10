@@ -156,7 +156,12 @@
         <div class="row fila">
             <div class="col-md-3">
                 <a href="#" class="btn btn-verde btn-sm" id="bc-btn">
-                    <i class="fa fa-file-pdf-o"></i> Generar
+                    <i class="fa fa-file-pdf-o"></i> Pdf
+                </a>
+            </div>
+            <div class="col-md-3">
+                <a href="#" class="btn btn-verde btn-sm" id="bc-btn-ex">
+                    <i class="fa fa-file-excel-o"></i> Excel
                 </a>
             </div>
         </div>
@@ -199,7 +204,12 @@
         <div class="row fila">
             <div class="col-md-3">
                 <a href="#" class="btn btn-verde btn-sm" id="aux-btn">
-                    <i class="fa fa-file-pdf-o"></i> Generar
+                    <i class="fa fa-file-pdf-o"></i> PDF
+                </a>
+            </div>
+            <div class="col-md-3">
+                <a href="#" class="btn btn-verde btn-sm" id="aux-btn-ex">
+                    <i class="fa fa-file-excel-o"></i> Excel
                 </a>
             </div>
         </div>
@@ -433,7 +443,7 @@
     <div class="panel-completo" style="margin-left: 10px">
         <div class="row">
             <div class="col-md-12 titulo-panel">
-                Auxiliar varias cuentas
+                Auxiliar por rango
             </div>
         </div>
         <div class="row fila">
@@ -483,6 +493,11 @@
             <div class="col-md-3">
                 <a href="#" class="btn btn-verde btn-sm" id="auxv-btn">
                     <i class="fa fa-file-pdf-o"></i> Generar
+                </a>
+            </div>
+            <div class="col-md-3">
+                <a href="#" class="btn btn-verde btn-sm" id="auxv-btn-ex">
+                    <i class="fa fa-file-excel-o"></i> Excel
                 </a>
             </div>
         </div>
@@ -538,6 +553,17 @@
             return false
         }
     })
+    $("#bc-btn-ex").click(function(){
+        if($("#bc-inicio_input").val()!="" && $("#bc-fin_input").val()!=""){
+            var b =  bootbox.alert({
+                message:$("#msn").html(),
+                title:"Generando reporte"
+            })
+            setTimeout(function(){b.modal("hide") }, 10000);
+            location.href="${createLink(controller: 'balanceExcel',action: 'reporte')}?inicio="+$("#bc-inicio_input").val()+"&fin="+$("#bc-fin_input").val()+"&nivel="+$("#bc-nivel").val()
+            return false
+        }
+    })
     $("#aux-btn").click(function(){
         if($("#aux-inicio_input").val()!="" && $("#aux-fin_input").val()!="" && $("#aux-cuenta").val()!=""){
             var b =  bootbox.alert({
@@ -546,6 +572,17 @@
             })
             setTimeout(function(){b.modal("hide") }, 10000);
             location.href="${createLink(controller: 'auxiliar',action: 'reporte')}?inicio="+$("#aux-inicio_input").val()+"&fin="+$("#aux-fin_input").val()+"&cuenta="+$("#aux-cuenta").val()
+            return false
+        }
+    })
+    $("#aux-btn-ex").click(function(){
+        if($("#aux-inicio_input").val()!="" && $("#aux-fin_input").val()!="" && $("#aux-cuenta").val()!=""){
+            var b =  bootbox.alert({
+                message:$("#msn").html(),
+                title:"Generando reporte"
+            })
+            setTimeout(function(){b.modal("hide") }, 10000);
+            location.href="${createLink(controller: 'auxiliarExcel',action: 'index')}?inicio="+$("#aux-inicio_input").val()+"&fin="+$("#aux-fin_input").val()+"&cuenta="+$("#aux-cuenta").val()
             return false
         }
     })
@@ -601,6 +638,17 @@
             })
             setTimeout(function(){b.modal("hide") }, 10000);
             location.href="${createLink(controller: 'auxiliarRango',action: 'index')}?inicio="+$("#auxv-inicio_input").val()+"&fin="+$("#auxv-fin_input").val()+"&cuenta="+$("#auxv-cuenta").val()+"&desde="+$("#auxv-desde").val()+"&hasta="+$("#auxv-hasta").val()
+            return false
+        }
+    })
+    $("#auxv-btn-ex").click(function(){
+        if($("#auxv-inicio_input").val()!="" && $("#auxv-fin_input").val()!="" && $("#auxv-cuenta").val()!="" && $("#auxv-desde").val()!=""  && $("#auxv-hasta").val()!=""){
+            var b =  bootbox.alert({
+                message:$("#msn").html(),
+                title:"Generando reporte"
+            })
+            setTimeout(function(){b.modal("hide") }, 10000);
+            location.href="${createLink(controller: 'auxiliarRangoExcel',action: 'index')}?inicio="+$("#auxv-inicio_input").val()+"&fin="+$("#auxv-fin_input").val()+"&cuenta="+$("#auxv-cuenta").val()+"&desde="+$("#auxv-desde").val()+"&hasta="+$("#auxv-hasta").val()
             return false
         }
     })

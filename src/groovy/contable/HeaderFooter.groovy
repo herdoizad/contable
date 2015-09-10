@@ -35,6 +35,7 @@ class HeaderFooter implements PdfPageEvent{
     Font header = new Font(Font.FontFamily.HELVETICA  , 12,Font.BOLD);
     Font titulo = new Font(Font.FontFamily.HELVETICA    , 10,Font.BOLD);
     Font contenido = new Font(Font.FontFamily.HELVETICA, 8);
+    Font foot = new Font(Font.FontFamily.HELVETICA, 6);
     public HeaderFooter(img,qr,fecha,usuario,extra,tabla) {
 
         this.img=img
@@ -44,7 +45,7 @@ class HeaderFooter implements PdfPageEvent{
         footer = new PdfPTable(1);
         footer.setTotalWidth(500);
         footer.getDefaultCell().setHorizontalAlignment(Element.ALIGN_LEFT);
-        def cell = new PdfPCell(new Paragraph("Impreso el "+new Date().format("dd-MM-yyyy HH:mm")+", Generado por: "+usuario+extra,contenido));
+        def cell = new PdfPCell(new Paragraph("Impreso el "+new Date().format("dd-MM-yyyy HH:mm")+", Generado por: "+usuario+extra,foot));
         cell.setBorder(0)
         cell.setHorizontalAlignment(Element.ALIGN_LEFT)
         footer.addCell(cell)

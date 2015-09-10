@@ -9,9 +9,10 @@ import com.itextpdf.text.pdf.PdfPCell
 import com.itextpdf.text.pdf.PdfPTable
 import com.itextpdf.text.pdf.PdfWriter
 import contable.core.Cuenta
+import contable.seguridad.Shield
 import groovy.sql.Sql
 
-class AuxiliarRangoController {
+class AuxiliarRangoController extends Shield  {
     def dataSource
     def qrCodeService
     def reportesService
@@ -27,28 +28,34 @@ class AuxiliarRangoController {
         def fecha = new Date()
         def nombre ="Auxiliar-${cuenta.numero.trim()}-${fecha.format('ddMMyyyy')}.pdf"
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        ByteArrayOutputStream bs = new ByteArrayOutputStream()
+        qrCodeService.renderPng(reportesService.getVcardReporte(session.usuario.login,"Auxiliar por rango"), 70, bs)
         def writer = PdfWriter.getInstance(document, baos);
-        def img = grailsApplication.mainContext.getResource('/images/logo-login.png').getFile()
-        writer.setPageEvent(new contable.HeaderFooter(img.readBytes(), fecha, session.usuario.login,""));
-        Font header = new Font(Font.FontFamily.HELVETICA, 12, Font.UNDERLINE | Font.BOLD);
-        Font titulo = new Font(Font.FontFamily.HELVETICA, 7, Font.BOLD);
-        Font contenido = new Font(Font.FontFamily.HELVETICA, 6);
+        def img = grailsApplication.mainContext.getResource('/images/favicons/apple-touch-icon-57x57.png').getFile()
+        writer.setPageEvent(new contable.HeaderFooter(img.readBytes(),bs, fecha, session.usuario.login,", Auxiliar por rango",null));
+        Font header = new Font(Font.FontFamily.HELVETICA, 11,  Font.BOLD);
+        Font titulo = new Font(Font.FontFamily.HELVETICA, 6, Font.BOLD);
+        Font contenido = new Font(Font.FontFamily.HELVETICA, 5);
+        document.setMargins(40,40,20,50)
         document.open();
         Image image = Image.getInstance(img.readBytes());
-        image.setAbsolutePosition(40f, 738f);
+        image.setAbsolutePosition(40f, 765f);
+        document.add(image);
+        image = Image.getInstance(bs.toByteArray());
+        image.setAbsolutePosition(500f, 750f);
         document.add(image);
         Paragraph p = new Paragraph("PETROLEOS Y SERVICIOS", header);
-        p.setAlignment(Element.ALIGN_RIGHT);
+        p.setAlignment(Element.ALIGN_LEFT);
+        p.setIndentationLeft(94)
         document.add(p);
-        p = new Paragraph("Ruc: 1791282299001 ", contenido);
-        p.setAlignment(Element.ALIGN_RIGHT);
-        document.add(p);
-        p = new Paragraph(" Dirección: Av. 6 de Diciembre \n" +
-                "    N30-182 y Alpallana, Quito" , contenido);
-        p.setAlignment(Element.ALIGN_RIGHT);
+        p = new Paragraph("Dirección: Av. 6 de Diciembre \n" +
+                "N30-182 y Alpallana, Quito" , contenido);
+        p.setAlignment(Element.ALIGN_LEFT);
+        p.setIndentationLeft(94)
         document.add(p);
         p = new Paragraph("Telefono: (593) (2) 381-9680", contenido);
-        p.setAlignment(Element.ALIGN_RIGHT);
+        p.setAlignment(Element.ALIGN_LEFT);
+        p.setIndentationLeft(94)
         document.add(p);
         document.add(new Paragraph("\n"));
         document.add(new Paragraph("\n"));
@@ -67,7 +74,7 @@ class AuxiliarRangoController {
                 num+="0"
             }
             num+=n
-            //println "num "+num
+//            println "num "+num
             auxiliarCuenta_ajax(cn,document,num,inicio,fin,titulo,contenido)
         }
 
@@ -86,14 +93,14 @@ class AuxiliarRangoController {
 
     def auxiliarCuenta_ajax(cn,document,cuenta,inicio,fin,titulo,contenido){
         def sql = "CONTABLE..up_rpt_auxiliar_por_cta  'PS' , ${inicio.format('yyyy').toInteger()}00 ,'${inicio.format('MM/dd/yyyy')}' , '${fin.format('MM/dd/yyyy')}','${cuenta.trim()}', 'S'"
-       // println "sql "+sql
+//       println "sql "+sql
         cn.call(sql.toString())
         sql = "select * from CONTABLE..COMPROBANTES_TMP "
         // println "sql "+sql
         def cont = 0
         def table = new PdfPTable(6);
         table.setWidthPercentage(95.toFloat())
-        int[] anchos = [10,15,30,15,15,15];
+        int[] anchos = [9,13,39,13,13,13];
         table.setWidths(anchos)
         def cell
         def debe = 0
@@ -209,7 +216,7 @@ class AuxiliarRangoController {
             table.addCell(cell);
             document.add(table)
         }
-
+//        println "cont "+cont
     }
 
     def getTipo_ajax(tipo){

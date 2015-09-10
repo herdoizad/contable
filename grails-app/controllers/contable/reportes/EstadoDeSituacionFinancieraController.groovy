@@ -37,28 +37,34 @@ class EstadoDeSituacionFinancieraController extends Shield {
         def fecha = new Date()
         def nombre ="EstadoSituacionFinanciera-${fecha.format('ddMMyyyy')}.pdf"
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        ByteArrayOutputStream bs = new ByteArrayOutputStream()
+        qrCodeService.renderPng(reportesService.getVcardReporte(session.usuario.login,"Estado de situación financiera"), 70, bs)
         def writer = PdfWriter.getInstance(document, baos);
-        def img = grailsApplication.mainContext.getResource('/images/logo-login.png').getFile()
-        writer.setPageEvent(new contable.HeaderFooter(img.readBytes(), fecha, session.usuario.login,""));
-        Font header = new Font(Font.FontFamily.HELVETICA, 12, Font.UNDERLINE | Font.BOLD);
-        Font titulo = new Font(Font.FontFamily.HELVETICA, 7, Font.BOLD);
-        Font contenido = new Font(Font.FontFamily.HELVETICA, 6);
+        def img = grailsApplication.mainContext.getResource('/images/favicons/apple-touch-icon-57x57.png').getFile()
+        writer.setPageEvent(new contable.HeaderFooter(img.readBytes(),bs, fecha, session.usuario.login,", Estado de situación financiera",null));
+        Font header = new Font(Font.FontFamily.HELVETICA, 11,  Font.BOLD);
+        Font titulo = new Font(Font.FontFamily.HELVETICA, 6, Font.BOLD);
+        Font contenido = new Font(Font.FontFamily.HELVETICA, 5);
+        document.setMargins(40,40,20,50)
         document.open();
         Image image = Image.getInstance(img.readBytes());
-        image.setAbsolutePosition(40f, 738f);
+        image.setAbsolutePosition(40f, 765f);
+        document.add(image);
+        image = Image.getInstance(bs.toByteArray());
+        image.setAbsolutePosition(500f, 750f);
         document.add(image);
         Paragraph p = new Paragraph("PETROLEOS Y SERVICIOS", header);
-        p.setAlignment(Element.ALIGN_RIGHT);
+        p.setAlignment(Element.ALIGN_LEFT);
+        p.setIndentationLeft(94)
         document.add(p);
-        p = new Paragraph("Ruc: 1791282299001 ", contenido);
-        p.setAlignment(Element.ALIGN_RIGHT);
-        document.add(p);
-        p = new Paragraph(" Dirección: Av. 6 de Diciembre \n" +
-                "    N30-182 y Alpallana, Quito" , contenido);
-        p.setAlignment(Element.ALIGN_RIGHT);
+        p = new Paragraph("Dirección: Av. 6 de Diciembre \n" +
+                "N30-182 y Alpallana, Quito" , contenido);
+        p.setAlignment(Element.ALIGN_LEFT);
+        p.setIndentationLeft(94)
         document.add(p);
         p = new Paragraph("Telefono: (593) (2) 381-9680", contenido);
-        p.setAlignment(Element.ALIGN_RIGHT);
+        p.setAlignment(Element.ALIGN_LEFT);
+        p.setIndentationLeft(94)
         document.add(p);
         document.add(new Paragraph("\n"));
         document.add(new Paragraph("\n"));

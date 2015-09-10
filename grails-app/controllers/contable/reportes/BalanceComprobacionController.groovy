@@ -29,7 +29,7 @@ class BalanceComprobacionController extends Shield {
         qrCodeService.renderPng(reportesService.getVcardReporte(session.usuario.login,"Balance de comprobación"), 70, bs)
         def writer = PdfWriter.getInstance(document, baos);
         def img = grailsApplication.mainContext.getResource('/images/favicons/apple-touch-icon-57x57.png').getFile()
-        writer.setPageEvent(new contable.HeaderFooter(img.readBytes(),bs, fecha, session.usuario.login,"Balance de comprobación",null));
+        writer.setPageEvent(new contable.HeaderFooter(img.readBytes(),bs, fecha, session.usuario.login,", Balance de comprobación",null));
         Font header = new Font(Font.FontFamily.HELVETICA, 11,  Font.BOLD);
         Font titulo = new Font(Font.FontFamily.HELVETICA, 6, Font.BOLD);
         Font contenido = new Font(Font.FontFamily.HELVETICA, 5);
