@@ -25,7 +25,7 @@ class MenuTagLib {
                 '        <div class="col-md-4 titulo hidden-sm hidden-xs ">\n' +titulo+
                 '        </div>\n' +
                 '        <div class="col-md-2 hidden-xs text-right" style="margin-top: 10px">\n' +
-                '          <li class="fa fa-user"></li> ' +session.usuario.login+
+                '         <a href="'+g.createLink(controller: "inicio",action: "personal")+'"> <li class="fa fa-user"></li> ' +session.usuario.login+'</a>'+
                 '        </div>\n' +
                 '        <div class="col-md-1 hidden-xs" style="width: 50px;margin-top: 10px">\n' +
                 '            <a href="#" class="item" title="Alertas" >\n' +

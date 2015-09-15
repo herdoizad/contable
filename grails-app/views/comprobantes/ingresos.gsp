@@ -16,22 +16,30 @@
 </head>
 <body>
 <elm:message tipo="${flash.tipo}" clase="${flash.clase}">${flash.message}</elm:message>
+<input type="hidden" id="act" value="01">
 <div class="row fila">
     <div class="col-md-12">
         <div class="panel-completo" style="margin-left: 10px">
             <div class="row">
-                <div class="col-md-8 titulo-panel">
+                <div class="col-md-3 titulo-panel">
                     Comprobantes de ingreso del ${anio}
+                </div>
+                <div class="col-md-5 titulo-panel" style="margin-top: -11px;text-align: right">
+                    Imprimir del
+                    <input type="text" style="width:80px;display: inline-table;text-align: right" id="desde" class="form-control input-sm number digits" value="1">
+                    al
+                    <input type="text" style="width:80px;display: inline-table;text-align: right" id="hasta" class="form-control input-sm number digits">
+                    <a href="#" class="btn btn-sm btn-verde" id="imprimirRango"><i class="fa fa-print"></i></a>
                 </div>
                 <div class="col-md-2 titulo-panel" style="margin-top: -11px">
                     <a href="#" class="btn btn-sm btn-verde" id="nuevo" activo="00">
                         <i class="fa fa-plus"></i>
                         Nuevo
                     </a>
-                    <a href="#" class="btn btn-sm btn-verde">
-                        <i class="fa fa-file-excel-o"></i>
-                        Exportar
-                    </a>
+                    %{--<a href="#" class="btn btn-sm btn-verde">--}%
+                        %{--<i class="fa fa-file-excel-o"></i>--}%
+                        %{--Exportar--}%
+                    %{--</a>--}%
                     <a href="#" id="fs" class="btn btn-verde btn-sm" title="Pantalla completa">
                         <i class="fa fa-desktop"></i>
                     </a>
@@ -94,6 +102,7 @@
     $(".mes").click(function(){
         var div = $($(this).attr("href"))
         var mes = $(this).attr("mes")
+        $("#act").val(mes)
         $("#nuevo").attr("activo",mes)
         openLoader()
         $.ajax({
@@ -134,6 +143,16 @@
 
     })
     $(".m-01").click()
+    $("#imprimirRango").click(function(){
+        var desde = $("#desde").val()
+        var hasta = $("#hasta").val()
+        if(desde!="" && hasta!=""){
+            openLoader()
+            location.href="${g.createLink(controller: 'reportesComprobantesRango',action:'reporte')}?empresa=${session.empresa.codigo}"+"&mes="+ $("#act").val()+"&tipo=1"+"&desde="+desde+"&hasta="+hasta+"&anio=${anio}"
+            closeLoader()
+        }
+
+    })
 </script>
 </body>
 </html>

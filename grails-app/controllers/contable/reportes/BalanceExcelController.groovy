@@ -42,13 +42,9 @@ class BalanceExcelController extends Shield  {
         Workbook wb = new Workbook()
         Sheet sheet = wb.createSheet("Balance de comprobación")
         int pictureIdx = wb.addPicture(img.readBytes(), Workbook.PICTURE_TYPE_PNG);
-        //Returns an object that handles instantiating concrete classes
         CreationHelper helper = wb.getCreationHelper();
-        //Creates the top-level drawing patriarch.
         Drawing drawing = sheet.createDrawingPatriarch();
-        //Create an anchor that is attached to the worksheet
         ClientAnchor anchor = helper.createClientAnchor();
-        //set top-left corner for the image
         anchor.setRow1(0);
         anchor.setCol1(0);
         anchor.setRow2(1);

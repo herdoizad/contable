@@ -123,15 +123,15 @@
         </div>
         <div class="col-md-2">
             <g:select name="bancoCliente" id="bancoCliente" noSelection="['':'Seleccione']" from="${contable.core.BancoOcp.list([sort: 'descripcion'])}"
-            optionValue="descripcion" optionKey="codigo" class="form-control input-sm" value="${comp.bancoCliente.codigo}"
+            optionValue="descripcion" optionKey="codigo" class="form-control input-sm" value="${comp?.bancoCliente?.codigo}"
             />
         </div>
         <div class="col-md-1">
             <g:select name="tipoCuenta" id="tipoCuenta" from="${tipos}" class="form-control  input-sm "
-                      optionValue="value" optionKey="key" value="${comp.tipoCuenta}"/>
+                      optionValue="value" optionKey="key" value="${comp?.tipoCuenta}"/>
         </div>
         <div class="col-md-2">
-            <input type="text" id="cuentaCliente" class="form-control input-sm digits" style="text-align: right" value="${comp.cuentaTransferencia}" name="cuentaTransferencia">
+            <input type="text" id="cuentaCliente" class="form-control input-sm digits" style="text-align: right" value="${comp?.cuentaTransferencia}" name="cuentaTransferencia">
         </div>
     </div>
     <div class="row fila">

@@ -94,7 +94,7 @@ class AuxiliarRangoExcelController extends Shield  {
 
 
         def output = response.getOutputStream()
-        def header = "attachment; filename=" + "Auxiliar-${cuenta.numero.trim()}-${fecha.format('ddMMyyyy')}.xlsx"
+        def header = "attachment; filename=" + "Auxiliar-${fecha.format('ddMMyyyy')}.xlsx"
         response.setContentType("application/application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
         response.setHeader("Content-Disposition", header)
         wb.write(output)

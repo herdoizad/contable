@@ -9,6 +9,8 @@ import contable.seguridad.Usuario
 
 class AccionesController extends Shield  {
 
+    def mailService
+
     static final sistema="T"  //todos
 
     /**
@@ -326,5 +328,41 @@ class AccionesController extends Shield  {
         } else {
             render "ERROR*" + errores
         }
+    }
+
+    def resetPassword_ajax(){
+        def usuario = Usuario.findByLogin(params.usu)
+        def r = new Random()
+        def chars = ["!","#","\$","%","&","-","_"]
+        def pass=usuario.login[0..2]
+        6.times{
+            def num = r.nextInt(120)
+            def c = Character.toChars(num)
+            if(num<56)
+                c=num.toString()[0..0]
+            if(c==" " || c=="" || c==null) {
+                c = chars[r.nextInt(6)]
+            }
+            pass+=c
+        }
+//        println "pass "+pass
+        usuario.password=pass.encodeAsMD5()
+        if(!usuario.save(flush: true))
+            println "error save usu "+usuario.errors
+        def email = usuario.nombre.split(" ")
+        email=email[0]+"."+email[1]+"@petroleosyservicios.com".toUpperCase()
+//        println "enviando email a "+email
+        mailService.sendMail {
+            multipart true
+//            to "valentinsvt@hotmail.com"
+            to email
+            subject "Nueva contraseña"
+            body( view:"cambioPass",
+                    model:[pass:pass,usuario:usuario.login,genera:session.usuario.login])
+            inline 'logo','image/png',grailsApplication.mainContext.getResource('/images/logo-login.png').getFile().readBytes()
+//            inline 'logo','image/png', new File('./web-app///images/logo-login.png').readBytes()
+        }
+        render "ok"
+
     }
 }

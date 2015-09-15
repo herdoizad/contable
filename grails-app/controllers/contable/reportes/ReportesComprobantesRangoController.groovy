@@ -1,4 +1,5 @@
 package contable.reportes
+
 import com.itextpdf.text.BaseColor
 import com.itextpdf.text.Document
 import com.itextpdf.text.Element
@@ -15,36 +16,88 @@ import contable.core.Comprobante
 import contable.core.DetalleComprobante
 import contable.core.DetalleFacturaEgresos
 import contable.core.Tabla
-import contable.seguridad.Shield
 
-class ReportesComprobantesController extends Shield {
+class ReportesComprobantesRangoController {
     def meses =["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"]
 
     def qrCodeService
     def reportesService
+    def reporte() {
+        println "params "+params
+        Document document = new Document();
+        def desde = params.desde.toInteger()
+        def hasta = params.hasta.toInteger()
+        def nombre = "comprobantes-del-${desde}-al-${hasta}.pdf"
+        def fecha = new Date()
+        def mes = params.anio+params.mes
+        println "mes "+mes
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        def writer = PdfWriter.getInstance(document, baos);
+        def img = grailsApplication.mainContext.getResource('/images/favicons/apple-touch-icon-57x57.png').getFile()
+        Font header = new Font(Font.FontFamily.HELVETICA, 12, Font.BOLD);
+        Font titulo = new Font(Font.FontFamily.HELVETICA, 9, Font.BOLD);
+        Font contenido = new Font(Font.FontFamily.HELVETICA, 8);
+        document.setMargins(40,40,20,50)
+        def hf = new contable.HeaderFooter(img.readBytes(),null, fecha, session.usuario.login,"",null)
+        writer.setPageEvent(hf);
+        document.open();
+        Image image = Image.getInstance(img.readBytes());
+        image.setAbsolutePosition(40f, 765f);
+        document.add(image);
 
-    def imprimeComprobante(){
+        Paragraph p = new Paragraph("PETROLEOS Y SERVICIOS", header);
+        p.setAlignment(Element.ALIGN_LEFT);
+        p.setIndentationLeft(94)
+        document.add(p);
+        p = new Paragraph("Dirección: Av. 6 de Diciembre \n" +
+                "N30-182 y Alpallana, Quito" , contenido);
+        p.setAlignment(Element.ALIGN_LEFT);
+        p.setIndentationLeft(94)
+        document.add(p);
+        p = new Paragraph("Telefono: (593) (2) 381-9680", contenido);
+        p.setAlignment(Element.ALIGN_LEFT);
+        p.setIndentationLeft(94)
+        document.add(p);
+        document.add(new Paragraph("\n"));
+
+        def cont = 0
+        (desde..hasta).each {
+            println "num "+it
+            def  comp = Comprobante.findAll("from Comprobante where empresa='${session.empresa.codigo}' and numero=${it} and tipo=${params.tipo} and mes=${mes}")
+            if(comp.size()>0) {
+                comp = comp.pop()
+                if (cont > 0)
+                    document.newPage()
+                cont++
+                imprimeComprobante(comp, document, header, titulo, contenido, hf,writer)
+            }
+        }
+
+
+
+
+
+
+        document.close();
+        def b = baos.toByteArray()
+        response.setContentType("application/pdf")
+        response.setHeader("Content-disposition", "attachment; filename=" + nombre)
+        response.setContentLength(b.length)
+        response.getOutputStream().write(b)
+    }
+
+
+    def imprimeComprobante(Comprobante comp,Document document,header,titulo,contenido,hf,writer){
 //        println "imprime comprobante "+params
-        def  comp = Comprobante.findAll("from Comprobante where empresa='${params.empresa}' and numero=${params.numero} and tipo=${params.tipo} and mes=${params.mes}")
+        ByteArrayOutputStream bs = new ByteArrayOutputStream()
+        qrCodeService.renderPng(reportesService.getVcardComprobante(session.usuario.login,g.formatNumber(number:  comp.numero,minFractionDigits: 0,maxFractionDigits: 0),comp.tipo,comp.mes), 70, bs)
+        def image = Image.getInstance(bs.toByteArray());
+        image.setAbsolutePosition(500f, 750f);
+        document.add(image);
+        hf.qr=bs
 
-        if(comp.size()>0)
-            comp=comp.pop()
-        def detalles = DetalleComprobante.findAll("from DetalleComprobante where empresa='${params.empresa}' and numero=${params.numero} and tipo=${params.tipo} and mes=${params.mes}")
+        def detalles = DetalleComprobante.findAll("from DetalleComprobante where empresa='${comp.empresa.codigo}' and numero=${comp.numero} and tipo=${comp.tipo} and mes=${comp.mes}")
         try {
-            Document document = new Document();
-            def nombre = "PS-${comp.mes}-${comp.tipo}-${comp.numero}.pdf"
-            def fecha = new Date()
-            ByteArrayOutputStream bs = new ByteArrayOutputStream()
-            qrCodeService.renderPng(reportesService.getVcardComprobante(session.usuario.login,g.formatNumber(number:  comp.numero,minFractionDigits: 0,maxFractionDigits: 0),comp.tipo,comp.mes), 70, bs)
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            def writer = PdfWriter.getInstance(document, baos);
-            def img = grailsApplication.mainContext.getResource('/images/favicons/apple-touch-icon-57x57.png').getFile()
-
-            Font header = new Font(Font.FontFamily.HELVETICA, 12, Font.BOLD);
-            Font titulo = new Font(Font.FontFamily.HELVETICA, 9, Font.BOLD);
-            Font contenido = new Font(Font.FontFamily.HELVETICA, 8);
-            document.setMargins(40,40,20,50)
-
             PdfPTable table
             PdfPTable tabla = new PdfPTable(3);
             tabla.setWidthPercentage(95.toFloat())
@@ -68,29 +121,7 @@ class ReportesComprobantesController extends Shield {
             cell = new PdfPCell(new Paragraph("No: PS-${comp.mes}-${comp.tipo}-${g.formatNumber(number: comp.numero,maxFractionDigits: 0)}", titulo));
             cell.setBorder(0)
             tabla.addCell(cell);
-            writer.setPageEvent(new contable.HeaderFooter(img.readBytes(),bs, fecha, session.usuario.login,"",tabla));
 
-            document.open();
-            Image image = Image.getInstance(img.readBytes());
-            image.setAbsolutePosition(40f, 765f);
-            document.add(image);
-            image = Image.getInstance(bs.toByteArray());
-            image.setAbsolutePosition(500f, 750f);
-            document.add(image);
-            Paragraph p = new Paragraph("PETROLEOS Y SERVICIOS", header);
-            p.setAlignment(Element.ALIGN_LEFT);
-            p.setIndentationLeft(94)
-            document.add(p);
-            p = new Paragraph("Dirección: Av. 6 de Diciembre \n" +
-                    "N30-182 y Alpallana, Quito" , contenido);
-            p.setAlignment(Element.ALIGN_LEFT);
-            p.setIndentationLeft(94)
-            document.add(p);
-            p = new Paragraph("Telefono: (593) (2) 381-9680", contenido);
-            p.setAlignment(Element.ALIGN_LEFT);
-            p.setIndentationLeft(94)
-            document.add(p);
-            document.add(new Paragraph("\n"));
             def cheque
             if(comp.tipo==2 ) {
                 document.add(new Paragraph("\n"));
@@ -352,24 +383,6 @@ class ReportesComprobantesController extends Shield {
                     cell.setBorder(0)
                     table.addCell(cell);
 
-
-//                    cell = new PdfPCell(new Paragraph("Tipo de comprobante ", titulo));
-//                    cell.setBorder(0)
-//                    cell.setColspan(2)
-//                    table.addCell(cell);
-//                    cell = new PdfPCell(new Paragraph(d.tipoDocumento.descripcion, contenido));
-//                    cell.setBorder(0)
-//                    table.addCell(cell);
-//
-//
-//
-//                    cell = new PdfPCell(new Paragraph("Numero de comprobante ", titulo));
-//                    cell.setBorder(0)
-//                    cell.setColspan(2)
-//                    table.addCell(cell);
-//                    cell = new PdfPCell(new Paragraph(d.numeroFactura, contenido));
-//                    cell.setBorder(0)
-//                    table.addCell(cell);
 
                     document.add(table)
                     document.add(new Paragraph("\n", titulo))
@@ -735,20 +748,13 @@ class ReportesComprobantesController extends Shield {
 
                 }
             }
-            p=new Paragraph("Impreso el "+new Date().format("dd-MM-yyyy HH:mm")+", Generado por: "+session.usuario.login,contenido)
+
+            def p=new Paragraph("Impreso el "+new Date().format("dd-MM-yyyy HH:mm")+", Generado por: "+session.usuario.login,contenido)
             p.setAlignment(Element.ALIGN_CENTER)
             document.add(p)
-            document.close();
-            def b = baos.toByteArray()
-            response.setContentType("application/pdf")
-            response.setHeader("Content-disposition", "attachment; filename=" + nombre)
-            response.setContentLength(b.length)
-            response.getOutputStream().write(b)
-
         }catch (e){
             println "error pdf "+e.printStackTrace()
         }
     }
-
 
 }

@@ -17,15 +17,20 @@
     <div class="col-md-12">
         <div class="panel-completo" style="">
             <div class="row">
-                <div class="col-md-8 titulo-panel">
+                <div class="col-md-7 titulo-panel">
                     Configuración del menú
                 </div>
-                <div class="col-md-2 titulo-panel">
-                        Seleccione el perfil
+                <div class="col-md-1 titulo-panel">
+                    Usuario:
                 </div>
                 <div class="col-md-2 titulo-panel" style="margin-top: -11px">
                     <g:select name="usuario" id="usuario" class="form-control input-sm" from="${Usuario.findAllByEstado('A',[sort: 'nombre'])}"
                               optionKey="login" optionValue="nombre" style="font-weight:normal"/>
+                </div>
+                <div class="col-md-2 titulo-panel" style="margin-top: -11px">
+                    <a href="#" class="btn btn-sm btn-verde" id="reset">
+                        <i class="fa fa-pencil"></i> Resetear contraseña
+                    </a>
                 </div>
             </div>
             <div class="row fila">
@@ -258,6 +263,26 @@
             });
         });
     });
+
+    $("#reset").click(function(){
+        bootbox.confirm("Está seguro?. Se enviará un correo electronico al usuario con su nueva contraseña temporal.",function(result){
+            if(result){
+                openLoader()
+                $.ajax({
+                    type    : "POST",
+                    data    :"usu="+$("#usuario").val(),
+                    url     : "${createLink(controller:'acciones', action:'resetPassword_ajax')}",
+                    success : function (msg) {
+                        closeLoader()
+                        if(msg=="ok"){
+                                bootbox.alert("Contraseña enviada")
+                        }
+                    }
+                });
+            }
+        });
+
+    })
 </script>
 
 </body>

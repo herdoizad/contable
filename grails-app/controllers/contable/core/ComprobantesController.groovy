@@ -32,7 +32,9 @@ class ComprobantesController extends Shield {
     }
 
     def getDetalle_ajax(){
+//        println "params "+params
         def  com = Comprobante.findAll("from Comprobante where empresa='${params.empresa}' and numero=${params.numero} and tipo=${params.tipo} and mes=${params.mes}")
+//        println "comp "+com
         def detalles = DetalleComprobante.findAll("from DetalleComprobante where empresa='${params.empresa}' and numero=${params.numero} and tipo=${params.tipo} and mes=${params.mes}")
         if(com.size()>0)
             com=com.pop()
@@ -789,9 +791,11 @@ class ComprobantesController extends Shield {
 
 
     def showEgreso(){
-
+        println "params show egreso "+params
         def comp = session.comprobante
         def cheque = session.cheque
+        session.comprobante=null
+        session.cheque=null
         if(!comp){
             comp = Comprobante.findAll("from Comprobante where mes=${params.mes} and numero=${params.numero} and tipo=${params.tipo} and empresa='${session.empresa.codigo}'")
             if(comp.size()>0)

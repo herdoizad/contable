@@ -113,7 +113,12 @@
         <div class="row fila">
             <div class="col-md-3">
                 <a href="#" class="btn btn-verde btn-sm" id="eri-btn">
-                    <i class="fa fa-file-pdf-o"></i> Generar
+                    <i class="fa fa-file-pdf-o"></i> PDF
+                </a>
+            </div>
+            <div class="col-md-3">
+                <a href="#" class="btn btn-verde btn-sm" id="eri-btn-ex">
+                    <i class="fa fa-file-excel-o"></i> Excel
                 </a>
             </div>
         </div>
@@ -295,7 +300,13 @@
         <div class="row fila">
             <div class="col-md-3">
                 <a href="#" class="btn btn-verde btn-sm" id="chq-btn">
-                    <i class="fa fa-file-pdf-o"></i> Generar
+                    <i class="fa fa-file-pdf-o"></i> PDF
+                </a>
+
+            </div>
+            <div class="col-md-3">
+                <a href="#" class="btn btn-verde btn-sm" id="chq-btn-ex">
+                    <i class="fa fa-file-excel-o"></i> Excel
                 </a>
             </div>
         </div>
@@ -542,6 +553,17 @@
             return false
         }
     })
+    $("#eri-btn-ex").click(function(){
+        if($("#eri-inicio_input").val()!="" && $("#eri-fin_input").val()!=""){
+            var b =  bootbox.alert({
+                message:$("#msn").html(),
+                title:"Generando reporte"
+            })
+            setTimeout(function(){b.modal("hide") }, 10000);
+            location.href="${createLink(controller: 'estadoIntegralExcel',action: 'index')}?inicio="+$("#eri-inicio_input").val()+"&fin="+$("#eri-fin_input").val()+"&nivel="+$("#eri-nivel").val()
+            return false
+        }
+    })
     $("#bc-btn").click(function(){
         if($("#bc-inicio_input").val()!="" && $("#bc-fin_input").val()!=""){
             var b =  bootbox.alert({
@@ -605,6 +627,17 @@
             })
             setTimeout(function(){b.modal("hide") }, 10000);
             location.href="${createLink(controller: 'cheques',action: 'reporte')}?inicio="+$("#may-inicio_input").val()+"&fin="+$("#may-fin_input").val()+"&banco="+$("#chq-banco").val()
+            return false
+        }
+    })
+    $("#chq-btn-ex").click(function(){
+        if($("#chq-inicio_input").val()!="" && $("#chq-fin_input").val()!=""){
+            var b =  bootbox.alert({
+                message:$("#msn").html(),
+                title:"Generando reporte"
+            })
+            setTimeout(function(){b.modal("hide") }, 10000);
+            location.href="${createLink(controller: 'chequesExcel',action: 'index')}?inicio="+$("#may-inicio_input").val()+"&fin="+$("#may-fin_input").val()+"&banco="+$("#chq-banco").val()
             return false
         }
     })

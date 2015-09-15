@@ -27,7 +27,7 @@ class Usuario {
     }
 
     static constraints = {
-        login(nullable: false,size: 1..16,unique: true)
+        login(nullable: false,size: 1..16)
         nombre(size: 1..30)
         descripcion(size: 1..40)
         password(size: 1..255,nullable: true)
