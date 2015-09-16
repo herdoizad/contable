@@ -23,14 +23,14 @@ class ReportesComprobantesRangoController {
     def qrCodeService
     def reportesService
     def reporte() {
-        println "params "+params
+//        println "params "+params
         Document document = new Document();
         def desde = params.desde.toInteger()
         def hasta = params.hasta.toInteger()
         def nombre = "comprobantes-del-${desde}-al-${hasta}.pdf"
         def fecha = new Date()
         def mes = params.anio+params.mes
-        println "mes "+mes
+//        println "mes "+mes
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         def writer = PdfWriter.getInstance(document, baos);
         def img = grailsApplication.mainContext.getResource('/images/favicons/apple-touch-icon-57x57.png').getFile()
@@ -62,7 +62,7 @@ class ReportesComprobantesRangoController {
 
         def cont = 0
         (desde..hasta).each {
-            println "num "+it
+//            println "num "+it
             def  comp = Comprobante.findAll("from Comprobante where empresa='${session.empresa.codigo}' and numero=${it} and tipo=${params.tipo} and mes=${mes}")
             if(comp.size()>0) {
                 comp = comp.pop()
@@ -204,7 +204,7 @@ class ReportesComprobantesRangoController {
                 cheque = Cheque.findAll("from Cheque where mes=${comp.mes} and comprobante=${comp.numero} and tipo=${comp.tipo} and empresa='${session.empresa.codigo}'")
                 if(cheque.size()>0) {
                     cheque = cheque.pop()
-                    p=new Paragraph("TRANSFERENCIA", titulo)
+                    def p=new Paragraph("TRANSFERENCIA", titulo)
                     p.setAlignment(Element.ALIGN_CENTER)
                     document.add(p)
                     document.add(new Paragraph("\n", titulo))
@@ -475,10 +475,13 @@ class ReportesComprobantesRangoController {
                 document.add(table)
             }else{
                 if(comp.tipo==2){
-                    table = new PdfPTable(5);
-                    table.setWidthPercentage(95.toFloat())
-                    anchos = [20,20,20,20,20];
+                    table = new PdfPTable(6);
+                    table.setWidthPercentage(100.toFloat())
+                    anchos = [16,16,16,16,16,16];
                     table.setWidths(anchos)
+                    cell = new PdfPCell(new Paragraph("\n\n\n\n", titulo));
+                    cell.setHorizontalAlignment(Element.ALIGN_RIGHT)
+                    table.addCell(cell);
                     cell = new PdfPCell(new Paragraph("\n\n\n\n", titulo));
                     cell.setHorizontalAlignment(Element.ALIGN_RIGHT)
                     table.addCell(cell);
@@ -495,6 +498,9 @@ class ReportesComprobantesRangoController {
                     cell.setHorizontalAlignment(Element.ALIGN_RIGHT)
                     table.addCell(cell);
                     cell = new PdfPCell(new Paragraph("Contador", contenido));
+                    cell.setHorizontalAlignment(Element.ALIGN_CENTER)
+                    table.addCell(cell);
+                    cell = new PdfPCell(new Paragraph("Jefe financiero", contenido));
                     cell.setHorizontalAlignment(Element.ALIGN_CENTER)
                     table.addCell(cell);
                     cell = new PdfPCell(new Paragraph("Auditoría interna", contenido));
@@ -512,7 +518,7 @@ class ReportesComprobantesRangoController {
                     document.add(table)
                 }else{
                     table = new PdfPTable(5);
-                    table.setWidthPercentage(95.toFloat())
+                    table.setWidthPercentage(100.toFloat())
                     anchos = [20,20,20,20,20];
                     table.setWidths(anchos)
                     cell = new PdfPCell(new Paragraph("\n\n\n\n", titulo));
@@ -527,11 +533,13 @@ class ReportesComprobantesRangoController {
                     cell = new PdfPCell(new Paragraph("", titulo));
                     cell.setHorizontalAlignment(Element.ALIGN_RIGHT)
                     table.addCell(cell);
-                    p =new Paragraph("Transferido a:\n${cheque.beneficiario}\nCta: ${comp.cuentaTransferencia}\n${comp.bancoCliente.descripcion}", contenido)
-                    p.setAlignment(Element.ALIGN_LEFT)
-                    cell = new PdfPCell(p);
+                    cell = new PdfPCell(new Paragraph("", titulo));
+                    cell.setHorizontalAlignment(Element.ALIGN_RIGHT)
                     table.addCell(cell);
                     cell = new PdfPCell(new Paragraph("Contador", contenido));
+                    cell.setHorizontalAlignment(Element.ALIGN_CENTER)
+                    table.addCell(cell);
+                    cell = new PdfPCell(new Paragraph("Jefe financiero", contenido));
                     cell.setHorizontalAlignment(Element.ALIGN_CENTER)
                     table.addCell(cell);
                     cell = new PdfPCell(new Paragraph("Auditoría interna", contenido));
@@ -543,10 +551,11 @@ class ReportesComprobantesRangoController {
                     cell = new PdfPCell(new Paragraph("Presidente de directorio", contenido));
                     cell.setHorizontalAlignment(Element.ALIGN_CENTER)
                     table.addCell(cell);
-                    cell = new PdfPCell(new Paragraph("Recibí conforme", contenido));
-                    cell.setHorizontalAlignment(Element.ALIGN_CENTER)
-                    table.addCell(cell);
                     document.add(table)
+
+                    def p =new Paragraph("Transferido a:${cheque.beneficiario?.toString().trim()} Cta: ${comp.cuentaTransferencia} - ${comp.bancoCliente.descripcion}", contenido)
+                    p.setAlignment(Element.ALIGN_LEFT)
+                    document.add(p);
                 }
             }
 

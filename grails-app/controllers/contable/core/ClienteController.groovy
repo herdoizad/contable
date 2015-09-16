@@ -108,6 +108,22 @@ class ClienteController extends Shield {
         return [clienteInstance: clienteInstance,combo:combo,tipos:tipos]
     } //form para cargar con ajax en un dialog
 
+
+    def form_id_ajax() {
+        def clienteInstance = new Cliente()
+        if (params.id) {
+            clienteInstance = Cliente.findByCodigo(params.id)
+            if (!clienteInstance) {
+                render "ERROR*No se encontró Cliente."
+                return
+            }
+        }
+        def combo = ["S":"SI","N":"NO"]
+        def tipos = ["01":"Ahorros","00":"Corriente"]
+        clienteInstance.properties = params
+        return [clienteInstance: clienteInstance,combo:combo,tipos:tipos]
+    } //form para cargar con ajax en un dialog
+
     /**
      * Acción llamada con ajax que guarda la información de un elemento
      */
@@ -132,6 +148,30 @@ class ClienteController extends Shield {
             return
         }
         render "SUCCESS*${params.id ? 'Actualización' : 'Creación'} de Cliente exitosa."
+        return
+    } //save para grabar desde ajax
+
+    def save_id_ajax() {
+        def clienteInstance = new Cliente()
+        if (params.id) {
+            clienteInstance = Cliente.findByCodigo(params.id)
+            if (!clienteInstance) {
+                render "error"
+                return
+            }
+        }
+        clienteInstance.properties = params
+        clienteInstance.usuario=session.usuario.login
+        clienteInstance.empresa=session.empresa
+        if(params.bancoOcp!="")
+            clienteInstance.banco=BancoOcp.findByCodigo(params.bancoOcp)
+        if(clienteInstance.creacion==null)
+            clienteInstance.creacion=new Date()
+        if (!clienteInstance.save(flush: true)) {
+            render "error"
+            return
+        }
+        render "${clienteInstance.codigo};${clienteInstance.cp}"
         return
     } //save para grabar desde ajax
 

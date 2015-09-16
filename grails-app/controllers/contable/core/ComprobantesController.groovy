@@ -3,7 +3,7 @@ package contable.core
 import contable.seguridad.Shield
 
 class ComprobantesController extends Shield {
-
+        def mailService
     def diarios(){
         def meses = ["Enero":"01","Febrero":"02","Marzo":"03","Abril":"04","Mayo":"05","Junio":"06","Juilo":"07","Agosto":"08","Septiembre":"09","Octubre":"10","Noviembre":"11","Diciembre":"12"]
         def anio = new Date().format("yyyy")
@@ -28,7 +28,8 @@ class ComprobantesController extends Shield {
         def anio = new Date().format("yyyy")
         def comps = Comprobante.findAll("from Comprobante where mes=${(anio+params.mes).toInteger()} and empresa='${session.empresa.codigo}' and tipo=${params.tipo} order by fecha desc ,numero asc")
         def mes = Mes.findByCodigo((anio+params.mes).toInteger())
-        [anio:anio,comps:comps,numero: params.numero,mes:params.mes,mesObj:mes]
+        def editable = Empresa.findByCodigo(session.empresa.codigo)?.editable
+        [anio:anio,comps:comps,numero: params.numero,mes:params.mes,mesObj:mes,editable:editable]
     }
 
     def getDetalle_ajax(){
@@ -342,6 +343,7 @@ class ComprobantesController extends Shield {
         def mes = params.mes.toInteger()
         def ultimo = Comprobante.findAll("from Comprobante where empresa='${session.empresa.codigo}' and tipo=${params.tipo} and mes=${mes} and tipoProcesamiento=2 order by numero desc",["max":1])
         def numero =1
+        def sendMail=false
         if(ultimo.size()>0) {
             ultimo = ultimo.pop()
             numero=ultimo.numero+1
@@ -351,6 +353,7 @@ class ComprobantesController extends Shield {
             comp=Comprobante.findAll("from Comprobante where empresa='${session.empresa.codigo}' and tipo=${params.tipo} and mes=${mes} and numero=${params.numero} order by numero desc",["max":1])
         }
         if(comp.size()>0) {
+            sendMail=true
             comp = comp.pop()
             numero = comp.numero
             DetalleComprobante.findAll("from DetalleComprobante where empresa='${comp.empresa.codigo}' and numero=${numero} and tipo=${params.tipo} and mes=${mes}").each {d->
@@ -441,6 +444,17 @@ class ComprobantesController extends Shield {
                     if(!det.save(flush: true))
                         println "error save det "+det.errors
                 }
+            }
+            def email = "valentinsvt@hotmail.com"
+            def det = DetalleComprobante.findAll("from DetalleComprobante  where mes=${comp.mes} and numero=${comp.numero} and tipo=${comp.tipo} and empresa='${session.empresa.codigo}'")
+            mailService.sendMail {
+                multipart true
+                to email
+                subject "Edición de comprobante resultado final"
+                body( view:"mailComprobanteFinal",
+                        model:[comp:comp,detalle:det,genera:session.usuario.login])
+                inline 'logo','image/png',grailsApplication.mainContext.getResource('/images/logo-login.png').getFile().readBytes()
+//            inline 'logo','image/png', new File('./web-app///images/logo-login.png').readBytes()
             }
         }
         switch (comp.tipo){
@@ -843,7 +857,7 @@ class ComprobantesController extends Shield {
 
     def getDatosCliente_ajax(){
         def cli = Cliente.findByCodigo(params.cliente)
-        render ""+cli.banco?.codigo+";"+cli.tipoCuenta+";"+cli.numeroCuenta
+        render ""+cli.banco?.codigo+";"+cli.tipoCuenta+";"+(cli.numeroCuenta?cli.numeroCuenta:'')
     }
 
     def aplicarPrototipo_ajax(){
@@ -851,5 +865,28 @@ class ComprobantesController extends Shield {
         def dets = DetallePrototipo.findAllByCodigo(p.id)
         [dets:dets]
     }
+
+    def enviarCorreo_ajax(){
+        println "enviar "+params
+        def email = "valentinsvt@hotmail.com"
+        def comp = Comprobante.findAll("from Comprobante where mes=${params.mes} and numero=${params.numero} and tipo=${params.tipo} and empresa='${session.empresa.codigo}'")
+        if(comp.size()>0) {
+            comp = comp.pop()
+            def det = DetalleComprobante.findAll("from DetalleComprobante  where mes=${comp.mes} and numero=${comp.numero} and tipo=${comp.tipo} and empresa='${session.empresa.codigo}'")
+            mailService.sendMail {
+                multipart true
+                to email
+                subject "Edición de comprobante"
+                body( view:"mailComprobante",
+                        model:[comp:comp,detalle:det,genera:session.usuario.login])
+                inline 'logo','image/png',grailsApplication.mainContext.getResource('/images/logo-login.png').getFile().readBytes()
+//            inline 'logo','image/png', new File('./web-app///images/logo-login.png').readBytes()
+            }
+
+        }
+        render "ok"
+    }
+
+
 
 }

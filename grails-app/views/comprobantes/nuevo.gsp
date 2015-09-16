@@ -318,6 +318,10 @@
             } //success
         }); //ajax
     })
+    $(".borrar").click(function(){
+        $(this).parent().parent().remove()
+        calcularTotales()
+    })
 </script>
 </body>
 </html>
