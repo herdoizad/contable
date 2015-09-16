@@ -27,7 +27,7 @@ class Empresa {
     String tipoRepresentante
     Integer numeroCopias
     Integer secucialTransporte
-
+    String editable="S"
 
     static auditable = [ignore: []]
 
@@ -66,6 +66,7 @@ class Empresa {
             tipoRepresentante column: 'EMP_TIPOREP'
             numeroCopias column: 'EMP_NUMEROCOPIAS'
             secucialTransporte column: 'EMP_SECUENCIA_FACT_TRANSPORTE'
+            editable column: 'EMP_EDITABLE'
         }
     }
 
@@ -96,5 +97,6 @@ class Empresa {
          tipoRepresentante(nullable: true,blank: true,size: 1..1)
          numeroCopias(nullable: true,blank: true)
          secucialTransporte(nullable: true,blank: true)
+        editable(nullable: true,blank: true,size: 1..1)
     }
 }

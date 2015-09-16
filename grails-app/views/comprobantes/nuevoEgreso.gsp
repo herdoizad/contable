@@ -78,7 +78,7 @@
     <input type="hidden" name="mes" value="${mes}">
     <input type="hidden" name="mesSolo" value="${mesSolo}">
     <input type="hidden" name="tipo" value="${tipo}">
-    %{--<input type="hidden" name="numero" value="${comp?.numero}">--}%
+%{--<input type="hidden" name="numero" value="${comp?.numero}">--}%
     <div class="row fila">
         <div class="col-md-1">
             <label>Número:</label>
@@ -90,7 +90,7 @@
         <div class="col-md-1">
             <label>Tipo egreso:</label>
         </div>
-        <div class="col-md-2">
+        <div class="col-md-1">
             <g:select name="tipoEgreso" id="modo" from="${tipos}" optionKey="key" optionValue="value" value="${comp?.tipoProcesamiento}" class="form-control input-sm"/>
         </div>
         <div class="col-md-1">
@@ -98,6 +98,19 @@
         </div>
         <div class="col-md-2">
             <elm:datepicker name="fecha" class="form-control input-sm" minDate="${inicio}" maxDate="${fin}" value="${comp?.fecha?:inicio}"></elm:datepicker>
+        </div>
+        <div class="col-md-1">
+            <label>Usar prototipo:</label>
+        </div>
+        <div class="col-md-3">
+            <g:select name="prototipo" id="prototipo" from="${contable.core.Prototipo.list([sort: 'descripcion'])}"
+                      optionKey="id" optionValue="descripcion" class="form-control input-sm"
+            />
+        </div>
+        <div class="col-md-1">
+            <a href="#" class="btn btn-verde btn-sm" id="usar">
+                <i class="fa fa-check"></i>
+            </a>
         </div>
     </div>
     <div class="row fila">
@@ -110,9 +123,12 @@
         <div class="col-md-1">
             <label>Beneficiario:</label>
         </div>
-        <div class="col-md-5" >
+        <div class="col-md-4" >
             <g:select name="cheque.cliente" id="cliente" from="${clientes}"  noSelection="['':'']"
                       class="form-control input-sm select"    optionKey="codigo" optionValue="cp" value="${cliente?.codigo}"/>
+        </div>
+        <div class="col-md-1">
+            <a href="#" class="btn btn-verde btn-sm" id="crearCliente"><i class="fa fa-plus"></i> Nuevo</a>
         </div>
 
     </div>
@@ -332,7 +348,80 @@
 <script type="text/javascript">
     var secuencial = 0
 
+    var id = null;
+    function submitFormCliente() {
+        var $form = $("#frmCliente");
+        var $btn = $("#dlgCreateEditCliente").find("#btnSave");
+        if ($form.valid()) {
+            $btn.replaceWith(spinner);
+            openLoader("Guardando Cliente");
+            $.ajax({
+                type    : "POST",
+                url     : $form.attr("action"),
+                data    : $form.serialize(),
+                success : function (msg) {
+                    closeLoader()
+                    if(msg!="error"){
+                        var parts = msg.split(";");
+                        $("#cliente").append("<option value='"+parts[0]+"'>"+parts[1]+"</option>")
+                        $('#cliente').data('combobox').refresh();
+                        $("#cliente").val(parts[0])
+                    }else{
+                        bootbox.alert("Ha ocurrido un error al registrar el cliente")
+                    }
 
+                },
+                error: function() {
+                    log("Ha ocurrido un error interno", "Error");
+                    closeLoader();
+                }
+            });
+        } else {
+            return false;
+        } //else
+    }
+
+
+    function createEditCliente(id) {
+        openLoader()
+        var title = id ? "Editar" : "Crear";
+        var data = id ? { id: id } : {};
+        $.ajax({
+            type    : "POST",
+            url     : "${createLink(controller:'cliente', action:'form_id_ajax')}",
+            data    : data,
+            success : function (msg) {
+                closeLoader()
+                var b = bootbox.dialog({
+                    id      : "dlgCreateEditCliente",
+                    title   : title + " Cliente",
+
+                    class   : "modal-lg",
+
+                    message : msg,
+                    buttons : {
+                        cancelar : {
+                            label     : "Cancelar",
+                            className : "btn-primary",
+                            callback  : function () {
+                            }
+                        },
+                        guardar  : {
+                            id        : "btnSave",
+                            label     : "<i class='fa fa-save'></i> Guardar",
+                            className : "btn-success",
+                            callback  : function () {
+                                return submitFormCliente();
+                            } //callback
+                        } //guardar
+                    } //buttons
+                }); //dialog
+                setTimeout(function () {
+                    b.find(".form-control").first().focus()
+                }, 500);
+            } //success
+        }); //ajax
+    } //createEdit
     function calcularTotales(){
         var debe = 0
         var haber = 0
@@ -660,6 +749,30 @@
 
     })
     calcularTotales()
+    $(".borrar").click(function(){
+        $(this).parent().parent().remove()
+        calcularTotales()
+    })
+
+    $("#crearCliente").click(function(){
+        createEditCliente()
+    })
+    $(".valores").blur()
+    $("#usar").click(function(){
+        openLoader()
+        $.ajax({
+            type: "POST",
+            url: "${createLink(controller:'comprobantes', action:'aplicarPrototipo_ajax')}",
+            data: {
+                id:$("#prototipo").val()
+            },
+            success: function (msg) {
+                closeLoader()
+                $("#detalles").append(msg)
+                calcularTotales()
+            } //success
+        }); //ajax
+    })
 </script>
 </body>
 </html>

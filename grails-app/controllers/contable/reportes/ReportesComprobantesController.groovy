@@ -462,10 +462,13 @@ class ReportesComprobantesController extends Shield {
                 document.add(table)
             }else{
                 if(comp.tipo==2){
-                    table = new PdfPTable(5);
-                    table.setWidthPercentage(95.toFloat())
-                    anchos = [20,20,20,20,20];
+                    table = new PdfPTable(6);
+                    table.setWidthPercentage(100.toFloat())
+                    anchos = [16,16,16,16,16,16];
                     table.setWidths(anchos)
+                    cell = new PdfPCell(new Paragraph("\n\n\n\n", titulo));
+                    cell.setHorizontalAlignment(Element.ALIGN_RIGHT)
+                    table.addCell(cell);
                     cell = new PdfPCell(new Paragraph("\n\n\n\n", titulo));
                     cell.setHorizontalAlignment(Element.ALIGN_RIGHT)
                     table.addCell(cell);
@@ -482,6 +485,9 @@ class ReportesComprobantesController extends Shield {
                     cell.setHorizontalAlignment(Element.ALIGN_RIGHT)
                     table.addCell(cell);
                     cell = new PdfPCell(new Paragraph("Contador", contenido));
+                    cell.setHorizontalAlignment(Element.ALIGN_CENTER)
+                    table.addCell(cell);
+                    cell = new PdfPCell(new Paragraph("Jefe financiero", contenido));
                     cell.setHorizontalAlignment(Element.ALIGN_CENTER)
                     table.addCell(cell);
                     cell = new PdfPCell(new Paragraph("Auditoría interna", contenido));
@@ -499,7 +505,7 @@ class ReportesComprobantesController extends Shield {
                     document.add(table)
                 }else{
                     table = new PdfPTable(5);
-                    table.setWidthPercentage(95.toFloat())
+                    table.setWidthPercentage(100.toFloat())
                     anchos = [20,20,20,20,20];
                     table.setWidths(anchos)
                     cell = new PdfPCell(new Paragraph("\n\n\n\n", titulo));
@@ -514,11 +520,13 @@ class ReportesComprobantesController extends Shield {
                     cell = new PdfPCell(new Paragraph("", titulo));
                     cell.setHorizontalAlignment(Element.ALIGN_RIGHT)
                     table.addCell(cell);
-                    p =new Paragraph("Transferido a:\n${cheque.beneficiario}\nCta: ${comp.cuentaTransferencia}\n${comp.bancoCliente.descripcion}", contenido)
-                    p.setAlignment(Element.ALIGN_LEFT)
-                    cell = new PdfPCell(p);
+                    cell = new PdfPCell(new Paragraph("", titulo));
+                    cell.setHorizontalAlignment(Element.ALIGN_RIGHT)
                     table.addCell(cell);
                     cell = new PdfPCell(new Paragraph("Contador", contenido));
+                    cell.setHorizontalAlignment(Element.ALIGN_CENTER)
+                    table.addCell(cell);
+                    cell = new PdfPCell(new Paragraph("Jefe financiero", contenido));
                     cell.setHorizontalAlignment(Element.ALIGN_CENTER)
                     table.addCell(cell);
                     cell = new PdfPCell(new Paragraph("Auditoría interna", contenido));
@@ -530,10 +538,11 @@ class ReportesComprobantesController extends Shield {
                     cell = new PdfPCell(new Paragraph("Presidente de directorio", contenido));
                     cell.setHorizontalAlignment(Element.ALIGN_CENTER)
                     table.addCell(cell);
-                    cell = new PdfPCell(new Paragraph("Recibí conforme", contenido));
-                    cell.setHorizontalAlignment(Element.ALIGN_CENTER)
-                    table.addCell(cell);
                     document.add(table)
+
+                    p =new Paragraph("Transferido a:${cheque.beneficiario?.toString().trim()} Cta: ${comp.cuentaTransferencia} - ${comp.bancoCliente.descripcion}", contenido)
+                    p.setAlignment(Element.ALIGN_LEFT)
+                    document.add(p);
                 }
             }
 

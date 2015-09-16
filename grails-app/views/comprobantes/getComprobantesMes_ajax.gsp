@@ -26,23 +26,13 @@
                 </a>
             </td>
             <td style="text-align: center">
-                <g:if test="${mesObj.estado!='C'}">
+                <g:if test="${mesObj.estado!='C' && editable!='N'}">
                     <g:if test="${c.tipo==3}">
                         <g:if test="${c.tipoProcesamiento!=4}">
                             <a href="${g.createLink(controller: 'comprobantes',action: 'nuevo',params: [mes:c.mes,tipo:c.tipo,numero:c.numero])}" class="btn btn-info btn-xsm editar ${mes}-${g.formatNumber(number:  c.numero,maxFractionDigits: 0)}" title="Editar" mes="${c.mes}" empresa="${c.empresa.codigo}" tipo="${c.tipo}" numero="${c.numero}">
                                 <i class="fa fa-pencil"></i>
                             </a>
                         </g:if>
-                        <g:else>
-                            <a href="${g.createLink(controller: 'comprobantes',action: 'nuevoCash',params: [mes:c.mes,tipo:c.tipo,numero:c.numero])}" class="btn btn-info btn-xsm editar ${mes}-${g.formatNumber(number:  c.numero,maxFractionDigits: 0)}" title="Editar" mes="${c.mes}" empresa="${c.empresa.codigo}" tipo="${c.tipo}" numero="${c.numero}">
-                                <i class="fa fa-pencil"></i>
-                            </a>
-                        </g:else>
-                    </g:if>
-                    <g:if test="${c.tipo==2}">
-                        <a href="${g.createLink(controller: 'comprobantes',action: 'nuevoEgreso',params: [mes:c.mes,tipo:c.tipo,numero:c.numero])}" class="btn btn-info btn-xsm editar ${mes}-${g.formatNumber(number:  c.numero,maxFractionDigits: 0)}" title="Editar" mes="${c.mes}" empresa="${c.empresa.codigo}" tipo="${c.tipo}" numero="${c.numero}">
-                            <i class="fa fa-pencil"></i>
-                        </a>
                     </g:if>
                     <g:if test="${c.tipo==1}">
                         <a href="${g.createLink(controller: 'comprobantes',action: 'nuevoIngreso',params: [mes:c.mes,tipo:c.tipo,numero:c.numero])}" class="btn btn-info btn-xsm editar ${mes}-${g.formatNumber(number:  c.numero,maxFractionDigits: 0)}" title="Editar" mes="${c.mes}" empresa="${c.empresa.codigo}" tipo="${c.tipo}" numero="${c.numero}">
@@ -231,5 +221,29 @@
     <g:if test="${numero && numero!=''}">
     verComp('${mes}',${numero})
     </g:if>
+
+    $(".editar").click(function(){
+        var boton = $(this)
+        bootbox.confirm("Está seguro?. Al editar un comprobante se enviará un correo electronico  a auditoría con los cambios realizados.",function(result){
+            if(result){
+                openLoader()
+                $.ajax({
+                    type: "POST",
+                    url: "${createLink(controller:'comprobantes', action:'enviarCorreo_ajax')}",
+                    data: {
+                        mes: boton.attr("mes"),
+                        tipo: boton.attr("tipo"),
+                        empresa: boton.attr("empresa"),
+                        numero: boton.attr("numero")
+                    },
+                    success: function (msg) {
+                        closeLoader()
+                        location.href=boton.attr("href")
+                    }
+                });
+            }
+        })
+        return false
+    })
 
 </script>
