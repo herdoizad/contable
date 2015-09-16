@@ -70,7 +70,12 @@
         <div class="row fila">
             <div class="col-md-3">
                 <a href="#" class="btn btn-verde btn-sm" id="esf-btn">
-                    <i class="fa fa-file-pdf-o"></i> Generar
+                    <i class="fa fa-file-pdf-o"></i> PDF
+                </a>
+            </div>
+            <div class="col-md-3">
+                <a href="#" class="btn btn-verde btn-sm" id="esf-btn-ex">
+                    <i class="fa fa-file-pdf-o"></i> Excel
                 </a>
             </div>
         </div>
@@ -257,7 +262,12 @@
         <div class="row fila">
             <div class="col-md-3">
                 <a href="#" class="btn btn-verde btn-sm" id="may-btn">
-                    <i class="fa fa-file-pdf-o"></i> Generar
+                    <i class="fa fa-file-pdf-o"></i> PDF
+                </a>
+            </div>
+            <div class="col-md-3">
+                <a href="#" class="btn btn-verde btn-sm" id="may-btn-ex">
+                    <i class="fa fa-file-pdf-o"></i> Excel
                 </a>
             </div>
         </div>
@@ -344,7 +354,12 @@
         <div class="row fila">
             <div class="col-md-3">
                 <a href="#" class="btn btn-verde btn-sm" id="dg-btn">
-                    <i class="fa fa-file-pdf-o"></i> Generar
+                    <i class="fa fa-file-pdf-o"></i> PDF
+                </a>
+            </div>
+            <div class="col-md-3">
+                <a href="#" class="btn btn-verde btn-sm" id="dg-btn-ex">
+                    <i class="fa fa-file-excel-o"></i> Excel
                 </a>
             </div>
         </div>
@@ -387,7 +402,12 @@
         <div class="row fila">
             <div class="col-md-3">
                 <a href="#" class="btn btn-verde btn-sm" id="mas-btn">
-                    <i class="fa fa-file-pdf-o"></i> Generar
+                    <i class="fa fa-file-pdf-o"></i> PDF
+                </a>
+            </div>
+            <div class="col-md-3">
+                <a href="#" class="btn btn-verde btn-sm" id="mas-btn-ex">
+                    <i class="fa fa-file-pdf-o"></i> Excel
                 </a>
             </div>
         </div>
@@ -444,10 +464,16 @@
         <div class="row fila">
             <div class="col-md-3">
                 <a href="#" class="btn btn-verde btn-sm" id="cv-btn">
-                    <i class="fa fa-file-pdf-o"></i> Generar
+                    <i class="fa fa-file-pdf-o"></i> PDF
+                </a>
+            </div>
+            <div class="col-md-3">
+                <a href="#" class="btn btn-verde btn-sm" id="cv-btn-ex">
+                    <i class="fa fa-file-pdf-o"></i> Excel
                 </a>
             </div>
         </div>
+
     </div>
 </div>
 <div class="col-md-4 reporte 3">
@@ -542,6 +568,18 @@
             return false
         }
     })
+    $("#esf-btn-ex").click(function(){
+        if($("#esf-inicio_input").val()!="" && $("#esf-fin_input").val()!=""){
+            var b =  bootbox.alert({
+                message:$("#msn").html(),
+                title:"Generando reporte"
+            })
+            setTimeout(function(){b.modal("hide") }, 10000);
+            location.href="${createLink(controller: 'estadoDeSituacionFinancieraExcel',action: 'estado')}?inicio="+$("#esf-inicio_input").val()+"&fin="+$("#esf-fin_input").val()+"&nivel="+$("#esf-nivel").val()
+            return false
+        }
+    })
+
     $("#eri-btn").click(function(){
         if($("#eri-inicio_input").val()!="" && $("#eri-fin_input").val()!=""){
             var b =  bootbox.alert({
@@ -619,6 +657,17 @@
             return false
         }
     })
+    $("#may-btn-ex").click(function(){
+        if($("#may-inicio_input").val()!="" && $("#may-fin_input").val()!="" && $("#may-cuenta").val()!=""){
+            var b =  bootbox.alert({
+                message:$("#msn").html(),
+                title:"Generando reporte"
+            })
+            setTimeout(function(){b.modal("hide") }, 10000);
+            location.href="${createLink(controller: 'mayorGeneralExcel',action: 'index')}?inicio="+$("#may-inicio_input").val()+"&fin="+$("#may-fin_input").val()+"&cuenta="+$("#may-cuenta").val()
+            return false
+        }
+    })
     $("#chq-btn").click(function(){
         if($("#chq-inicio_input").val()!="" && $("#chq-fin_input").val()!=""){
             var b =  bootbox.alert({
@@ -652,6 +701,17 @@
             return false
         }
     })
+    $("#dg-btn-ex").click(function(){
+                if($("#dg-inicio_input").val()!="" && $("#dg-fin_input").val()!=""){
+            var b =  bootbox.alert({
+                message:$("#msn").html(),
+                title:"Generando reporte"
+            })
+            setTimeout(function(){b.modal("hide") }, 10000);
+            location.href="${createLink(controller: 'diarioGeneralExcel',action: 'index')}?inicio="+$("#dg-inicio_input").val()+"&fin="+$("#dg-fin_input").val()
+            return false
+        }
+    })
     $("#mas-btn").click(function(){
         if($("#mas-inicio_input").val()!="" && $("#mas-fin_input").val()!="" && $("#mas-cuenta").val()!=""){
             var b =  bootbox.alert({
@@ -660,6 +720,17 @@
             })
             setTimeout(function(){b.modal("hide") }, 10000);
             location.href="${createLink(controller: 'mayorAuxiliar',action: 'index')}?inicio="+$("#mas-inicio_input").val()+"&fin="+$("#mas-fin_input").val()+"&cuenta="+$("#mas-cuenta").val()
+            return false
+        }
+    })
+    $("#mas-btn-ex").click(function(){
+        if($("#mas-inicio_input").val()!="" && $("#mas-fin_input").val()!="" && $("#mas-cuenta").val()!=""){
+            var b =  bootbox.alert({
+                message:$("#msn").html(),
+                title:"Generando reporte"
+            })
+            setTimeout(function(){b.modal("hide") }, 10000);
+            location.href="${createLink(controller: 'mayorAuxiliarExcel',action: 'index')}?inicio="+$("#mas-inicio_input").val()+"&fin="+$("#mas-fin_input").val()+"&cuenta="+$("#mas-cuenta").val()
             return false
         }
     })
@@ -693,6 +764,17 @@
             })
             setTimeout(function(){b.modal("hide") }, 10000);
             location.href="${createLink(controller: 'carteraVencida',action: 'index')}?inicio="+$("#cv-inicio_input").val()+"&fin="+$("#cv-fin_input").val()+"&cuenta="+$("#cv-cuenta").val()+"&desde="+$("#cv-desde").val()+"&hasta="+$("#cv-hasta").val()+"&dias="+$("#cv-dias").val()
+            return false
+        }
+    })
+    $("#cv-btn-ex").click(function(){
+        if($("#auxv-inicio_input").val()!="" && $("#cv-fin_input").val()!="" && $("#cv-cuenta").val()!="" && $("#cv-desde").val()!=""  && $("#cv-hasta").val()!=""){
+            var b =  bootbox.alert({
+                message:$("#msn").html(),
+                title:"Generando reporte"
+            })
+            setTimeout(function(){b.modal("hide") }, 10000);
+            location.href="${createLink(controller: 'carteraVencidaExcel',action: 'index')}?inicio="+$("#cv-inicio_input").val()+"&fin="+$("#cv-fin_input").val()+"&cuenta="+$("#cv-cuenta").val()+"&desde="+$("#cv-desde").val()+"&hasta="+$("#cv-hasta").val()+"&dias="+$("#cv-dias").val()
             return false
         }
     })

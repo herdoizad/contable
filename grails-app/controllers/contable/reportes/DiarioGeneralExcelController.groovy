@@ -17,10 +17,9 @@ import org.apache.poi.xssf.usermodel.XSSFRow
 import org.apache.poi.xssf.usermodel.XSSFSheet
 import org.apache.poi.xssf.usermodel.XSSFWorkbook
 
-class MayorGeneralExcelController extends Shield {
+class DiarioGeneralExcelController extends Shield{
     def dataSource
     def index() {
-
         def inicio = new Date().parse("dd-MM-yyyy",params.inicio)
         def fin = new Date().parse("dd-MM-yyyy",params.fin)
         def cierre = "01/01/2015"
@@ -28,11 +27,8 @@ class MayorGeneralExcelController extends Shield {
 
         def banco = Banco.findByCodigo(params.banco)
         def cn = new Sql(dataSource)
-        def sql = "CONTABLE..up_mayor_general 'PS' ,'${params.cuenta}',${inicio.format('yyyy').toInteger()}00 ,'${inicio.format('MM/dd/yyyy')}' , '${fin.format('MM/dd/yyyy')}', '${cierre}'"
-        println "sql "+sql
+        def sql = "CONTABLE..up_rpt_diario_general  'PS' ,'${inicio.format('MM/dd/yyyy')}' , '${fin.format('MM/dd/yyyy')}'"
         cn.call(sql.toString())
-        sql = "select * from CONTABLE..PLAN_CUENTA_TMP where CTA_NIVEL=4 order by MES_CODIGO,CTA_CUENTA "
-        println "sql "+sql
 
 
         def iniRow = 0
@@ -41,7 +37,7 @@ class MayorGeneralExcelController extends Shield {
         def curRow = iniRow
         def curCol = iniCol
         XSSFWorkbook wb = new XSSFWorkbook()
-        XSSFSheet sheet = wb.createSheet("Mayor General")
+        XSSFSheet sheet = wb.createSheet("Diario General")
         int pictureIdx = wb.addPicture(img.readBytes(), XSSFWorkbook.PICTURE_TYPE_PNG);
 
         CreationHelper helper = wb.getCreationHelper();
@@ -116,7 +112,7 @@ class MayorGeneralExcelController extends Shield {
         cellTitulo.setCellValue("Petróleos y servicios" )
         cellTitulo.setCellStyle(styleTitulo)
         XSSFCell cellSubtitulo = row2.createCell((short) iniCol)
-        cellSubtitulo.setCellValue("Mayor General del "+inicio.format("dd-MM-yyyy")+" hasta "+fin.format("dd-MM-yyyy"))
+        cellSubtitulo.setCellValue("DIARIO GENERAL del "+inicio.format("dd-MM-yyyy")+" hasta "+fin.format("dd-MM-yyyy"))
         cellSubtitulo.setCellStyle(styleSubtitulo)
         sheet.addMergedRegion(new CellRangeAddress(
                 iniRow, //first row (0-based)
@@ -139,132 +135,89 @@ class MayorGeneralExcelController extends Shield {
         sheet.setColumnWidth(7,5000)
         sheet.setColumnWidth(8,5000)
 
+
+
+        sql = "select * from CONTABLE..COMPROBANTES_TMP  order by COM_NUMERO"
         def celda
-        def cont = 0
-        def last=null
-        def debe = 0,haber=0,totald=0,totalh=0
+        def td = 0,th=0
+        def last = null
+        def table = null
+        def cell
 
-
-
-        cn.eachRow(sql.toString()) { r ->
-            if(cont==0){
-            row = sheet.createRow((short) curRow)
-            celda =  row.createCell((short) 1)
-            celda.setCellValue(r["CTA_MAYOR"])
-            celda.setCellStyle(styleNegrilla)
-            //row = sheet.createRow((short) curRow)
-            curRow++
-            celda =  row.createCell((short) 2)
-            celda.setCellValue(r["CTA_DESCRIPCION_MAYOR"])
-            celda.setCellStyle(styleNegrilla)
+        cn.eachRow(sql.toString()){r->
+            if(last!=r["COM_NUMERO"]){
 
                 row = sheet.createRow((short) curRow)
-                celda =  row.createCell((short) 1)
-                celda.setCellValue("CODIGO CUENTA")
-                celda.setCellStyle(styleHeader)
-                //row = sheet.createRow((short) curRow)
-                celda =  row.createCell((short) 2)
-                celda.setCellValue("DESCRIPCION")
-                celda.setCellStyle(styleHeader)
-                //row = sheet.createRow((short) curRow)
                 celda =  row.createCell((short) 3)
-                celda.setCellValue("DEBE")
-                celda.setCellStyle(styleHeader)
-                //row = sheet.createRow((short) curRow)
-                celda =  row.createCell((short) 4)
-                celda.setCellValue("HABER")
-                celda.setCellStyle(styleHeader)
-                //row = sheet.createRow((short) curRow)
-                celda =  row.createCell((short) 5)
-                celda.setCellValue("SALDO")
-                celda.setCellStyle(styleHeader)
-                curRow++
-
-
-            }
-
-
-
-
-            if(r["MES_CODIGO"]!=last){
-                if(last!=null){
-                    row = sheet.createRow((short) curRow)
-                    celda =  row.createCell((short) 3)
-                    celda.setCellValue(debe)
-                    celda.setCellStyle(styleNegrilla)
-                    curRow++
-                    //row = sheet.createRow((short) curRow)
-                    celda =  row.createCell((short) 4)
-                    celda.setCellValue(haber)
-                    celda.setCellStyle(styleNegrilla)
-                    totald+=debe
-                    totalh+=haber
-                    debe=0
-                    haber=0
-                }
-
-                row = sheet.createRow((short) curRow)
-                celda =  row.createCell((short) 1)
-                celda.setCellValue(r["CTA_MESPROCESO"])
+                celda.setCellValue(imprimeNumero_ajax(r["COM_NUMERO"]))
                 celda.setCellStyle(styleNegrilla)
                 curRow++
+                row = sheet.createRow((short) curRow)
+                celda =  row.createCell((short) 1)
+                celda.setCellValue(r["COM_CONCEPTO"])
+                celda.setCellStyle(styleNegrilla)
+
             }
-            last=r["MES_CODIGO"]
-            debe+= r["CTA_DEBE"]
-            haber+= r["CTA_HABER"]
+            last=r["COM_NUMERO"]
+
+
+        //cn.eachRow(sql.toString()){r->
+            curRow++
             row = sheet.createRow((short) curRow)
             celda =  row.createCell((short) 1)
             celda.setCellValue(r["CTA_CUENTA"])
-
+            celda.setCellStyle(styleTable)
             celda =  row.createCell((short) 2)
             celda.setCellValue(r["CTA_DESCRIPCION"])
-
-
+            //celda.setCellStyle(styleHeader)
             celda =  row.createCell((short) 3)
-            celda.setCellValue(r["CTA_DEBE"])
-            celda.setCellStyle(styleTable)
-
+            celda.setCellValue("PS-"+r["COM_MES_CODIGO"]+"-D-"+r["COM_NUMERO"])
+            //celda.setCellStyle(styleHeader)
             celda =  row.createCell((short) 4)
-            celda.setCellValue(r["CTA_HABER"])
+            celda.setCellValue(r["COM_DEBE"])
             celda.setCellStyle(styleTable)
-
             celda =  row.createCell((short) 5)
-            celda.setCellValue(r["CTA_SALDO_INI"])
+            celda.setCellValue(r["COM_HABER"])
             celda.setCellStyle(styleTable)
-            cont++
-             //println "¡¡¡¡¡"+ r
-            curRow++
 
+            def debe = r["COM_DEBE"]
+            def haber = r["COM_HABER"]
+            td+=debe
+            th+=haber
+
+           //println "---!!  "+r
+        //}
+        //}
         }
-
+        //curRow++
         row = sheet.createRow((short) curRow)
         celda =  row.createCell((short) 3)
-        celda.setCellValue(debe)
+        celda.setCellValue("TOTALES")
         celda.setCellStyle(styleNegrilla)
         celda =  row.createCell((short) 4)
-        celda.setCellValue(haber)
-        celda.setCellStyle(styleNegrilla)
-        totald+=debe
-        totalh+=haber
+        celda.setCellValue(td)
+        celda.setCellStyle(styleFooter)
+        celda =  row.createCell((short) 5)
+        celda.setCellValue(th)
+        celda.setCellStyle(styleFooter)
 
-        curRow++
-        curRow++
-        row = sheet.createRow((short) curRow)
-        celda =  row.createCell((short) 2)
-        celda.setCellValue("TOTALES PERIODO")
-        celda.setCellStyle(styleNegrilla)
-        celda =  row.createCell((short) 3)
-        celda.setCellValue(totald)
-        celda.setCellStyle(styleFooter)
-        celda =  row.createCell((short) 4)
-        celda.setCellValue(totalh)
-        celda.setCellStyle(styleFooter)
+
 
         def output = response.getOutputStream()
-        def header = "attachment; filename=" + "mayorGeneral.xlsx"
+        def header = "attachment; filename=" + "diarioGeneral.xlsx"
         response.setContentType("application/application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
         response.setHeader("Content-Disposition", header)
         wb.write(output)
         output.flush()
+    }
+    def imprimeNumero_ajax(numero){
+        def res ="-"
+        def num = numero.toString().trim()
+        (8-num.length()).times {
+            res+="0"
+        }
+        res+=num
+        res+="-"
+        return res
     }
 }

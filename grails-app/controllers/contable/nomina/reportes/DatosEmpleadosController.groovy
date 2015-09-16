@@ -117,7 +117,7 @@ class DatosEmpleadosController extends Shield {
         //def tipo = TipoContrato.get(params.id)
         //def tcon = TipoContrato.findByCodigo()
         //def resp = con.tipo.des
-
+        println "aaaaaa"
         Empleado.listOrderByApellido().each {emp->
             def con = Contrato.findByEmpleadoAndFinIsNull(emp)
 
