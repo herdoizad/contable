@@ -88,8 +88,9 @@ class EstadoDeSituacionFinancieraController extends Shield {
         def total6=0
         def band = 1
         def show = true
+
         result.each {r->
-//            println "r "+r
+           println "r "+r
             if(r.key=="1"){
                 total1=r.value["debe"]-r.value["haber"]+r.value["inicial"]
             }
@@ -103,7 +104,7 @@ class EstadoDeSituacionFinancieraController extends Shield {
             }
             if(r.key=="4"){
                 total4=r.value["saldo"]
-              //  println "4 "+r
+                //println "4 "+r
                 show = false
             }
             if(r.key=="5"){

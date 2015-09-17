@@ -29,10 +29,10 @@ class MayorGeneralExcelController extends Shield {
         def banco = Banco.findByCodigo(params.banco)
         def cn = new Sql(dataSource)
         def sql = "CONTABLE..up_mayor_general 'PS' ,'${params.cuenta}',${inicio.format('yyyy').toInteger()}00 ,'${inicio.format('MM/dd/yyyy')}' , '${fin.format('MM/dd/yyyy')}', '${cierre}'"
-        println "sql "+sql
+        //println "sql "+sql
         cn.call(sql.toString())
         sql = "select * from CONTABLE..PLAN_CUENTA_TMP where CTA_NIVEL=4 order by MES_CODIGO,CTA_CUENTA "
-        println "sql "+sql
+        //println "sql "+sql
 
 
         def iniRow = 0

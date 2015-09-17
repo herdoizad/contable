@@ -575,7 +575,7 @@
                 title:"Generando reporte"
             })
             setTimeout(function(){b.modal("hide") }, 10000);
-            location.href="${createLink(controller: 'estadoDeSituacionFinancieraExcel',action: 'estado')}?inicio="+$("#esf-inicio_input").val()+"&fin="+$("#esf-fin_input").val()+"&nivel="+$("#esf-nivel").val()
+            location.href="${createLink(controller: 'estadoDeSituacionFinancieraExcel',action: 'index')}?inicio="+$("#esf-inicio_input").val()+"&fin="+$("#esf-fin_input").val()+"&nivel="+$("#esf-nivel").val()
             return false
         }
     })

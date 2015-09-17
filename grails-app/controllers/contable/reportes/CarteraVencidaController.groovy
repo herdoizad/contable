@@ -26,7 +26,7 @@ class CarteraVencidaController extends Shield {
         def cn = new Sql(dataSource)
         Document document = new Document();
         def fecha = new Date()
-        def nombre ="Auxiliar-${cuenta.numero.trim()}-${fecha.format('ddMMyyyy')}.pdf"
+        def nombre ="Cartera Vencida-${cuenta.numero.trim()}-${fecha.format('ddMMyyyy')}.pdf"
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         ByteArrayOutputStream bs = new ByteArrayOutputStream()
         qrCodeService.renderPng(reportesService.getVcardReporte(session.usuario.login,"Cartera vencida"), 70, bs)

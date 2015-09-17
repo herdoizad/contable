@@ -1,6 +1,7 @@
 package contable.reportes
 
 import contable.core.Banco
+import contable.core.Cuenta
 import contable.seguridad.Shield
 import groovy.sql.Sql
 import org.apache.poi.ss.usermodel.CellStyle
@@ -17,15 +18,23 @@ import org.apache.poi.xssf.usermodel.XSSFRow
 import org.apache.poi.xssf.usermodel.XSSFSheet
 import org.apache.poi.xssf.usermodel.XSSFWorkbook
 
-class DiarioGeneralExcelController extends Shield{
+class CarteraVencidaExcelController extends Shield {
     def dataSource
+
     def index() {
+       //println "payaso2"
         def inicio = new Date().parse("dd-MM-yyyy",params.inicio)
         def fin = new Date().parse("dd-MM-yyyy",params.fin)
         //def cierre = "01/01/2015"
         //def banco = Banco.findByCodigo(params.banco)
+        def cuenta = Cuenta.findByNumeroAndEmpresa(params.cuenta,session.empresa)
+        def desde =cuenta.numero.trim()+"01001"
+        def hasta = cuenta.numero.trim()+"99999"
+        //def fecha = new Date()
         def cn = new Sql(dataSource)
-        def sql = "CONTABLE..up_rpt_diario_general  'PS' ,'${inicio.format('MM/dd/yyyy')}' , '${fin.format('MM/dd/yyyy')}'"
+        def sql = "CONTABLE..up_rpt_cartera_vencida " +
+                " 'PS' , ${inicio.format('yyyy').toInteger()}00 ,'${inicio.format('MM/dd/yyyy')}' " +
+                ", '${fin.format('MM/dd/yyyy')}'" + ",'${desde}','${hasta}', ${params.dias}"
         cn.call(sql.toString())
         def iniRow = 0
         def iniCol = 0
@@ -43,6 +52,7 @@ class DiarioGeneralExcelController extends Shield{
         anchor.setCol1(0);
         anchor.setRow2(1);
         anchor.setCol2(1);
+
         //Picture pict = drawing.createPicture(anchor, pictureIdx);
 
         DataFormat format = wb.createDataFormat();
@@ -107,20 +117,56 @@ class DiarioGeneralExcelController extends Shield{
         XSSFCell cellTitulo = row.createCell((short) iniCol)
         cellTitulo.setCellValue("Petróleos y servicios" )
         cellTitulo.setCellStyle(styleTitulo)
-        XSSFCell cellSubtitulo = row2.createCell((short) iniCol)
-        cellSubtitulo.setCellValue("DIARIO GENERAL del "+inicio.format("dd-MM-yyyy")+" hasta "+fin.format("dd-MM-yyyy"))
+
+        def tit = ""
+        switch (params.dias){
+            case "0":
+                tit="DE 0 a 29"
+                break;
+            case "30":
+                tit="DE 30 a 59"
+                break;
+            case "60":
+                tit="DE 60 a 89"
+                break;
+            case "90 a 364":
+                tit=""
+                break;
+            case "DE 365 a 1825":
+                tit=""
+                break;
+            case "1826":
+                tit="MAS DE 1825"
+                break;
+
+        }
+
+        row = sheet.createRow((short) curRow)
+        XSSFCell cellSubtitulo = row.createCell((short) 3)
+        cellSubtitulo.setCellValue("CARTERA VENCIDA CUENTAS CONTABLES "+tit+" DIAS")
         cellSubtitulo.setCellStyle(styleSubtitulo)
+        curRow++
+        row = sheet.createRow((short) curRow)
+        XSSFCell cellSubtitulo2 = row.createCell((short) 3)
+        cellSubtitulo2.setCellValue("Desde "+inicio.format("dd-MM-yyyy")+" hasta "+fin.format("dd-MM-yyyy"))
+        cellSubtitulo2.setCellStyle(styleSubtitulo)
+
+
+        curRow++
+        //row = sheet.createRow((short) curRow)
+
+
         sheet.addMergedRegion(new CellRangeAddress(
                 iniRow, //first row (0-based)
                 iniRow, //last row  (0-based)
                 iniCol, //first column (0-based)
-                8  //last column  (0-based)
+                6  //last column  (0-based)
         ))
         sheet.addMergedRegion(new CellRangeAddress(
                 1, //first row (0-based)
                 1, //last row  (0-based)
                 0, //first column (0-based)
-                8  //last column  (0-based)
+                6  //last column  (0-based)
         ))
         sheet.setColumnWidth(1,4000)
         sheet.setColumnWidth(2,15000)
@@ -133,87 +179,83 @@ class DiarioGeneralExcelController extends Shield{
 
 
 
-        sql = "select * from CONTABLE..COMPROBANTES_TMP  order by COM_NUMERO"
+
+
+        sql = "select * from CONTABLE..COMPROBANTES_TMP "
         def celda
-        def td = 0,th=0
-        def last = null
-        def table = null
-        def cell
+        //def td = 0,th=0
+        //def last = null
+        //def table = null
+        //def cell
+        def total = 0
+        row = sheet.createRow((short) curRow)
+        celda =  row.createCell((short) 1)
+        celda.setCellValue("CUENTA")
+        celda.setCellStyle(styleHeader)
+        //row = sheet.createRow((short) curRow)
+        celda =  row.createCell((short) 2)
+        celda.setCellValue("DESCRIPCIÓN")
+        celda.setCellStyle(styleHeader)
+        //row = sheet.createRow((short) curRow)
+        celda =  row.createCell((short) 3)
+        celda.setCellValue("DÍAS VENCIDOS")
+        celda.setCellStyle(styleHeader)
+        //row = sheet.createRow((short) curRow)
+        celda =  row.createCell((short) 4)
+        celda.setCellValue("ÚLTIMO MOVIMIENTO")
+        celda.setCellStyle(styleHeader)
+        //row = sheet.createRow((short) curRow)
+        celda =  row.createCell((short) 5)
+        celda.setCellValue("SALDO")
+        celda.setCellStyle(styleHeader)
+        curRow++
 
         cn.eachRow(sql.toString()){r->
-            if(last!=r["COM_NUMERO"]){
-
-                row = sheet.createRow((short) curRow)
-                celda =  row.createCell((short) 3)
-                celda.setCellValue(imprimeNumero_ajax(r["COM_NUMERO"]))
-                celda.setCellStyle(styleNegrilla)
-                curRow++
-                row = sheet.createRow((short) curRow)
-                celda =  row.createCell((short) 1)
-                celda.setCellValue(r["COM_CONCEPTO"])
-                celda.setCellStyle(styleNegrilla)
-
-            }
-            last=r["COM_NUMERO"]
-
-
-        //cn.eachRow(sql.toString()){r->
-            curRow++
+            total+=r["COM_SALDO"]
             row = sheet.createRow((short) curRow)
             celda =  row.createCell((short) 1)
             celda.setCellValue(r["CTA_CUENTA"])
             celda.setCellStyle(styleTable)
+
+
             celda =  row.createCell((short) 2)
             celda.setCellValue(r["CTA_DESCRIPCION"])
-            //celda.setCellStyle(styleHeader)
+            //celda.setCellStyle(styleNegrilla)
+
+
             celda =  row.createCell((short) 3)
-            celda.setCellValue("PS-"+r["COM_MES_CODIGO"]+"-D-"+r["COM_NUMERO"])
-            //celda.setCellStyle(styleHeader)
+            celda.setCellValue("")
+            celda.setCellStyle(styleTable)
+
+
             celda =  row.createCell((short) 4)
-            celda.setCellValue(r["COM_DEBE"])
+            celda.setCellValue((r["CON_FECHA"].format("dd-MM-yyyy")))
             celda.setCellStyle(styleTable)
+
+
+
             celda =  row.createCell((short) 5)
-            celda.setCellValue(r["COM_HABER"])
+            celda.setCellValue(r["COM_SALDO"])
             celda.setCellStyle(styleTable)
+            curRow++
 
-            def debe = r["COM_DEBE"]
-            def haber = r["COM_HABER"]
-            td+=debe
-            th+=haber
-
-           //println "---!!  "+r
-        //}
-        //}
+            println "------" + r
         }
-        //curRow++
         row = sheet.createRow((short) curRow)
-        celda =  row.createCell((short) 3)
-        celda.setCellValue("TOTALES")
-        celda.setCellStyle(styleNegrilla)
         celda =  row.createCell((short) 4)
-        celda.setCellValue(td)
-        celda.setCellStyle(styleFooter)
+        celda.setCellValue("TOTAL")
+        celda.setCellStyle(styleNegrilla)
+
+        //row = sheet.createRow((short) curRow)
         celda =  row.createCell((short) 5)
-        celda.setCellValue(th)
+        celda.setCellValue(total)
         celda.setCellStyle(styleFooter)
-
-
 
         def output = response.getOutputStream()
-        def header = "attachment; filename=" + "diarioGeneral.xlsx"
+        def header = "attachment; filename=" + "carteraVencida.xlsx"
         response.setContentType("application/application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
         response.setHeader("Content-Disposition", header)
         wb.write(output)
         output.flush()
-    }
-    def imprimeNumero_ajax(numero){
-        def res ="-"
-        def num = numero.toString().trim()
-        (8-num.length()).times {
-            res+="0"
-        }
-        res+=num
-        res+="-"
-        return res
     }
 }
