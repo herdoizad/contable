@@ -58,6 +58,7 @@ class LoginController {
                 if(verificaHorario(user)) {
                     session.usuario = user
                     session.usuarioKerberos = user.login
+                    session.ip = request.remoteAddr
                     session.empresa = Empresa.findByPrincipal("S")
                     session.color=""
                     doLogin()

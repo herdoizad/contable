@@ -13,6 +13,7 @@ class CargaFamiliar {
     Date inicio
     Date fin  //En caso de que deje de ser carga
     Relacion relacion
+    String path
 
     static auditable = [ignore: []]
     /**
@@ -38,6 +39,7 @@ class CargaFamiliar {
             relacion column: 'RELACION_ID'
             inicio column: 'INICIO'
             fin column: 'FIN'
+            path column: 'PATH'
         }
     }
 
@@ -49,6 +51,7 @@ class CargaFamiliar {
         direccion(size: 1..150)
         telefono(size: 1..10)
         email(nullable: true, size: 1..60)
+        path(nullable: true, size: 1..150)
         fin(nullable: true)
     }
 }

@@ -38,6 +38,21 @@
     </div>
 </div>
 <div class="row fila">
+    <div class="col-md-1">
+        <label>Aplicar plantilla:</label>
+    </div>
+    <div class="col-md-4">
+       <g:select name="plantilla" id="tipo" from="${contable.nomina.TipoContrato.list([sort: 'descripcion'])}"
+       class="form-control input-sm" optionValue="descripcion" optionKey="id" noSelection="['':'']"
+       />
+    </div>
+    <div class="col-md-1">
+      <a href="#" class="btn btn-verde btn-sm" id="aplicar">
+          <i class="fa fa-adjust"></i> Aplicar
+      </a>
+    </div>
+</div>
+<div class="row fila">
     <div class="col-md-11">
         <table class="table table-darkblue table-sm table-bordered">
             <thead>
@@ -151,5 +166,23 @@
                 $("#detalle").html(msg)
             } //success
         }); //ajax
+    })
+    $("#aplicar").click(function(){
+        if($("#tipo").val()!=""){
+            openLoader()
+            $.ajax({
+                type: "POST",
+                url: "${createLink(controller:'rubros', action:'aplicarPLantilla_ajax')}",
+                data: {
+                    empleado:"${empleado?.id}",
+                    tipo:$("#tipo").val()
+                },
+                success: function (msg) {
+                    closeLoader()
+                    $("#detalle").html(msg)
+                } //success
+            }); //ajax
+        }
+
     })
 </script>

@@ -98,7 +98,7 @@
                 </div>
             </div>
             <div class="row fila">
-                <div class="col-md-12" id="detalle">
+                <div class="col-md-12" id="detalle" style="position: relative">
                 </div>
             </div>
         </div>
@@ -173,6 +173,15 @@
                 openLoader()
                 var id = nodeStrId.replace("e","")
                 location.href="${g.createLink(controller: 'empleado',action: 'nuevoEmpleado')}/"+id
+            }
+        };
+        var foto = {
+            label: "Foto",
+            icon: "fa fa-camera",
+            action: function () {
+                openLoader()
+                var id = nodeStrId.replace("e","")
+                location.href="${g.createLink(controller: 'empleado',action: 'fotoEmpleado')}/"+id
             }
         };
         var editarCarga = {
@@ -369,6 +378,7 @@
         if(esContrato)
             items.editar=editarContrato
         if(esEmpleado) {
+            items.foto=foto
             items.editar = editarEmpleado
             if(!desactivado)
                 items.desactivarEmp=desactivarEmp

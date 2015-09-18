@@ -178,7 +178,7 @@ class ReporteRolController extends Shield {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         def writer = PdfWriter.getInstance(document, baos);
         def img = grailsApplication.mainContext.getResource('/images/favicons/apple-touch-icon-60x60.png').getFile()
-        writer.setPageEvent(new contable.HeaderFooter(img.readBytes(), fecha, session.usuario.login,""));
+        writer.setPageEvent(new contable.HeaderFooter(img.readBytes(),bs, fecha, session.usuario.login,"",null));
         Font header = new Font(Font.FontFamily.HELVETICA, 12, Font.UNDERLINE | Font.BOLD);
         Font titulo = new Font(Font.FontFamily.HELVETICA, 9, Font.BOLD);
         Font contenido = new Font(Font.FontFamily.HELVETICA, 8);
@@ -233,6 +233,8 @@ class ReporteRolController extends Shield {
             table.addCell(cell);
         }
         document.add(table)
+        p = new Paragraph("Total ingresos: "+formatNumber(number: rol.totalIngresos,maxFractionDigits: 2,format: "###,##0",minFractionDigits: 2 ), titulo);
+        document.add(p);
         p = new Paragraph("\n", titulo);
         document.add(p);
         p = new Paragraph("\n", titulo);
@@ -258,6 +260,8 @@ class ReporteRolController extends Shield {
             table.addCell(cell);
         }
         document.add(table)
+        p = new Paragraph("Total egresos: "+formatNumber(number: rol.totalEgresos,maxFractionDigits: 2,format: "###,##0",minFractionDigits: 2 ), titulo);
+        document.add(p);
         p = new Paragraph("\n", titulo);
         document.add(p);
         p = new Paragraph("Total a recibir: "+g.formatNumber(number:  rol.totalIngresos-rol.totalEgresos,type: "currency",currencySymbol: ""), titulo);

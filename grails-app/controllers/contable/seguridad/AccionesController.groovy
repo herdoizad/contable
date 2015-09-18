@@ -356,7 +356,7 @@ class AccionesController extends Shield  {
             multipart true
 //            to "valentinsvt@hotmail.com"
             to email
-            subject "Nueva contraseña"
+            subject "[CONTABLE]Nueva contraseña"
             body( view:"cambioPass",
                     model:[pass:pass,usuario:usuario.login,genera:session.usuario.login])
             inline 'logo','image/png',grailsApplication.mainContext.getResource('/images/logo-login.png').getFile().readBytes()

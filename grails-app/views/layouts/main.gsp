@@ -16,7 +16,7 @@
 <mn:menuVertical/>
 </div>
 <div class="contenido">
-    <mn:barraTop titulo="${g.layoutTitle(default: 'Zeus')}"></mn:barraTop>
+    <mn:barraTop titulo="${g.layoutTitle(default: 'P&S')}"></mn:barraTop>
     <g:layoutBody/>
 </div>
 <script type="text/javascript">

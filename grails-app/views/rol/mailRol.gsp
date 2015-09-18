@@ -59,6 +59,11 @@
                     </g:if>
                     <g:if test="${d.signo<0 && !band}">
                         <tr>
+                            <td style="font-weight: bold">Total ingresos</td>
+                            <td  style="text-align: right;font-weight: bold"><g:formatNumber number="${rol.totalIngresos}" type="currency" currencySymbol=""/></td>
+                            <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+                        </tr>
+                        <tr>
                             <td colspan="3">&nbsp;</td>
                         </tr>
                         <g:set var="band" value="${true}"></g:set>
@@ -75,6 +80,11 @@
                         <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
                     </tr>
                 </g:each>
+                <tr>
+                    <td style="font-weight: bold">Total descuentos</td>
+                    <td  style="text-align: right;font-weight: bold"><g:formatNumber number="${rol.totalEgresos}" type="currency" currencySymbol=""/></td>
+                    <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+                </tr>
                 <tr>
                     <td colspan="3">&nbsp;&nbsp;&nbsp;</td>
                 </tr>

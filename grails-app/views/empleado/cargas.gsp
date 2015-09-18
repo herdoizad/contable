@@ -4,6 +4,8 @@
     <meta name="layout" content="main">
     <title>Empleados</title>
     <link href="${g.resource(dir: 'css/custom/', file: 'dashboard.css')}" rel="stylesheet" type="text/css">
+    <link href="${g.resource(dir: 'css/custom/', file: 'pdfViewer.css')}" rel="stylesheet" type="text/css">
+    <imp:js src="${resource(dir: 'js/plugins/pdfObject', file: 'pdfobject.min.js')}"/>
     <style>
     label{
         font-size: 10px;
@@ -11,6 +13,32 @@
     </style>
 </head>
 <body>
+<div class="pdf-viewer" style="width: 46%">
+    <div class="pdf-content" >
+        <div class="pdf-container" id="doc"></div>
+        <div class="pdf-handler" >
+            <i class="fa fa-arrow-right"></i>
+        </div>
+        <div class="pdf-header" id="data">
+            N. Referencia: <span id="referencia-pdf" class="data"></span>
+            Código: <span id="codigo" class="data"></span>
+            Tipo: <span id="tipo" class="data"></span>
+
+
+
+        </div>
+        <div id="msgNoPDF">
+            <p>No tiene configurado el plugin de lectura de PDF en este navegador.</p>
+
+            <p>
+                Puede
+                <a class="text-info" target="_blank" style="color: white" href="http://get.adobe.com/es/reader/">
+                    <u>descargar Adobe Reader aquí</u>
+                </a>
+            </p>
+        </div>
+    </div>
+</div>
 <elm:message tipo="${flash.tipo}" clase="${flash.clase}">${flash.message}</elm:message>
 <div class="row">
 <div class="col-md-12">
@@ -84,7 +112,7 @@
         <div class="panel panel-info" style="border-color:#2F4050 ">
             <div class="panel-heading " style="background:  #2F4050;color: #ffffff">${c.nombre+" "+c.apellido}</div>
             <div class="panel-body">
-                <g:form action="saveCar_ajax" class="frm frmCar-${c.id}"  >
+                <g:form action="saveCar_ajax" class="frm frmCar-${c.id}" enctype="multipart/form-data"  >
                     <input type="hidden" name="id" value="${c.id}">
                     <input type="hidden" name="empleado.id" value="${empleado.id}">
                     <div class="row">
@@ -158,12 +186,30 @@
                         </div>
                     </div>
                     <div class="row fila">
-                        <div class="col-md-1 ">
+                        <div class="col-md-1">
+                            <label>Archivo PDF</label>
+                        </div>
+                        <g:if test="${c.path}">
+                            <div class="col-md-1">
+                                <a href="#" data-file="${c.path}"
+                                   data-ref="Capacitación"
+                                   data-codigo=""
+                                   data-tipo="Capacitación"
+                                   target="_blank" class="btn btn-info ver-doc btn-sm" title="${c.path}" >
+                                    <i class="fa fa-search"></i> Ver
+                                </a>
+                            </div>
+                        </g:if>
+                        <div class="col-md-3">
+                            <input type="file" placeholder="Seleccione un archivo" name="archivo" class="form-control input-sm">
+                        </div>
+                        <div class="col-md-1">
                             <a href="#" class="btn btn-verde btn-sm save-car"  iden="${c.id}">
                                 <i class="fa fa-save"></i> Guardar
                             </a>
                         </div>
                     </div>
+
                 </g:form>
             </div>
         </div>
@@ -172,7 +218,7 @@
         <div class="panel-heading " style="background:  #2F4050;color: #ffffff">Registrar nueva carga familiar</div>
         <div class="panel-body">
 
-            <g:form action="saveCar_ajax" class="frmCar"  >
+            <g:form action="saveCar_ajax" class="frmCar" enctype="multipart/form-data"   >
                 <input type="hidden" name="empleado.id" value="${empleado.id}">
                 <div class="row">
                     <div class="col-md-1">
@@ -245,7 +291,13 @@
                     </div>
                 </div>
                 <div class="row fila">
-                    <div class="col-md-1 ">
+                    <div class="col-md-1">
+                        <label>Archivo PDF</label>
+                    </div>
+                    <div class="col-md-3">
+                        <input type="file" placeholder="Seleccione un archivo" name="archivo" class="form-control input-sm">
+                    </div>
+                    <div class="col-md-1">
                         <a href="#" class="btn btn-verde btn-sm" id="save-car">
                             <i class="fa fa-save"></i> Guardar
                         </a>
@@ -264,6 +316,25 @@
 </div>
 </div>
 <script>
+    function showPdf(div){
+        $("#msgNoPDF").show();
+        $("#doc").html("")
+        var pathFile = div.data("file")
+        $("#referencia-pdf").html(div.data("ref"))
+        $("#codigo").html(div.data("codigo"))
+        $("#tipo").html(div.data("tipo"))
+        var path = "${resource()}/" + pathFile;
+        var myPDF = new PDFObject({
+            url           : path,
+            pdfOpenParams : {
+                navpanes: 1,
+                statusbar: 0,
+                view: "FitW"
+            }
+        }).embed("doc");
+        $(".pdf-viewer").show("slide",{direction:'right'})
+        $("#data").show()
+    }
     function check_cedula( valor ){
         console.log(valor)
         if(valor=="")
@@ -375,6 +446,14 @@
     })
     $(".save-car").click(function(){
         $(".frmCar-"+$(this).attr("iden")).submit()
+    })
+    $(".ver-doc").click(function(){
+        showPdf($(this))
+        return false
+    })
+    $(".pdf-handler").click(function(){
+        $(".pdf-viewer").hide("slide",{direction:'right'})
+        $("#data").hide()
     })
 </script>
 </body>

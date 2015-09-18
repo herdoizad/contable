@@ -402,4 +402,15 @@ class UnidadController extends Shield {
         render str
     }
 
+
+    def cambiarFac_ajax(){
+        def empleado = Empleado.get(params.id)
+        if(empleado.sistemaDeFacturacion=="S")
+            empleado.sistemaDeFacturacion=="N"
+        else
+            empleado.sistemaDeFacturacion="S"
+        empleado.save(flush: true)
+        redirect(action: 'detalle_empleado_ajax',id: empleado.id)
+    }
+
 }

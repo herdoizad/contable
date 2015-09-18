@@ -13,6 +13,8 @@ class Empleado {
     Date fechaNacimiento
     String sexo
     String direccion
+    String calleSecundaria
+    String numero
     String telefono
     String cargo
     String email
@@ -26,8 +28,9 @@ class Empleado {
     String banco
     String tipoCuenta
     String estado  ="A"
-
+    String foto
     String path /*path al pdf de la hoja de vida*/
+    String sistemaDeFacturacion
 
     Cuenta cuentaContable /*Todo esto cambiar a dominio cuenta cuando se una con contabilidad*/
 
@@ -44,6 +47,8 @@ class Empleado {
             nombre column: "NOMBRE"
             apellido column: "APELLLIDO"
             direccion column: "DIRECCION"
+            calleSecundaria column: "CALLE_SECUNDARIA"
+            numero column: 'NUMERO_DIRECCION'
             telefono column: "TELEFONO"
             fechaNacimiento column: "FECHA_NACIMIENTO"
             nacionalidad column: "NACIONALIDAD"
@@ -64,6 +69,8 @@ class Empleado {
             estado column: 'ESTADO'
             path column: 'PATH'
             cuentaContable column: 'CTA_CUENTA'
+            foto column: 'PATH_FOTO'
+            sistemaDeFacturacion column: 'SISTEMA_FACTURACION'
         }
     }
 
@@ -88,6 +95,10 @@ class Empleado {
         tipoCuenta(size: 1..1,nullable: true)
         estado(size: 1..1)
         cuentaContable(size: 1..15,nullable: true)
+        numero(nullable: true,blank: true,size: 1..20)
+        calleSecundaria(nullable: true,blank: true,size: 1..75)
+        foto(nullable: true,blank: true,size: 1..150)
+        sistemaDeFacturacion(nullable: true,blank: true,size: 1..1)
     }
 
     String toString(){

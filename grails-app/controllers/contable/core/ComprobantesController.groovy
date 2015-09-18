@@ -56,6 +56,8 @@ class ComprobantesController extends Shield {
         detalles.each {
             if(band) {
                 it.valor = 0
+                it.ipMod=session.ip
+                it.usuario=session.ip
                 if (!it.save(flush: true)) {
                     println "error save detalle comprobante " + it.errors
                     band = false
@@ -339,7 +341,7 @@ class ComprobantesController extends Shield {
     }
 
     def save(){
-        //println "params !! "+params
+        println "params !! "+params
         def mes = params.mes.toInteger()
         def ultimo = Comprobante.findAll("from Comprobante where empresa='${session.empresa.codigo}' and tipo=${params.tipo} and mes=${mes} and tipoProcesamiento=2 order by numero desc",["max":1])
         def numero =1
@@ -369,6 +371,8 @@ class ComprobantesController extends Shield {
         comp.concepto=params.concepto
         comp.fecha=new Date().parse("dd-MM-yyyy",params.fecha_input)
         comp.usuario=session.usuario.login
+        println "ip "+session.ip
+        comp.ipMod = session.ip
         comp.control=9
         comp.tipoProcesamiento=2
         if(!comp.save(flush: true))
@@ -440,22 +444,26 @@ class ComprobantesController extends Shield {
                     det.creacion=new Date()
                     det.secuencial=parts[0].toDouble()
                     det.usuario = session.usuario.login
+                    det.ipMod=session.ip
 //                    println "cuenta "+det.cuenta+"  "+det.valor+"  "+det.tipo
                     if(!det.save(flush: true))
                         println "error save det "+det.errors
                 }
             }
-            def email = "valentinsvt@hotmail.com"
-            def det = DetalleComprobante.findAll("from DetalleComprobante  where mes=${comp.mes} and numero=${comp.numero} and tipo=${comp.tipo} and empresa='${session.empresa.codigo}'")
-            mailService.sendMail {
-                multipart true
-                to email
-                subject "Edición de comprobante resultado final"
-                body( view:"mailComprobanteFinal",
-                        model:[comp:comp,detalle:det,genera:session.usuario.login])
-                inline 'logo','image/png',grailsApplication.mainContext.getResource('/images/logo-login.png').getFile().readBytes()
+            if(sendMail){
+                def email = "ana.duque@petroleosyservicios.com"
+                def det = DetalleComprobante.findAll("from DetalleComprobante  where mes=${comp.mes} and numero=${comp.numero} and tipo=${comp.tipo} and empresa='${session.empresa.codigo}'")
+                mailService.sendMail {
+                    multipart true
+                    to email
+                    subject "[CONTABLE]Edición de comprobante resultado final"
+                    body( view:"mailComprobanteFinal",
+                            model:[comp:comp,detalle:det,genera:session.usuario.login])
+                    inline 'logo','image/png',grailsApplication.mainContext.getResource('/images/logo-login.png').getFile().readBytes()
 //            inline 'logo','image/png', new File('./web-app///images/logo-login.png').readBytes()
+                }
             }
+
         }
         switch (comp.tipo){
             case 1:
@@ -506,6 +514,8 @@ class ComprobantesController extends Shield {
         comp.concepto=params.concepto
         comp.fecha=new Date().parse("dd-MM-yyyy",params.fecha_input)
         comp.usuario=session.usuario.login
+        println "ip "+session.ip
+        comp.ipMod=session.ip
         comp.control=9
         comp.tipoProcesamiento=params.tipoEgreso.toInteger()
         if(comp.tipoProcesamiento==1)
@@ -586,6 +596,7 @@ class ComprobantesController extends Shield {
                         det.retencionIva=0
                     }
                     det.pagar=parts[9].toDouble()
+
                     if(!det.save(flush: true)){
                         println "error save det "+det.errors
                     }
@@ -623,7 +634,8 @@ class ComprobantesController extends Shield {
                     det.secuencial=cont
                     cont++
                     det.usuario = session.usuario.login
-                    println "cuenta "+det.cuenta+"  "+det.valor+"  "+det.tipo
+                    det.ipMod=session.ip
+//                    println "cuenta "+det.cuenta+"  "+det.valor+"  "+det.tipo
                     if(!det.save(flush: true))
                         println "error save det "+det.errors
                 }
@@ -666,6 +678,7 @@ class ComprobantesController extends Shield {
         comp.concepto=params.concepto
         comp.fecha=new Date().parse("dd-MM-yyyy",params.fecha_input)
         comp.usuario=session.usuario.login
+        comp.ip=session.ip
         comp.control=9
         comp.numeroCheque=0
         comp.bancoCliente=BancoOcp.findByCodigo(params.bancoCliente)
@@ -792,6 +805,7 @@ class ComprobantesController extends Shield {
                     det.secuencial=cont
                     cont++
                     det.usuario = session.usuario.login
+                    det.ipMod=session.ip
                     println "cuenta "+det.cuenta+"  "+det.valor+"  "+det.tipo
                     if(!det.save(flush: true))
                         println "error save det "+det.errors
@@ -867,8 +881,8 @@ class ComprobantesController extends Shield {
     }
 
     def enviarCorreo_ajax(){
-        println "enviar "+params
-        def email = "valentinsvt@hotmail.com"
+//        println "enviar "+params
+        def email = "ana.duque@petroleosyservicios.com"
         def comp = Comprobante.findAll("from Comprobante where mes=${params.mes} and numero=${params.numero} and tipo=${params.tipo} and empresa='${session.empresa.codigo}'")
         if(comp.size()>0) {
             comp = comp.pop()
@@ -876,7 +890,7 @@ class ComprobantesController extends Shield {
             mailService.sendMail {
                 multipart true
                 to email
-                subject "Edición de comprobante"
+                subject "[CONTABLE]Edición de comprobante"
                 body( view:"mailComprobante",
                         model:[comp:comp,detalle:det,genera:session.usuario.login])
                 inline 'logo','image/png',grailsApplication.mainContext.getResource('/images/logo-login.png').getFile().readBytes()

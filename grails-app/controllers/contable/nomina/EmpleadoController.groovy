@@ -281,6 +281,66 @@ class EmpleadoController extends Shield {
         car.properties=params
         if(!car.inicio)
             car.inicio=new Date()
+
+
+        def f = request.getFile('archivo')
+        def ext2
+        if(f && !f.empty){
+
+            def nombre = f.getOriginalFilename()
+            def parts2 = nombre.split("\\.")
+            nombre = ""
+            parts2.eachWithIndex { obj, i ->
+                if (i < parts2.size() - 1) {
+                    nombre += obj
+                } else {
+                    ext2 = obj
+                }
+            }
+            def path = servletContext.getRealPath("/") + "cargas/" + empleado.cedula + "/"
+            def pathLocal = "cargas/" + empleado.cedula + "/"
+            if(ext2 == 'pdf' || ext2 == 'PDF'){
+                /* upload */
+                new File(path).mkdirs()
+                if (f && !f.empty) {
+
+                    def fileName = f.getOriginalFilename()
+                    def ext
+
+                    def parts = fileName.split("\\.")
+                    fileName = ""
+                    parts.eachWithIndex { obj, i ->
+                        if (i < parts.size() - 1) {
+                            fileName += obj
+                        }
+                    }
+                    def name = "carga_" + empleado.cedula+"_"+new Date().format("ddMMyyyyHHssmm")+"."+ext2
+                    def pathFile = path + name
+                    def fn = fileName
+                    def src = new File(pathFile)
+                    def i = 1
+                    while (src.exists()) {
+                        nombre = fn + "_" + i + "." + ext2
+                        pathFile = path + nombre
+                        src = new File(pathFile)
+                        i++
+                    }
+                    try {
+                        f.transferTo(new File(pathFile))
+                        car.path=pathLocal+name
+
+
+                    } catch (e) {
+                        println "????????\n" + e + "\n???????????"
+                    }
+                }
+
+            }
+
+        }
+
+
+
         if(!car.save(flush: true))
             println "error save car "+car.errors
         redirect(action: 'cargas',id: empleado.id)
@@ -376,4 +436,73 @@ class EmpleadoController extends Shield {
         render "ok"
     }
 
+
+    def fotoEmpleado(){
+        def empleado = Empleado.get(params.id)
+        [empleado:empleado]
+    }
+
+
+
+    def saveFoto_ajax(){
+        def empleado = Empleado.get(params.id)
+        def f = request.getFile('file')
+        def ext2
+        if(f && !f.empty){
+
+            def nombre = f.getOriginalFilename()
+            def parts2 = nombre.split("\\.")
+            nombre = ""
+            parts2.eachWithIndex { obj, i ->
+                if (i < parts2.size() - 1) {
+                    nombre += obj
+                } else {
+                    ext2 = obj
+                }
+            }
+            ext2=ext2.toUpperCase()
+            def path = servletContext.getRealPath("/") + "fotos/"
+            def pathLocal = "fotos/"
+            if(ext2 == 'JPG' || ext2 == 'JPEG' || ext2=="PNG"){
+                /* upload */
+                new File(path).mkdirs()
+                if (f && !f.empty) {
+
+                    def fileName = f.getOriginalFilename()
+                    def ext
+
+                    def parts = fileName.split("\\.")
+                    fileName = ""
+                    parts.eachWithIndex { obj, i ->
+                        if (i < parts.size() - 1) {
+                            fileName += obj
+                        }
+                    }
+                    def name = "foto_" + empleado.cedula+"_"+new Date().format("ddMMyyyyHHssmm")+"."+ext2
+                    def pathFile = path + name
+                    def fn = fileName
+                    def src = new File(pathFile)
+                    def i = 1
+                    while (src.exists()) {
+                        nombre = fn + "_" + i + "." + ext2
+                        pathFile = path + nombre
+                        src = new File(pathFile)
+                        i++
+                    }
+                    try {
+                        f.transferTo(new File(pathFile))
+                        empleado.foto=pathLocal+name
+                        empleado.save(flush: true)
+
+                    } catch (e) {
+                        println "????????\n" + e + "\n???????????"
+                    }
+                }
+
+            }
+
+        }
+
+        redirect(action: "fotoEmpleado",id: empleado.id)
+    }
 }

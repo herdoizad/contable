@@ -1,3 +1,8 @@
+<div style="position: absolute;width: 200px;top: -50px;right: 0px">
+    <g:if test="${empleado.foto}">
+        <img src="${g.resource(file: empleado.foto)}" width="200px"/>
+    </g:if>
+</div>
 <div class="row fila">
     <div class="col-md-3">
         <label>Nombre</label>
@@ -95,6 +100,24 @@
     </div>
 </div>
 <div class="row fila">
+    <div class="col-md-3">
+        <label>Sistama de facturación</label>
+    </div>
+    <div class="col-md-1">
+        <g:if test="${empleado.sistemaDeFacturacion=='S'}">
+            Sí
+        </g:if>
+        <g:else>
+            No
+        </g:else>
+    </div>
+    <div class="col-md-2">
+        <a href="#" class="btn btn-info btn-sm" iden="${empleado.id}" id="cambiar">
+            <i class="fa fa-refresh"></i> Cambiar
+        </a>
+    </div>
+</div>
+<div class="row fila">
     <div class="col-md-2">
         <g:link controller="rubros" action="rubrosEmpleado" id="${empleado.id}" class="btn btn-verde btn-sm" style="width: 100%">
             <i class="fa fa-list"></i> Rubros
@@ -125,6 +148,18 @@
 
     $(".ver-doc").click(function(){
         showPdf($(this))
+        return false
+    })
+    $("#cambiar").click(function(){
+        $.ajax({
+            type: "POST",
+            url: "${createLink(controller:'unidad', action:'cambiarFac_ajax')}",
+            data: {
+                id: "${empleado.id}"
+            },
+            success: function (msg) {
+                $("#detalle").html(msg)
+            }});
         return false
     })
 

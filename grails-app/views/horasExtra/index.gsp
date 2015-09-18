@@ -20,7 +20,7 @@
 <body>
 <div class="row fila">
     <div class="col-md-12">
-        <div class="panel-completo" style="margin-left: 10px">
+        <div class="panel-completo" style="margin-left: 10px;min-height: 10px">
             <div class="row">
                 <div class="col-md-7 titulo-panel">
                     Registro de horas extra
@@ -60,6 +60,25 @@
                                     </td>
                                 </g:each>
                             </tr>
+                            <g:if test="${e.sistemaDeFacturacion=='S'}">
+                                <tr>
+                                    <td>
+                                        ${e.apellido} <br/>${e.nombre}<br/>
+                                        <span style="font-weight: bold;color:#006EB7">
+                                            Sistema de facturación
+                                        </span>
+                                    </td>
+                                    <g:each in="${meses}" var="m">
+                                        <g:set var="horaf" value="${contable.nomina.HorasExtraFacturacion.findByMesAndEmpleado(m,e)}"></g:set>
+                                        <td style="text-align: center" class=" hora-container-f h-${e.id}" mes="${m.id}" emp="${e.id}">
+                                            <label class="factor">0.25</label><input type="number" class="form-control input-sm hora f-2  ${e.id} m-${m.id}" max="10"  value="${horaf?.horas2x?.toInteger()}" min="0" mes="${m.id}" emp="${e.id}" ><br/>
+                                            <label class="factor">1.00</label><input type="number" class="form-control input-sm hora f-1  ${e.id} m-${m.id} " value="${horaf?.horas1x?.toInteger()}" max="10" min="0" mes="${m.id}" emp="${e.id}" ><br/>
+                                            <label class="factor">1.50</label><input type="number" class="form-control input-sm hora f-15  ${e.id} m-${m.id}"  value="${horaf?.horas15x?.toInteger()}" max="10" min="0" mes="${m.id}" emp="${e.id}" ><br/>
+
+                                        </td>
+                                    </g:each>
+                                </tr>
+                            </g:if>
                         </g:each>
                         </tbody>
                     </table>
@@ -75,6 +94,8 @@
         </div>
     </div>
 </div>
+
+
 <script>
     $("#ver").click(function(){
         location.href="${g.createLink(action: 'index')}/?empleado="+$("#empleado").val()
@@ -83,11 +104,11 @@
     $("#guardar").click(function(){
         openLoader();
         var data =""
+        var dataf=""
         $(".hora-container").each(function(){
             var h1 = $(this).find(".f-1").val()*1
             var h15= $(this).find(".f-15").val()*1
             var h2 = $(this).find(".f-2").val()*1
-            console.log($(this).find(".f-1"),$(this).find(".f-15"), $(this).find(".f-2"))
             if(isNaN(h1))
                 h1=0
             if(isNaN(h15))
@@ -97,12 +118,26 @@
             data+=$(this).attr("mes")+";"+$(this).attr("emp")+";"+h1+";"+h15+";"+h2+"W"
 
         })
+        $(".hora-container-f").each(function(){
+            var h1 = $(this).find(".f-1").val()*1
+            var h15= $(this).find(".f-15").val()*1
+            var h2 = $(this).find(".f-2").val()*1
+            if(isNaN(h1))
+                h1=0
+            if(isNaN(h15))
+                h15=0
+            if(isNaN(h2))
+                h2=0
+            dataf+=$(this).attr("mes")+";"+$(this).attr("emp")+";"+h1+";"+h15+";"+h2+"W"
+
+        })
 
         $.ajax({
             type    : "POST",
             url     : '${createLink(controller:'horasExtra', action:'save_ajax')}',
             data    : {
-                data : data
+                data : data,
+                dataf:dataf
             },
             success : function (msg) {
                 location.reload(true)

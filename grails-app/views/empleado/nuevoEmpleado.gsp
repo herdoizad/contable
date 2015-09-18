@@ -132,16 +132,30 @@
         </div>
         <div class="row fila">
             <div class="col-md-1">
+                <label>Dirección</label>
+            </div>
+            <div class="col-md-5">
+                <input type="text"  maxlength="150" value="${empleado?.direccion}" name="direccion" class="required form-control input-sm allCaps">
+            </div>
+            <div class="col-md-1">
+                <label>Número</label>
+            </div>
+            <div class="col-md-1">
+                <input type="text"  maxlength="20" value="${empleado?.numero}" name="numero" class=" form-control input-sm allCaps">
+            </div>
+            <div class="col-md-1">
+                <label>Calle secundaria</label>
+            </div>
+            <div class="col-md-3">
+                <input type="text"  maxlength="75" value="${empleado?.calleSecundaria}" name="calleSecundaria" class=" form-control input-sm allCaps">
+            </div>
+        </div>
+        <div class="row fila">
+            <div class="col-md-1">
                 <label>Teléfono</label>
             </div>
             <div class="col-md-2">
                 <input type="text"  maxlength="10" value="${empleado?.telefono}" name="telefono" class="required form-control input-sm allCaps">
-            </div>
-            <div class="col-md-1">
-                <label>Dirección</label>
-            </div>
-            <div class="col-md-4">
-                <input type="text"  maxlength="150" value="${empleado?.direccion}" name="direccion" class="required form-control input-sm allCaps">
             </div>
 
             <div class="col-md-1">
@@ -149,6 +163,12 @@
             </div>
             <div class="col-md-3">
                 <input type="text"   maxlength="60" value="${empleado?.email}" name="email" class="required form-control input-sm allCaps">
+            </div>
+            <div class="col-md-1">
+                <label>Código sectorial</label>
+            </div>
+            <div class="col-md-3">
+                <input type="text" name="codigoSectorial"  maxlength="20" value="${empleado?.codigoSectorial}" class="form-control input-sm allCaps">
             </div>
         </div>
         <div class="row fila">
@@ -178,22 +198,6 @@
                 <input type="text" name="tipoSangre" maxlength="4"  value="${empleado?.tipoSangre}" class="form-control input-sm allCaps">
             </div>
 
-        </div>
-        <div class="row fila" style="border-top: 1px solid #000000">
-        </div>
-        <div class="row fila">
-            <div class="col-md-1">
-                <label>IESS</label>
-            </div>
-            <div class="col-md-2">
-                <input type="text" name="afiliacionIess" maxlength="20"  value="${empleado?.afiliacionIess}" class="form-control input-sm allCaps">
-            </div>
-            <div class="col-md-1">
-                <label>Código sectorial</label>
-            </div>
-            <div class="col-md-3">
-                <input type="text" name="codigoSectorial"  maxlength="20" value="${empleado?.codigoSectorial}" class="form-control input-sm allCaps">
-            </div>
         </div>
         <div class="row fila" style="border-top: 1px solid #000000">
         </div>

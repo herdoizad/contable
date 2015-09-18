@@ -10,10 +10,14 @@ class DetalleComprobante implements Serializable{
     String descripcion
     Integer signo
     Double valor
-    String usuario
     Date  creacion
     Double secuencial
     Integer concilia
+
+    String usuario
+    String ipMod
+
+
     static auditable = [ignore: []]
 
     /**
@@ -36,14 +40,16 @@ class DetalleComprobante implements Serializable{
             valor column: 'COM_VALOR'
             secuencial column: 'COM_SECUENCIAL'
             concilia column: 'COM_CONCILIA'
-            usuario column: 'COM_EMPLEADO_CREA'
+
             creacion column: 'COM_FECHA_CREA'
+            usuario column: 'USUARIO'
+            ipMod column: 'IPCREA'
         }
     }
     static constraints = {
         descripcion(size: 1..35)
-        usuario(size: 1..16)
         concilia(nullable: true,blank:true)
-
+        usuario(size: 1..32,nullable: true,blank: true)
+        ipMod(nullable: true,blank: true,size: 1..24)
     }
 }

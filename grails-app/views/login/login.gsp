@@ -117,28 +117,28 @@
             </div>
         </div>
     </div>
-    <div class="col-md-3 ">
-        <div class="panel-completo" style="height: 338px">
-            <div class="row">
-                <div class="col-md-12 titulo-panel">
-                    Otra iformación
-                </div>
-            </div>
-            <div class="row fila">
-                <div class="col-md-12">
-                    <p>
-                        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque sollicitudin enim sapien,
-                        vel efficitur justo semper in. Nunc rhoncus leo non vestibulum eleifend. Duis faucibus,
-                        sem nec convallis efficitur, eros lectus efficitur ex, eget pharetra velit dolor eget ipsum.
-                        Vestibulum a placerat neque. Nullam sit amet nulla tempus, pulvinar dolor vitae, maximus augue.
-                        Sed purus mi, auctor et nisl ut, pharetra ornare metus. Phasellus commodo arcu sit amet enim eleifend
-                        rutrum. Aliquam ac efficitur tortor. Donec sit amet augue eu tellus vulputate condimentum id quis nunc.
-                    </p>
-                </div>
-            </div>
+    %{--<div class="col-md-3 ">--}%
+        %{--<div class="panel-completo" style="height: 338px">--}%
+            %{--<div class="row">--}%
+                %{--<div class="col-md-12 titulo-panel">--}%
+                    %{--Otra iformación--}%
+                %{--</div>--}%
+            %{--</div>--}%
+            %{--<div class="row fila">--}%
+                %{--<div class="col-md-12">--}%
+                    %{--<p>--}%
+                        %{--Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque sollicitudin enim sapien,--}%
+                        %{--vel efficitur justo semper in. Nunc rhoncus leo non vestibulum eleifend. Duis faucibus,--}%
+                        %{--sem nec convallis efficitur, eros lectus efficitur ex, eget pharetra velit dolor eget ipsum.--}%
+                        %{--Vestibulum a placerat neque. Nullam sit amet nulla tempus, pulvinar dolor vitae, maximus augue.--}%
+                        %{--Sed purus mi, auctor et nisl ut, pharetra ornare metus. Phasellus commodo arcu sit amet enim eleifend--}%
+                        %{--rutrum. Aliquam ac efficitur tortor. Donec sit amet augue eu tellus vulputate condimentum id quis nunc.--}%
+                    %{--</p>--}%
+                %{--</div>--}%
+            %{--</div>--}%
 
-        </div>
-    </div>
+        %{--</div>--}%
+    %{--</div>--}%
 </div>
 <script type="text/javascript">
     $("#ingresar").click(function(){

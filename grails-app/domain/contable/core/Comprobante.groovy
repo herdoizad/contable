@@ -11,7 +11,7 @@ class Comprobante  implements Serializable{
     Double cotiza
     Double control
     Integer tipoProcesamiento
-    String usuario
+
     Date creacion=new Date()
     Integer revisaAuditoria
     String beneficiario
@@ -21,6 +21,9 @@ class Comprobante  implements Serializable{
     String cuentaTransferencia
     BancoOcp bancoCliente
     String  tipoCuenta
+
+    String usuario
+    String ipMod
     static auditable = [ignore: []]
 
     /**
@@ -43,7 +46,7 @@ class Comprobante  implements Serializable{
             cotiza column: 'COM_COTIZA_DOLAR'
             control column: 'COM_CODIGO_CONTROL'
             tipoProcesamiento column: 'COM_TIPO_PROCESAMIENTO'
-            usuario column: 'COM_EMPLEADO_CREA'
+            usuario column: 'USUARIO'
             creacion column: 'COM_FECHA_CREA'
             revisaAuditoria column: 'REVISA_AUDITORIA'
             beneficiario column: 'CODIGO_BENEFICIARIO'
@@ -53,13 +56,14 @@ class Comprobante  implements Serializable{
             cuentaTransferencia column: 'CUENTA_TRANSFERENCIA'
             bancoCliente column: 'BANCO_CLIENTE'
             tipoCuenta column: 'TIPO_CUENTA_CLIENTE'
+            ipMod column: 'IPCREA'
         }
     }
     static constraints = {
         concepto(size: 1..255)
         numeroCheque(nullable: true,blank:true)
         cotiza(nullable: true,blank:true)
-        usuario(size: 1..16)
+        usuario(size: 1..32,nullable: true,blank: true)
         revisaAuditoria(nullable: true,blank:true)
         beneficiario(nullable: true,blank: true,size: 1..8)
         ocp(nullable: true,blank:true)
@@ -68,6 +72,7 @@ class Comprobante  implements Serializable{
         cuentaTransferencia(nullable: true,blank:true,size: 1..25)
         bancoCliente(nullable: true)
         tipoCuenta(nullable: true,blank:true,size: 1..5)
+        ipMod(nullable: true,blank: true,size: 1..24)
     }
 
     def getTipoString(){

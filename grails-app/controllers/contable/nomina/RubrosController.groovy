@@ -1,6 +1,5 @@
 package contable.nomina
 
-import contable.core.Mes
 import contable.seguridad.Shield
 import groovy.sql.Sql
 
@@ -27,7 +26,7 @@ class RubrosController extends Shield {
 
 
     def test_ajax(){
-        println "params "+params
+//        println "params "+params
         def variables = Variable.list()
         def empleado = Empleado.get(params.empleado)
         def formula = params.formula
@@ -88,7 +87,14 @@ class RubrosController extends Shield {
     }
 
     def addRubroContrato_ajax(){
-
+        def tipo = TipoContrato.get(params.tipo)
+        def rubro = Rubro.get(params.rubro)
+        def re = new RubroContrato()
+        re.tipoContrato=tipo
+        re.rubro=rubro
+        if(!re.save(flush: true))
+            println "error save rubro "+re.errors
+        redirect(action: 'detalleContrato_ajax',id: tipo.id)
     }
 
     def addRubroEmpleado_ajax(){
@@ -207,6 +213,53 @@ class RubrosController extends Shield {
         if(!re.save(flush: true))
             println "error save rubro "+re.errors
         redirect(action: 'detalleFijosEmpleado_ajax',id: empleado.id)
+    }
+
+
+
+
+
+    def rubrosContrato(){
+        def tipo = null
+        if(params.id)
+            tipo=TipoContrato.get(params.id)
+        def rubros = Rubro.list([sort: "nombre"])
+        def tipos = TipoContrato.list([sort: "descripcion"])
+        [tipo:tipo,rubros:rubros,tipos:tipos]
+    }
+
+    def detalleContrato_ajax(){
+        def tipo = TipoContrato.get(params.id)
+        def rubros = RubroContrato.findAllByTipoContrato(tipo)
+        def meses = ["0":"Todos","1":"Enero","2":"Febero","3":"Marzo","4":"Abril","5":"Mayo","6":"Junio","7":"Juilo","8":"Agosto","9":"Septiembre","10":"Octubre","11":"Noviembre","12":"Diciembre"]
+        [tipo:tipo,rubros: rubros,meses:meses]
+    }
+
+    def borrarRubroContrato_ajax(){
+        def re = RubroContrato.get(params.id)
+        def tipo = re.tipoContrato
+        re.delete(flush: true)
+        redirect(action: 'detalleContrato_ajax',id: tipo.id)
+    }
+
+
+    def aplicarPLantilla_ajax(){
+        def empleado = Empleado.get(params.empleado)
+        def tipo = TipoContrato.get(params.tipo)
+        def rubros = RubroContrato.findAllByTipoContrato(tipo)
+        rubros.each {r->
+            def re =RubroEmpleado.findByEmpleadoAndRubro(empleado,r.rubro)
+            if(!re){
+                re=new RubroEmpleado()
+                re.rubro=r.rubro
+                re.empleado=empleado
+                re.inicio=empleado.registro
+                re.mes=0
+                if(!re.save(flush: true))
+                    println "error save rubro empleado con plantilla "+re.errors
+            }
+        }
+        redirect(action: 'detalleEmpleado_ajax',id: empleado.id)
     }
 
 }
