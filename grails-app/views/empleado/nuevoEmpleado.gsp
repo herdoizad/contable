@@ -1,4 +1,4 @@
-<%@ page contentType="text/html;charset=UTF-8" %>
+<%@ page import="contable.seguridad.Usuario" contentType="text/html;charset=UTF-8" %>
 <html>
 <head>
     <meta name="layout" content="main">
@@ -14,7 +14,7 @@
 </head>
 <body>
 <elm:message tipo="${flash.tipo}" clase="${flash.clase}">${flash.message}</elm:message>
-<div class="row">
+<div class="row fila">
 <div class="col-md-12">
 <div class="panel-completo" style="margin-left: 10px">
 <div class="row">
@@ -260,6 +260,18 @@
                     </a>
                 </div>
             </g:if>
+        </div>
+        <div class="row fila" style="border-top: 1px solid #000000">
+        </div>
+        <div class="row fila">
+            <div class="col-md-1">
+                <label>Usuario</label>
+            </div>
+            <div class="col-md-3">
+                <g:select name="usuario" id="usuario" class="form-control input-sm" noSelection="['':'Seleccione']"
+                          from="${Usuario.findAllByEstado('A',[sort: 'nombre'])}" value="${empleado?.usuario}"
+                          optionKey="login" optionValue="nombre" style="font-weight:normal"/>
+            </div>
         </div>
         <div class="row fila" style="margin-top: 20px">
             <div class="col-md-1">

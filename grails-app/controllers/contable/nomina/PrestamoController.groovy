@@ -9,6 +9,8 @@ import contable.seguridad.Shield
  */
 class PrestamoController extends Shield {
 
+    def mailService
+
     static allowedMethods = [save_ajax: "POST", delete_ajax: "POST"]
 
     /**
@@ -150,5 +152,153 @@ class PrestamoController extends Shield {
             return
         }
     } //delete para eliminar via ajax
+
+
+    def solicitar(){
+
+    }
+
+
+    def formSolicitud_ajax(){
+        def tipo = TipoPrestamo.get(params.id)
+        switch (tipo.codigo){
+            case "ANTC":
+                redirect(action: 'formAnticipo_ajax',id:tipo.id)
+                break;
+            case "EMRG":
+                redirect(action: 'formEmergente_ajax',id:tipo.id)
+                break;
+            case "CSMO":
+                redirect(action: 'formConsumo_ajax',id:tipo.id)
+                break;
+        }
+    }
+
+    def formAnticipo_ajax(){
+        def empleado = Empleado.findByUsuario(session.usuario.login)
+        def tipo = TipoPrestamo.get(params.id)
+        if(!empleado){
+            render "El usuario ${session.usuario} no está registrado como empleado de la institución"
+            return
+        }else{
+            def sueldo = Sueldo.findAllByEmpleado(empleado,[sort:"inicio"])
+            if(sueldo.size()>0)
+                sueldo=sueldo.pop()
+            else{
+                render "El usuario ${session.usuario} no tiene un sueldo vigente"
+                return
+            }
+            [sueldo:sueldo,empleado: empleado,tipo:tipo]
+        }
+
+
+    }
+
+    def saveAnticipo_ajax(){
+        def empleado = Empleado.findByUsuario(session.usuario.login)
+        def tipo = TipoPrestamo.findByCodigo("ANTC")
+        def valor =params.monto
+        def prestamo = new Prestamo()
+        prestamo.empleado=empleado
+        prestamo.tipo=tipo
+        prestamo.monto=valor.toDouble()
+        prestamo.plazo=1
+        prestamo.valorCuota=prestamo.monto
+        if(!prestamo.save(flush: true)){
+            println "error save prestamo"
+        }
+
+        redirect(action: "historialPrestamos")
+
+    }
+
+    def historialPrestamos(){
+        def empleado = Empleado.findByUsuario(session.usuario.login)
+        if(!empleado)
+            response.sendError(403)
+        def prestamos = Prestamo.findAllByEmpleado(empleado)
+        [empleado:empleado,prestamos:prestamos]
+    }
+
+    def formEmergente_ajax(){
+        def empleado = Empleado.findByUsuario(session.usuario.login)
+        def tipo = TipoPrestamo.get(params.id)
+        if(!empleado){
+            render "El usuario ${session.usuario} no está registrado como empleado de la institución"
+            return
+        }else{
+            def sueldo = Sueldo.findAllByEmpleado(empleado,[sort:"inicio"])
+            if(sueldo.size()>0)
+                sueldo=sueldo.pop()
+            else{
+                render "El usuario ${session.usuario} no tiene un sueldo vigente"
+                return
+            }
+            [sueldo:sueldo,empleado: empleado,tipo:tipo]
+        }
+    }
+
+    def saveEmergente_ajax(){
+        def empleado = Empleado.findByUsuario(session.usuario.login)
+        def tipo = TipoPrestamo.findByCodigo("EMRG")
+        def valor =params.monto
+        def prestamo = new Prestamo()
+        prestamo.empleado=empleado
+        prestamo.tipo=tipo
+        prestamo.monto=valor.toDouble()
+        prestamo.plazo=params.plazo.toInteger()
+        prestamo.valorCuota=(prestamo.monto/prestamo.plazo).toDouble().round(2)
+        if(!prestamo.save(flush: true)){
+            println "error save prestamo"
+        }
+
+        redirect(action: "historialPrestamos")
+    }
+
+    def formConsumo_ajax(){
+        def empleado = Empleado.findByUsuario(session.usuario.login)
+        def tipo = TipoPrestamo.get(params.id)
+        def interes = Variable.findByCodigo("TINT")
+        if(!empleado){
+            render "El usuario ${session.usuario} no está registrado como empleado de la institución"
+            return
+        }else{
+            def sueldo = Sueldo.findAllByEmpleado(empleado,[sort:"inicio"])
+            if(sueldo.size()>0)
+                sueldo=sueldo.pop()
+            else{
+                render "El usuario ${session.usuario} no tiene un sueldo vigente"
+                return
+            }
+            [sueldo:sueldo,empleado: empleado,tipo:tipo,interes:interes.valor]
+        }
+
+    }
+
+    def tabla_ajax(){
+
+
+    }
+
+    def pendientesAnticipos(){
+
+    }
+
+    def pendientesEmergentes(){
+
+    }
+
+    def pendientesConsumo(){
+
+    }
+
+    def aprobar_ajax(){
+
+    }
+
+    def negar_ajax(){
+
+    }
+
 
 }

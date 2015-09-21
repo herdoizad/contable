@@ -31,6 +31,7 @@ class Empleado {
     String foto
     String path /*path al pdf de la hoja de vida*/
     String sistemaDeFacturacion
+    String usuario
 
     Cuenta cuentaContable /*Todo esto cambiar a dominio cuenta cuando se una con contabilidad*/
 
@@ -71,6 +72,7 @@ class Empleado {
             cuentaContable column: 'CTA_CUENTA'
             foto column: 'PATH_FOTO'
             sistemaDeFacturacion column: 'SISTEMA_FACTURACION'
+            usuario column: 'USUARIO_LOGIN'
         }
     }
 
@@ -99,6 +101,7 @@ class Empleado {
         calleSecundaria(nullable: true,blank: true,size: 1..75)
         foto(nullable: true,blank: true,size: 1..150)
         sistemaDeFacturacion(nullable: true,blank: true,size: 1..1)
+        usuario(nullable: true,blank: true,size: 1..20)
     }
 
     String toString(){
