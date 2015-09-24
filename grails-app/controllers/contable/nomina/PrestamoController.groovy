@@ -278,6 +278,50 @@ class PrestamoController extends Shield {
     def tabla_ajax(){
 
 
+        def monto = params.monto.toDouble()
+        def taza = params.interes.toDouble()
+        def plazo = params.plazo.toInteger()
+        def cuota = ((monto*(1+(taza/100)))/plazo).toDouble().round(2)
+        def datos=[]
+        def inicio = new Date()
+        def tmp = [:]
+        def saldo = monto
+        tmp["fecha"]=inicio
+        tmp["saldo"]=monto
+        tmp["taza"]=0
+        tmp["interes"]=0
+        tmp["cuota"]=0
+        tmp["capital"]=0
+        datos.add(tmp)
+        /*Todo calcular el interes primero! (con las fechas) no depende de la cuota!!!!*/
+        plazo.times{
+            Calendar cal = Calendar.getInstance();
+            cal.set(Calendar.MONTH, inicio.format("MM").toInteger()-1);
+            cal.set(Calendar.YEAR, inicio.format("yyyy").toInteger());
+            cal.set(Calendar.DAY_OF_MONTH, 1);// This is necessary to get proper results
+            cal.set(Calendar.DATE, cal.getActualMaximum(Calendar.DATE));
+            def fin  = cal.getTime();
+            println "inicio "+inicio.format("dd-MM-yyyy")+" - "+fin.format("dd-MM-yyyy")+" (${fin-inicio}) saldo "+saldo
+            tmp = [:]
+            tmp["fecha"]=fin
+            tmp["taza"]=taza
+            if(it==0)
+                tmp["interes"]=(saldo*((fin-inicio))*((taza/100)/360)).toDouble().round(2)
+            else
+                tmp["interes"]=(saldo*((fin-inicio)+1)*((taza/100)/360)).toDouble().round(2)
+            tmp["cuota"]=cuota
+            tmp["capital"]=(cuota-tmp["interes"]).toDouble().round(2)
+            tmp["saldo"]=(saldo-tmp["capital"]).toDouble().round(2)
+            datos.add(tmp)
+            inicio = fin
+            inicio = inicio.plus(1)
+            saldo-=tmp["capital"]
+            saldo = saldo.toDouble().round(2)
+        }
+
+
+        [ monto:monto,taza:taza,plazo:plazo,cuota:cuota,datos:datos]
+
     }
 
     def pendientesAnticipos(){

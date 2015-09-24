@@ -60,14 +60,26 @@
 </g:form>
 <script>
     $("#tabla").click(function(){
+        openLoader()
         $.ajax({
             type: "POST",
             url: "${createLink(controller:'prestamo', action:'tabla_ajax')}",
             data: "monto="+$("#monto").val()+"&plazo="+$("#plazo").val()+"&interes="+$("#interes").val(),
             success: function (msg) {
                 closeLoader()
-                $("#contentTabla").show()
-                $("#detalleTabla").html(msg)
+                var b = bootbox.dialog({
+                    id: "dlgDetalles",
+                    message: msg,
+                    buttons: {
+                        cerrar: {
+                            label: "Cerrar",
+                            className: "btn-default",
+                            callback: function () {
+
+                            }
+                        }
+                    } //buttons
+                }); //dialog
             } //success
         }); //ajax
     });
