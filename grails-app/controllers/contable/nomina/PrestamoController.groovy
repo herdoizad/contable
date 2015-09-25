@@ -254,6 +254,28 @@ class PrestamoController extends Shield {
 
         redirect(action: "historialPrestamos")
     }
+    def saveConsumo_ajax(){
+        def empleado = Empleado.findByUsuario(session.usuario.login)
+        def tipo = TipoPrestamo.findByCodigo("CSMO")
+//        println "tipo "+tipo
+        def valor =params.monto
+        def prestamo = new Prestamo()
+        prestamo.empleado=empleado
+        prestamo.tipo=tipo
+        prestamo.monto=valor.toDouble()
+        prestamo.plazo=params.plazo.toInteger()
+        prestamo.interes=params.interes.toDouble()
+        def interes = prestamo.interes/prestamo.plazo/100
+        def cuota = interes*Math.pow(1+interes,prestamo.plazo)
+        cuota=cuota/(Math.pow(1+interes,prestamo.plazo)-1)
+        cuota=cuota*prestamo.monto
+        prestamo.valorCuota=cuota
+        if(!prestamo.save(flush: true)){
+            println "error save prestamo"
+        }
+
+        redirect(action: "historialPrestamos")
+    }
 
     def formConsumo_ajax(){
         def empleado = Empleado.findByUsuario(session.usuario.login)
@@ -281,11 +303,23 @@ class PrestamoController extends Shield {
         def monto = params.monto.toDouble()
         def taza = params.interes.toDouble()
         def plazo = params.plazo.toInteger()
-        def cuota = ((monto*(1+(taza/100)))/plazo).toDouble().round(2)
+        def interes = taza/plazo/100
+        def cuota = interes*Math.pow(1+interes,plazo)
+//        println "cuota "+cuota
+        cuota=cuota/(Math.pow(1+interes,plazo)-1)
+//        println "cuota "+cuota
+        cuota=cuota*monto
+//        println "cuota --> "+cuota
         def datos=[]
         def inicio = new Date()
         def tmp = [:]
         def saldo = monto
+        Calendar cal = Calendar.getInstance();
+        cal.set(Calendar.MONTH, inicio.format("MM").toInteger()-1);
+        cal.set(Calendar.YEAR, inicio.format("yyyy").toInteger());
+        cal.set(Calendar.DAY_OF_MONTH, 1);// This is necessary to get proper results
+        cal.set(Calendar.DATE, cal.getActualMaximum(Calendar.DATE));
+        inicio  = cal.getTime();
         tmp["fecha"]=inicio
         tmp["saldo"]=monto
         tmp["taza"]=0
@@ -293,9 +327,10 @@ class PrestamoController extends Shield {
         tmp["cuota"]=0
         tmp["capital"]=0
         datos.add(tmp)
+        inicio = inicio.plus(1)
         /*Todo calcular el interes primero! (con las fechas) no depende de la cuota!!!!*/
         plazo.times{
-            Calendar cal = Calendar.getInstance();
+            cal = Calendar.getInstance();
             cal.set(Calendar.MONTH, inicio.format("MM").toInteger()-1);
             cal.set(Calendar.YEAR, inicio.format("yyyy").toInteger());
             cal.set(Calendar.DAY_OF_MONTH, 1);// This is necessary to get proper results
@@ -305,19 +340,25 @@ class PrestamoController extends Shield {
             tmp = [:]
             tmp["fecha"]=fin
             tmp["taza"]=taza
-            if(it==0)
-                tmp["interes"]=(saldo*((fin-inicio))*((taza/100)/360)).toDouble().round(2)
-            else
-                tmp["interes"]=(saldo*((fin-inicio)+1)*((taza/100)/360)).toDouble().round(2)
+            tmp["interes"]=(saldo*((fin-inicio)+1)*((taza/100)/360)).toDouble().round(2)
             tmp["cuota"]=cuota
             tmp["capital"]=(cuota-tmp["interes"]).toDouble().round(2)
             tmp["saldo"]=(saldo-tmp["capital"]).toDouble().round(2)
-            datos.add(tmp)
+
             inicio = fin
             inicio = inicio.plus(1)
             saldo-=tmp["capital"]
             saldo = saldo.toDouble().round(2)
+            if(it==plazo-1){
+                if(saldo!=0){
+                    tmp["cuota"]+=saldo
+                    tmp["capital"]+=saldo
+                    tmp["saldo"]=0
+                }
+            }
+            datos.add(tmp)
         }
+
 
 
         [ monto:monto,taza:taza,plazo:plazo,cuota:cuota,datos:datos]
@@ -325,23 +366,95 @@ class PrestamoController extends Shield {
     }
 
     def pendientesAnticipos(){
-
+        def tipo = TipoPrestamo.findByCodigo("ANTC")
+        def sol = Prestamo.findAllByEstadoAndTipo("S",tipo)
+        [sol:sol]
     }
 
     def pendientesEmergentes(){
-
+        def tipo = TipoPrestamo.findByCodigo("EMRG")
+        def sol = Prestamo.findAllByEstadoAndTipo("S",tipo)
+        [sol:sol]
     }
 
     def pendientesConsumo(){
-
+        def tipo = TipoPrestamo.findByCodigo("CSMO")
+        def sol = Prestamo.findAllByEstadoAndTipo("S",tipo)
+        [sol:sol]
     }
 
     def aprobar_ajax(){
-
+        def prestamo = Prestamo.get(params.id)
+        if(prestamo.estado!="S"){
+            render "error"
+            return
+        }else{
+            prestamo.estado="A"
+            prestamo.observaciones=params.observaciones
+            prestamo.inicio=new Date().parse("dd-MM-yyyy",params.inicio)
+            if(prestamo.tipo.codigo=="ANTC")
+                prestamo.fin=prestamo.inicio
+            else{
+                def fin
+                def inicio = prestamo.inicio
+                prestamo.plazo.times {
+                    def cal = Calendar.getInstance();
+                    cal.set(Calendar.MONTH, inicio.format("MM").toInteger() - 1);
+                    cal.set(Calendar.YEAR, inicio.format("yyyy").toInteger());
+                    cal.set(Calendar.DAY_OF_MONTH, 1);// This is necessary to get proper results
+                    cal.set(Calendar.DATE, cal.getActualMaximum(Calendar.DATE));
+                    fin = cal.getTime();
+                    inicio=fin
+                    inicio=inicio.plus(1)
+                }
+                prestamo.fin=fin
+            }
+            prestamo.usuarioAprueba=session.usuario.login
+            prestamo.fechaRevision = new Date()
+            prestamo.save(flush: true)
+            render "ok"
+        }
     }
 
     def negar_ajax(){
+        def prestamo = Prestamo.get(params.id)
+        if(prestamo.estado!="S"){
+            render "error"
+            return
+        }else{
+            prestamo.estado="N"
+            prestamo.observaciones=params.observaciones
+            prestamo.usuarioAprueba=session.usuario
+            prestamo.fechaRevision = new Date()
+            prestamo.fin=new Date()
+            prestamo.save(flush: true)
+            render "ok"
+        }
+    }
 
+    def revisar(){
+        def sol = Prestamo.get(params.id)
+        if(sol.estado!="S")
+            response.sendError(403)
+        def sueldo = Sueldo.findAllByEmpleado(sol.empleado,[sort:"inicio"])
+        if(sueldo.size()>0)
+            sueldo=sueldo.pop()
+        def roles = Rol.findAllByEmpleado(sol.empleado,[sort: "registro",order:"desc",max:2])
+        def prestamos = Prestamo.findAllByEmpleado(sol.empleado)
+        [sol:sol,sueldo: sueldo,roles:roles,prestamos:prestamos]
+    }
+
+    def historial(){
+
+    }
+
+
+    def historialTipo_ajax(){
+        def tipo = TipoPrestamo.findByCodigo(params.tipo)
+        def solicitados = Prestamo.findAllByTipoAndEstado(tipo,"S")
+        def aprobados = Prestamo.findAllByTipoAndEstado(tipo,"A")
+        def negados = Prestamo.findAllByTipoAndEstado(tipo,"N")
+        [solicitados:solicitados,aprobados:aprobados,negados:negados]
     }
 
 

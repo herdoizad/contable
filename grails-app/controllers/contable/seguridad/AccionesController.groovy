@@ -7,7 +7,7 @@ import contable.seguridad.Permiso
 import contable.seguridad.TipoAccion
 import contable.seguridad.Usuario
 
-class AccionesController extends Shield  {
+class AccionesController extends Shield {
 
     def mailService
 
@@ -310,6 +310,7 @@ class AccionesController extends Shield  {
             }
         }
         accionesDelete.each { accion ->
+            println "delete "+accion
             def perm = Permiso.findAllByUsuarioAndAccion(usuario, accion)
             try {
                 if (perm.size() == 1) {

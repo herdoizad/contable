@@ -1,6 +1,6 @@
 package contable.seguridad
 
-class Usuario {
+class Usuario implements Serializable{
 
     String login
     Grupos grupo
