@@ -9,6 +9,8 @@ import contable.seguridad.Shield
  */
 class PrestamoController extends Shield {
 
+    def mailService
+
     static allowedMethods = [save_ajax: "POST", delete_ajax: "POST"]
 
     /**
@@ -150,5 +152,197 @@ class PrestamoController extends Shield {
             return
         }
     } //delete para eliminar via ajax
+
+
+    def solicitar(){
+
+    }
+
+
+    def formSolicitud_ajax(){
+        def tipo = TipoPrestamo.get(params.id)
+        switch (tipo.codigo){
+            case "ANTC":
+                redirect(action: 'formAnticipo_ajax',id:tipo.id)
+                break;
+            case "EMRG":
+                redirect(action: 'formEmergente_ajax',id:tipo.id)
+                break;
+            case "CSMO":
+                redirect(action: 'formConsumo_ajax',id:tipo.id)
+                break;
+        }
+    }
+
+    def formAnticipo_ajax(){
+        def empleado = Empleado.findByUsuario(session.usuario.login)
+        def tipo = TipoPrestamo.get(params.id)
+        if(!empleado){
+            render "El usuario ${session.usuario} no está registrado como empleado de la institución"
+            return
+        }else{
+            def sueldo = Sueldo.findAllByEmpleado(empleado,[sort:"inicio"])
+            if(sueldo.size()>0)
+                sueldo=sueldo.pop()
+            else{
+                render "El usuario ${session.usuario} no tiene un sueldo vigente"
+                return
+            }
+            [sueldo:sueldo,empleado: empleado,tipo:tipo]
+        }
+
+
+    }
+
+    def saveAnticipo_ajax(){
+        def empleado = Empleado.findByUsuario(session.usuario.login)
+        def tipo = TipoPrestamo.findByCodigo("ANTC")
+        def valor =params.monto
+        def prestamo = new Prestamo()
+        prestamo.empleado=empleado
+        prestamo.tipo=tipo
+        prestamo.monto=valor.toDouble()
+        prestamo.plazo=1
+        prestamo.valorCuota=prestamo.monto
+        if(!prestamo.save(flush: true)){
+            println "error save prestamo"
+        }
+
+        redirect(action: "historialPrestamos")
+
+    }
+
+    def historialPrestamos(){
+        def empleado = Empleado.findByUsuario(session.usuario.login)
+        if(!empleado)
+            response.sendError(403)
+        def prestamos = Prestamo.findAllByEmpleado(empleado)
+        [empleado:empleado,prestamos:prestamos]
+    }
+
+    def formEmergente_ajax(){
+        def empleado = Empleado.findByUsuario(session.usuario.login)
+        def tipo = TipoPrestamo.get(params.id)
+        if(!empleado){
+            render "El usuario ${session.usuario} no está registrado como empleado de la institución"
+            return
+        }else{
+            def sueldo = Sueldo.findAllByEmpleado(empleado,[sort:"inicio"])
+            if(sueldo.size()>0)
+                sueldo=sueldo.pop()
+            else{
+                render "El usuario ${session.usuario} no tiene un sueldo vigente"
+                return
+            }
+            [sueldo:sueldo,empleado: empleado,tipo:tipo]
+        }
+    }
+
+    def saveEmergente_ajax(){
+        def empleado = Empleado.findByUsuario(session.usuario.login)
+        def tipo = TipoPrestamo.findByCodigo("EMRG")
+        def valor =params.monto
+        def prestamo = new Prestamo()
+        prestamo.empleado=empleado
+        prestamo.tipo=tipo
+        prestamo.monto=valor.toDouble()
+        prestamo.plazo=params.plazo.toInteger()
+        prestamo.valorCuota=(prestamo.monto/prestamo.plazo).toDouble().round(2)
+        if(!prestamo.save(flush: true)){
+            println "error save prestamo"
+        }
+
+        redirect(action: "historialPrestamos")
+    }
+
+    def formConsumo_ajax(){
+        def empleado = Empleado.findByUsuario(session.usuario.login)
+        def tipo = TipoPrestamo.get(params.id)
+        def interes = Variable.findByCodigo("TINT")
+        if(!empleado){
+            render "El usuario ${session.usuario} no está registrado como empleado de la institución"
+            return
+        }else{
+            def sueldo = Sueldo.findAllByEmpleado(empleado,[sort:"inicio"])
+            if(sueldo.size()>0)
+                sueldo=sueldo.pop()
+            else{
+                render "El usuario ${session.usuario} no tiene un sueldo vigente"
+                return
+            }
+            [sueldo:sueldo,empleado: empleado,tipo:tipo,interes:interes.valor]
+        }
+
+    }
+
+    def tabla_ajax(){
+
+
+        def monto = params.monto.toDouble()
+        def taza = params.interes.toDouble()
+        def plazo = params.plazo.toInteger()
+        def cuota = ((monto*(1+(taza/100)))/plazo).toDouble().round(2)
+        def datos=[]
+        def inicio = new Date()
+        def tmp = [:]
+        def saldo = monto
+        tmp["fecha"]=inicio
+        tmp["saldo"]=monto
+        tmp["taza"]=0
+        tmp["interes"]=0
+        tmp["cuota"]=0
+        tmp["capital"]=0
+        datos.add(tmp)
+        /*Todo calcular el interes primero! (con las fechas) no depende de la cuota!!!!*/
+        plazo.times{
+            Calendar cal = Calendar.getInstance();
+            cal.set(Calendar.MONTH, inicio.format("MM").toInteger()-1);
+            cal.set(Calendar.YEAR, inicio.format("yyyy").toInteger());
+            cal.set(Calendar.DAY_OF_MONTH, 1);// This is necessary to get proper results
+            cal.set(Calendar.DATE, cal.getActualMaximum(Calendar.DATE));
+            def fin  = cal.getTime();
+            println "inicio "+inicio.format("dd-MM-yyyy")+" - "+fin.format("dd-MM-yyyy")+" (${fin-inicio}) saldo "+saldo
+            tmp = [:]
+            tmp["fecha"]=fin
+            tmp["taza"]=taza
+            if(it==0)
+                tmp["interes"]=(saldo*((fin-inicio))*((taza/100)/360)).toDouble().round(2)
+            else
+                tmp["interes"]=(saldo*((fin-inicio)+1)*((taza/100)/360)).toDouble().round(2)
+            tmp["cuota"]=cuota
+            tmp["capital"]=(cuota-tmp["interes"]).toDouble().round(2)
+            tmp["saldo"]=(saldo-tmp["capital"]).toDouble().round(2)
+            datos.add(tmp)
+            inicio = fin
+            inicio = inicio.plus(1)
+            saldo-=tmp["capital"]
+            saldo = saldo.toDouble().round(2)
+        }
+
+
+        [ monto:monto,taza:taza,plazo:plazo,cuota:cuota,datos:datos]
+
+    }
+
+    def pendientesAnticipos(){
+
+    }
+
+    def pendientesEmergentes(){
+
+    }
+
+    def pendientesConsumo(){
+
+    }
+
+    def aprobar_ajax(){
+
+    }
+
+    def negar_ajax(){
+
+    }
+
 
 }
