@@ -26,29 +26,42 @@ class ReporteRolController extends Shield {
         Document document = new Document();
         def fecha = new Date()
         def nombre ="rolEmpleado-${fecha.format('ddMMyyyy')}.pdf"
+        //Document document = new Document();
+        //def fecha = new Date()
+        def rol = Rol.get(params.id)
+        def ingresos = DetalleRol.findAllByRolAndSigno(rol,1)
+        def egresos = DetalleRol.findAllByRolAndSigno(rol,-1)
+        def meses = ["0":"Todos","1":"Enero","2":"Febero","3":"Marzo","4":"Abril","5":"Mayo","6":"Junio","7":"Juilo","8":"Agosto","9":"Septiembre","10":"Octubre","11":"Noviembre","12":"Diciembre"]
+        //def nombre ="rolEmpleado-${rol.empleado.nombre}-${fecha.format('ddMMyyyy')}.pdf"
+        //def nombre ="rolEmpleado-${rol.empleado.nombre}-${fecha.format('ddMMyyyy')}.pdf"
+        ByteArrayOutputStream bs = new ByteArrayOutputStream()
+        qrCodeService.renderPng(getVcard("Rol de pagos de ${rol.empleado}, mes de ${rol.mes.descripcion}"), 65, bs)
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         def writer = PdfWriter.getInstance(document, baos);
-        def img = grailsApplication.mainContext.getResource('/images/logo-login.png').getFile()
-        writer.setPageEvent(new contable.HeaderFooter(img.readBytes(), fecha, session.usuario.login,""));
+        def img = grailsApplication.mainContext.getResource('/images/favicons/apple-touch-icon-60x60.png').getFile()
+        writer.setPageEvent(new contable.HeaderFooter(img.readBytes(),bs, fecha, session.usuario.login,"",null));
         Font header = new Font(Font.FontFamily.HELVETICA, 12, Font.UNDERLINE | Font.BOLD);
-        Font titulo = new Font(Font.FontFamily.HELVETICA, 7, Font.BOLD);
-        Font contenido = new Font(Font.FontFamily.HELVETICA, 6);
+        Font titulo = new Font(Font.FontFamily.HELVETICA, 9, Font.BOLD);
+        Font contenido = new Font(Font.FontFamily.HELVETICA, 8);
         document.open();
         Image image = Image.getInstance(img.readBytes());
-        image.setAbsolutePosition(40f, 738f);
+        image.setAbsolutePosition(40f, 740f);
+        document.add(image);
+        image = Image.getInstance(bs.toByteArray());
+        image.setAbsolutePosition(500f, 738f);
         document.add(image);
         Paragraph p = new Paragraph("PETROLEOS Y SERVICIOS", header);
-        p.setAlignment(Element.ALIGN_RIGHT);
+        p.setAlignment(Element.ALIGN_LEFT);
+        p.setIndentationLeft(94)
         document.add(p);
-        p = new Paragraph("Ruc: 1791282299001 ", contenido);
-        p.setAlignment(Element.ALIGN_RIGHT);
+        p = new Paragraph("Dirección: Av. 6 de Diciembre \n" +
+                "N30-182 y Alpallana, Quito" , contenido);
+        p.setAlignment(Element.ALIGN_LEFT);
+        p.setIndentationLeft(94)
         document.add(p);
-        p = new Paragraph(" Dirección: Av. 6 de Diciembre \n" +
-                "    N30-182 y Alpallana, Quito" , contenido);
-        p.setAlignment(Element.ALIGN_RIGHT);
-        document.add(p);
-        p = new Paragraph("Teléfono: (593) (2) 381-9680", contenido);
-        p.setAlignment(Element.ALIGN_RIGHT);
+        p = new Paragraph("Telefono: (593) (2) 381-9680", contenido);
+        p.setAlignment(Element.ALIGN_LEFT);
+        p.setIndentationLeft(94)
         document.add(p);
         document.add(new Paragraph("\n"));
         document.add(new Paragraph("\n"));
@@ -83,76 +96,35 @@ class ReporteRolController extends Shield {
         //def emp = Empleado.get(params.id) -31082015
         def emp = Empleado.get(params.id)
         def s = Sueldo.findByEmpleadoAndFinIsNull(emp) //02092015
-        //def rol = Rol.get(params.id)
         roles.each{r-> // iterando todos los roles
             def dr = DetalleRol.findAllByRolAndSigno(r, +1)
-            //def dr2 = DetalleRol.findAllByRolAndSigno(r, -1)
             def tmo = dr.size()
             //def tmo2 = dr2.size()
 
             def y = 0
             while (y < tmo ){
-                //println " Ingreso: " + dr.valor[x]
-                cell = new PdfPCell(new Paragraph(dr.descripcion[y], contenido));
+                 cell = new PdfPCell(new Paragraph(dr.descripcion[y], contenido));
                 cell.setBorder(0)
                 cell.setHorizontalAlignment(Element.ALIGN_CENTER)
                 table.addCell(cell);
                 y++
             }
-            /*def w = 0
-            while (w < tmo2 ){
-                //println " Ingreso: " + dr.valor[x]
-                cell = new PdfPCell(new Paragraph(dr2.descripcion[w], contenido));
-                cell.setBorder(0)
-                cell.setHorizontalAlignment(Element.ALIGN_CENTER)
-                table.addCell(cell);
-                w++
-            }*/
-            //println "empleado: " +  r.empleado.nombre + " Ingreso: " + tmo + " Ingreso: " + dr.valor + " egresos : " + r.totalEgresos
-            //+ "tama�o descripcion" + dr.descripcion.size() + "tama�o valor" + dr.valor.size()
-            // lo anterior imprime en consola resultado
             cell = new PdfPCell(new Paragraph(r.empleado.nombre + " " + r.empleado.apellido, contenido));
             table.addCell(cell);
             cell = new PdfPCell(new Paragraph(formatNumber(number: r.totalIngresos,maxFractionDigits: 2,format: "###,##0",minFractionDigits: 2 ), contenido));
             table.addCell(cell);
-            //cell = new PdfPCell(new Paragraph(r.totalIngresos, contenido));
             cell = new PdfPCell(new Paragraph(formatNumber(number: r.totalEgresos,maxFractionDigits: 2,format: "###,##0",minFractionDigits: 2 ), contenido));
             table.addCell(cell);
             cell = new PdfPCell(new Paragraph(formatNumber(number: s.sueldo,maxFractionDigits: 2,format: "###,##0",minFractionDigits: 2 ), contenido));
             table.addCell(cell);
             def x = 0
             while (x < tmo ){
-                //println " Ingreso: " + dr.valor[x]
+
                 cell = new PdfPCell(new Paragraph(formatNumber(number: dr.valor[x],maxFractionDigits: 2,format: "###,##0",minFractionDigits: 2 ), contenido));
                 table.addCell(cell);
                 x++
             }
-            /*def z = 0
-            while (z < tmo2 ){
-                //println " Ingreso: " + dr.valor[x]
-                cell = new PdfPCell(new Paragraph(formatNumber(number: dr2.valor[z],maxFractionDigits: 2,format: "###,##0",minFractionDigits: 2 ), contenido));
-                table.addCell(cell);
-                x++
-            }*/
-
-
-
-            // detrol.each {dr->
-            //cell = new PdfPCell(new Paragraph(dr.descripcion, contenido)); //-31082015
-            //table.addCell(cell); //-31082015
-            //}
-            //sueld.each {sld->
-            //cell = new PdfPCell(new Paragraph(formatNumber(number:sld.sueldo,maxFractionDigits: 2,format: "###,##0",minFractionDigits: 2 ), contenido));
-            //table.addCell(cell); //-31082015
-            //}
-
-
-
-
         }
-
-
-
         document.add(table)
         document.close();
         def b = baos.toByteArray()
@@ -204,7 +176,6 @@ class ReporteRolController extends Shield {
         p.setIndentationLeft(94)
         document.add(p);
         document.add(new Paragraph("\n"));
-
         document.add(new Paragraph("ROL DEL PAGOS MES DE "+meses[new Date().parse("yyyyMMdd",""+rol.mes.codigo+"01").format("M")].toUpperCase()));
         document.add(new Paragraph("\n"));
         p = new Paragraph("Detalle de ingresos y descuentos", contenido);

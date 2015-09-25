@@ -25,7 +25,7 @@
             </a>
         </div>
         <div class="col-md-1">
-            <a href="${g.createLink(action: 'reporte',controller: 'reporteRol',id: mes.id)}" class="btn btn-default btn-sm " id="reporte" empleado="${emp}" mes="${mes.id}">
+            <a href="${g.createLink(action: 'index',controller: 'reporteRolExcel',id: mes.id)}" class="btn btn-default btn-sm " id="reporte" empleado="${emp}" mes="${mes.id}">
                 <i class="fa fa-print"></i> Imprimir
             </a>
         </div>

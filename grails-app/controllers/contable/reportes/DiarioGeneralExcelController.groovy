@@ -26,6 +26,7 @@ class DiarioGeneralExcelController extends Shield{
         //def banco = Banco.findByCodigo(params.banco)
         def cn = new Sql(dataSource)
         def sql = "CONTABLE..up_rpt_diario_general  'PS' ,'${inicio.format('MM/dd/yyyy')}' , '${fin.format('MM/dd/yyyy')}'"
+        println "-----" +sql
         cn.call(sql.toString())
         def iniRow = 0
         def iniCol = 0
@@ -134,6 +135,7 @@ class DiarioGeneralExcelController extends Shield{
 
 
         sql = "select * from CONTABLE..COMPROBANTES_TMP  order by COM_NUMERO"
+
         def celda
         def td = 0,th=0
         def last = null
@@ -142,6 +144,7 @@ class DiarioGeneralExcelController extends Shield{
 
         cn.eachRow(sql.toString()){r->
             if(last!=r["COM_NUMERO"]){
+                // println "bvbv" + r
 
                 row = sheet.createRow((short) curRow)
                 celda =  row.createCell((short) 3)
