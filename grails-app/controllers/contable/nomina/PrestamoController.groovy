@@ -206,6 +206,20 @@ class PrestamoController extends Shield {
         prestamo.valorCuota=prestamo.monto
         if(!prestamo.save(flush: true)){
             println "error save prestamo"
+        }else{
+            def email = "susana.barriga@petroleosyservicios.com"
+            mailService.sendMail {
+                multipart true
+                to "valentinsvt@hotmail.com"
+//                to r.empleado.email
+                cc "valentinsvt@hotmail.com"
+//                cc email
+                subject "Solicitud de anticipo"
+                body( view:"mailSolicitud",
+                        model:[prestamo:prestamo,usuario:session.usuario.login,titulo:'Solicitud de anticipo'])
+                inline 'logo','image/png',grailsApplication.mainContext.getResource('/images/logo-login.png').getFile().readBytes()
+//            inline 'logo','image/png', new File('./web-app///images/logo-login.png').readBytes()
+            }
         }
 
         redirect(action: "historialPrestamos")
@@ -250,6 +264,20 @@ class PrestamoController extends Shield {
         prestamo.valorCuota=(prestamo.monto/prestamo.plazo).toDouble().round(2)
         if(!prestamo.save(flush: true)){
             println "error save prestamo"
+        }else{
+            def email = "susana.barriga@petroleosyservicios.com"
+            mailService.sendMail {
+                multipart true
+                to "valentinsvt@hotmail.com"
+//                to r.empleado.email
+                cc "valentinsvt@hotmail.com"
+//                cc email
+                subject "Solicitud de prestamo emergente"
+                body( view:"mailSolicitud",
+                        model:[prestamo:prestamo,usuario:session.usuario.login,titulo:'Solicitud de prestamo emergente'])
+                inline 'logo','image/png',grailsApplication.mainContext.getResource('/images/logo-login.png').getFile().readBytes()
+//            inline 'logo','image/png', new File('./web-app///images/logo-login.png').readBytes()
+            }
         }
 
         redirect(action: "historialPrestamos")
@@ -272,6 +300,20 @@ class PrestamoController extends Shield {
         prestamo.valorCuota=cuota
         if(!prestamo.save(flush: true)){
             println "error save prestamo"
+        }else{
+            def email = "susana.barriga@petroleosyservicios.com"
+            mailService.sendMail {
+                multipart true
+                to "valentinsvt@hotmail.com"
+//                to r.empleado.email
+                cc "valentinsvt@hotmail.com"
+//                cc email
+                subject "Solicitud de prestamo de consumo"
+                body( view:"mailSolicitud",
+                        model:[prestamo:prestamo,usuario:session.usuario.login,titulo:'Solicitud de prestamo emergente'])
+                inline 'logo','image/png',grailsApplication.mainContext.getResource('/images/logo-login.png').getFile().readBytes()
+//            inline 'logo','image/png', new File('./web-app///images/logo-login.png').readBytes()
+            }
         }
 
         redirect(action: "historialPrestamos")
@@ -385,13 +427,15 @@ class PrestamoController extends Shield {
 
     def aprobar_ajax(){
         def prestamo = Prestamo.get(params.id)
-        if(prestamo.estado!="S"){
+        if(prestamo.estado=="A"){
             render "error"
             return
         }else{
             prestamo.estado="A"
-            prestamo.observaciones=params.observaciones
-            prestamo.inicio=new Date().parse("dd-MM-yyyy",params.inicio)
+            if(params.observaciones)
+                prestamo.observaciones=params.observaciones
+            if(params.inicio)
+                prestamo.inicio=new Date().parse("dd-MM-yyyy",params.inicio)
             if(prestamo.tipo.codigo=="ANTC")
                 prestamo.fin=prestamo.inicio
             else{
@@ -412,6 +456,16 @@ class PrestamoController extends Shield {
             prestamo.usuarioAprueba=session.usuario.login
             prestamo.fechaRevision = new Date()
             prestamo.save(flush: true)
+            mailService.sendMail {
+                multipart true
+                to "valentinsvt@hotmail.com"
+//                to prestamo.empleado.email
+                subject "Prestamo aprobado"
+                body( view:"mailResultado",
+                        model:[prestamo:prestamo,usuario:session.usuario.login,titulo:'Prestamo aprobado'])
+                inline 'logo','image/png',grailsApplication.mainContext.getResource('/images/logo-login.png').getFile().readBytes()
+//            inline 'logo','image/png', new File('./web-app///images/logo-login.png').readBytes()
+            }
             render "ok"
         }
     }
@@ -444,6 +498,25 @@ class PrestamoController extends Shield {
         [sol:sol,sueldo: sueldo,roles:roles,prestamos:prestamos]
     }
 
+    def revisar_ajax(){
+        def prestamo = Prestamo.get(params.id)
+        if(prestamo.estado!="S"){
+            render "error"
+            return
+        }else{
+            prestamo.estado="R"
+            prestamo.observaciones=params.observaciones
+            if(params.inicio)
+                prestamo.inicio=new Date().parse("dd-MM-yyyy",params.inicio)
+            prestamo.usuarioAprueba=session.usuario.login
+            prestamo.fechaRevision = new Date()
+            prestamo.save(flush: true)
+            render "ok"
+        }
+    }
+
+
+
     def historial(){
 
     }
@@ -451,11 +524,71 @@ class PrestamoController extends Shield {
 
     def historialTipo_ajax(){
         def tipo = TipoPrestamo.findByCodigo(params.tipo)
-        def solicitados = Prestamo.findAllByTipoAndEstado(tipo,"S")
+        def solicitados = Prestamo.findAllByTipoAndEstadoInList(tipo,["S","R"])
         def aprobados = Prestamo.findAllByTipoAndEstado(tipo,"A")
         def negados = Prestamo.findAllByTipoAndEstado(tipo,"N")
         [solicitados:solicitados,aprobados:aprobados,negados:negados]
     }
+
+    def pendientes(){
+        def prestamos = Prestamo.findAllByEstado("R")
+        [prestamos:prestamos]
+    }
+
+
+    def revisar_presidencia(){
+        def sol = Prestamo.get(params.id)
+        if(sol.estado!="R")
+            response.sendError(403)
+        def sueldo = Sueldo.findAllByEmpleado(sol.empleado,[sort:"inicio"])
+        if(sueldo.size()>0)
+            sueldo=sueldo.pop()
+        def roles = Rol.findAllByEmpleado(sol.empleado,[sort: "registro",order:"desc",max:2])
+        def prestamos = Prestamo.findAllByEmpleado(sol.empleado)
+        [sol:sol,sueldo: sueldo,roles:roles,prestamos:prestamos]
+    }
+
+
+    def verPrestamo(){
+        def prestamo = Prestamo.get(params.id)
+        def det = DetallePrestamo.findAllByPrestamoAndEstado(prestamo,"A",[sort:"fechaDePago"])
+        def taza = Variable.findByCodigo("TINT")?.valor
+        def lastCuota = new Date().parse("yyyyMMdd",prestamo.inicio.format("yyyyMM")+"01")
+        if(det.size()>0){
+            lastCuota=det.last().fechaDePago
+        }
+
+        if(prestamo.tipo.codigo!="CSMO")
+            taza=0
+        [prestamo:prestamo,det:det,taza:taza,lastCuota:lastCuota]
+    }
+
+
+    def savePago_ajax(){
+        def pretamo = Prestamo.get(params.prestamo)
+        def last = DetallePrestamo.findAllByPrestamoAndEstado(pretamo,"A",[sort: "fechaDePago"])
+        def saldo = pretamo.monto
+        if(last.size()>0) {
+            last = last.last()
+            saldo = last.saldo
+        }
+        def dp = new DetallePrestamo()
+        def taza = Variable.findByCodigo("TINT")?.valor
+        dp.prestamo=pretamo
+        dp.fechaDePago=new Date()
+        dp.usuario=session.usuario.login
+        dp.registro=new Date()
+        dp.estado="A"
+        dp.cuota=params.valor.toDouble().round(2)
+        dp.interes=params.interes.toDouble().round(2)
+        dp.taza=taza
+        dp.capital=(dp.cuota-dp.interes).toDouble().round(2)
+        dp.saldo= (saldo-dp.capital).toDouble().round(2)
+        dp.save(flush: true)
+        render "ok"
+    }
+
+
 
 
 }

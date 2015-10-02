@@ -14,11 +14,13 @@
 </g:if>
 <g:else>
     <div  class="row" style="margin-bottom: 10px;margin-top: -10px">
-        <div class="col-md-1">
-            <a href="#" class="btn btn-success btn-sm " id="aprobar" empleado="${emp}" mes="${mes.id}">
-                <i class="fa fa-check"></i> Aprobar
-            </a>
-        </div>
+        <g:if test="${roles[0].estado!='C'}">
+            <div class="col-md-1">
+                <a href="#" class="btn btn-success btn-sm " id="aprobar" empleado="${emp}" mes="${mes.id}">
+                    <i class="fa fa-check"></i> Aprobar
+                </a>
+            </div>
+        </g:if>
         <div class="col-md-1">
             <a href="#" class="btn btn-default btn-sm " id="mail" empleado="${emp}" mes="${mes.id}">
                 <i class="fa fa-envelope"></i> Enviar
@@ -30,20 +32,22 @@
             </a>
         </div>
         <g:if test="${roles.size()<max}">
-            <g:if test="${new java.util.Date()>new Date().parse('yyyyMMdd',''+mes.codigo+'01')}">
-                <div class="col-md-2">
-                    <a href="#" class="btn btn-verde btn-sm" id="generar"><i class="fa fa-copy"></i> Generar rol de pagos</a>
-                </div>
+            <g:if test="${roles[0].estado!='C'}">
+                <g:if test="${new java.util.Date()>new Date().parse('yyyyMMdd',''+mes.codigo+'01')}">
+                    <div class="col-md-2">
+                        <a href="#" class="btn btn-verde btn-sm" id="generar"><i class="fa fa-copy"></i> Generar rol de pagos</a>
+                    </div>
+                </g:if>
             </g:if>
         </g:if>
     </div>
 </g:else>
 
 <g:each in="${roles}" var="r">
-    <div class="panel ${r.estado!='A'?'panel-success':'panel-darkblue'}" style="position: relative">
+    <div class="panel ${r.estado!='A'?(r.estado=='C'?'panel-default':'panel-success'):'panel-darkblue'}" style="position: relative">
         <i class="fa fa-print print"  style="position: absolute;top: 5px;right: 5px;color: #ffffff;cursor: pointer" rol="${r.id}"></i>
         <div class="panel-heading " style="font-size: 10px;line-height: 10px;padding: 5px">
-            ${r?.empleado.apellido} ${r.empleado.nombre}
+            ${r?.empleado.apellido} ${r.empleado.nombre} ${r.estado=='C'?'(Aprobado por contabilidad)':''}
 
         </div>
         <div class="panel-body" style="padding-bottom: 0px">
@@ -115,14 +119,14 @@
                             </g:else>
                         </td>
                         <td style="text-align: center">
-                            <g:if test="${r.estado=='N'}">
+                            <g:if test="${r.estado=='N' && d.codigo!='PRST'}">
                                 <a href="#" class="btn btn-info btn-xs guardar" title="Guardar" iden="${d.id}" >
                                     <i class="fa fa-save"></i>
                                 </a>
                             </g:if>
                         </td>
                         <td style="text-align: center">
-                            <g:if test="${r.estado=='N'}">
+                            <g:if test="${r.estado=='N' && d.codigo!='PRST'}">
                                 <a href="#" class="btn btn-danger btn-xs borrar" title="Borrar" iden="${d.id}">
                                     <i class="fa fa-trash"></i>
                                 </a>
@@ -179,7 +183,7 @@
     $(".panel-heading").css({cursor:"pointer"}).click(function(){
         $(this).parent().find(".panel-body").toggle()
     })
-//    $(".panel-heading").click()
+    //    $(".panel-heading").click()
     $(".guardar").click(function(){
         var id = $(this).attr("iden")
         var rol = $(".valor-"+id).attr("rol")

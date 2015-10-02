@@ -112,8 +112,9 @@ class ComprobantesController extends Shield {
         def rets = []
         def cheque = null
         def cliente=null
-        def ultimo = Comprobante.findAll("from Comprobante where empresa='${session.empresa.codigo}' and tipo=${params.tipo} and mes=${mes} and tipoProcesamiento=4 order by numero desc",["max":1])
-        def siguiente=(""+inicio.format("yyMM")+"01").toInteger()
+        println "inicio "+inicio
+        def ultimo = Comprobante.findAll("from Comprobante where empresa='${session.empresa.codigo}' and tipo=${params.tipo} and numero>${inicio.format('yy')+'0000'} and tipoProcesamiento=4 order by numero desc",["max":1])
+        def siguiente=(""+inicio.format("yy")+"0001").toInteger()
         if(ultimo.size()>0) {
             ultimo = ultimo.pop()
             siguiente=ultimo.numero+1
@@ -651,8 +652,12 @@ class ComprobantesController extends Shield {
         println "params "+params
         def mes = params.mes.toInteger()
         def inicio = new Date().parse("yyyyMMdd",mes+"01")
-        def ultimo = Comprobante.findAll("from Comprobante where empresa='${session.empresa.codigo}' and tipo=${params.tipo} and mes=${mes} and tipoProcesamiento=4 order by numero desc",["max":1])
-        def numero =(""+inicio.format("yyMM")+"01").toInteger()
+        def ultimo = Comprobante.findAll("from Comprobante where empresa='${session.empresa.codigo}' and tipo=${params.tipo} and numero>${inicio.format('yy')+'0000'} and tipoProcesamiento=4 order by numero desc",["max":1])
+        def numero=(""+inicio.format("yy")+"0001").toInteger()
+        if(ultimo.size()>0) {
+            ultimo = ultimo.pop()
+            numero=ultimo.numero+1
+        }
         if(ultimo.size()>0) {
             ultimo = ultimo.pop()
             numero=ultimo.numero+1
@@ -678,7 +683,7 @@ class ComprobantesController extends Shield {
         comp.concepto=params.concepto
         comp.fecha=new Date().parse("dd-MM-yyyy",params.fecha_input)
         comp.usuario=session.usuario.login
-        comp.ip=session.ip
+        comp.ipMod=session.ip
         comp.control=9
         comp.numeroCheque=0
         comp.bancoCliente=BancoOcp.findByCodigo(params.bancoCliente)

@@ -31,6 +31,7 @@
                     <td  style="text-align: right"><g:formatNumber number="${p.valorCuota}" type="currency"/></td>
                     <td style="text-align: center">${p.inicio?.format("dd-MM-yyyy")}</td>
                     <td style="text-align: center">${p.fin?.format("dd-MM-yyyy")}</td>
+
                 </tr>
             </g:each>
             </tbody>
@@ -42,7 +43,7 @@
         <table class="table  table-sm table-darkblue table-condensed table-hover table-bordered">
             <thead>
             <tr>
-                <th colspan="9">
+                <th colspan="10">
                     Aprobados
                 </th>
             </tr>
@@ -56,6 +57,7 @@
                 <th>Cuota</th>
                 <th>Inicio</th>
                 <th>Fin</th>
+                <th></th>
             </tr>
             </thead>
             <tbody>
@@ -70,6 +72,11 @@
                     <td  style="text-align: right"><g:formatNumber number="${p.valorCuota}" type="currency"/></td>
                     <td style="text-align: center">${p.inicio?.format("dd-MM-yyyy")}</td>
                     <td style="text-align: center">${p.fin?.format("dd-MM-yyyy")}</td>
+                    <td style="text-align: center;width: 40px">
+                        <g:link action="verPrestamo" id="${p.id}" class="btn btn-verde btn-xsm">
+                            <i class="fa fa-search"></i>
+                        </g:link>
+                    </td>
                 </tr>
             </g:each>
             </tbody>
@@ -94,6 +101,7 @@
                 <th>Plazo</th>
                 <th>Cuota</th>
                 <th>Fecha negación</th>
+
             </tr>
             </thead>
             <tbody>
@@ -107,6 +115,7 @@
                     <td  style="text-align: right">${p.plazo}</td>
                     <td  style="text-align: right"><g:formatNumber number="${p.valorCuota}" type="currency"/></td>
                     <td style="text-align: center">${p.fechaRevision?.format("dd-MM-yyyy")}</td>
+
                 </tr>
             </g:each>
             </tbody>

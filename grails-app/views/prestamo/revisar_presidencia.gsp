@@ -202,28 +202,21 @@
                     <label>Observaciones:</label>
                 </div>
                 <div class="col-md-10">
-                    <textarea name="observaciones" id="obs" class="form-control input-sm" maxlength="255" style="height: 100px;resize: none"></textarea>
+                    <textarea name="observaciones" class="form-control input-sm" maxlength="255" style="height: 100px;resize: none" disabled>${sol.observaciones}</textarea>
                 </div>
             </div>
             <div class="row fila">
                 <div class="col-md-2">
-                    <label>Fecha del primer pago: <br/>(Solo en caso de aprobación)</label>
+                    <label>Fecha del primer pago:</label>
                 </div>
                 <div class="col-md-2">
-                    <elm:datepicker name="inicio" class="form-control input-sm"/>
+                  ${sol.inicio?.format("dd-MM-yyyy")}
                 </div>
             </div>
             <div class="row fila">
-                <g:if test="${sol.tipo.codigo=='ANTC'}">
-                    <div class="col-md-1">
-                        <a href="#" id="aprobar" class="btn btn-success "><i class="fa fa-check"></i> Aprobar</a>
-                    </div>
-                </g:if>
-                <g:else>
-                    <div class="col-md-2">
-                        <a href="#" id="revisar" class="btn btn-success "><i class="fa fa-check"></i> Enviar a presidencia</a>
-                    </div>
-                </g:else>
+                <div class="col-md-1">
+                    <a href="#" id="aprobar" class="btn btn-success "><i class="fa fa-check"></i> Aprobar</a>
+                </div>
                 <div class="col-md-1">
                     <a href="#" id="negar" class="btn btn-danger "><i class="fa fa-times"></i> Negar</a>
                 </div>
@@ -257,7 +250,7 @@
                     $.ajax({
                         type: "POST",
                         url: "${createLink(controller:'prestamo', action:'aprobar_ajax')}",
-                        data: "id=${sol.id}&inicio=" + $("#inicio_input").val()+"&observaciones="+$("#obs").val(),
+                        data: "id=${sol.id}",
                         success: function (msg) {
                             closeLoader()
                             location.href = "${g.createLink(controller: 'prestamo',action: 'historial')}"
@@ -277,7 +270,7 @@
                     $.ajax({
                         type: "POST",
                         url: "${createLink(controller:'prestamo', action:'revisar_ajax')}",
-                        data: "id=${sol.id}&inicio=" + $("#inicio_input").val()+"&observaciones="+$("#obs").val(),
+                        data: "id=${sol.id}&inicio=" + $("#inicio_input").val(),
                         success: function (msg) {
                             closeLoader()
                             location.href = "${g.createLink(controller: 'prestamo',action: 'historial')}"

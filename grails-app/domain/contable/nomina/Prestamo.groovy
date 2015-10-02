@@ -67,6 +67,9 @@ class Prestamo {
             case "N":
                 return "Negado"
                 break;
+            case "R":
+                return "Revisado"
+                break;
         }
     }
 }

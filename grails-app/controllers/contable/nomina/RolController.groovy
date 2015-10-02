@@ -48,7 +48,7 @@ class RolController extends Shield {
 
 
     def generarRol_ajax(){
-        println "params generar "+params
+//        println "params generar "+params
         def empleados = []
         def variables = Variable.list()
         if(params.empleado=="0")
@@ -66,24 +66,25 @@ class RolController extends Shield {
         def fin  = cal.getTime();
         def resultados=[:]
 
-        println "inicio "+inicio+"  fin "+fin
+//        println "inicio "+inicio+"  fin "+fin
         empleados.each {e->
-            println "empleado "+e
+//            println "empleado "+e
             def rol = Rol.findByMesAndEmpleado(mes,e)
             if(rol){
-                try{
-                    def det = DetalleRol.findAllByRol(rol)
-                    det.each {
-                        it.delete(flush: true)
+                if(rol.estado!='C'){
+                    try{
+                        def det = DetalleRol.findAllByRol(rol)
+                        det.each {
+                            it.delete(flush: true)
+                        }
+                        rol.delete(flush: true)
+                        rol=null
+                    }catch (er){
+                        println "error delete rol "+er.printStackTrace()
                     }
-                    rol.delete(flush: true)
-                    rol=null
-                }catch (er){
-                    println "error delete rol "+er.printStackTrace()
                 }
 
-            }
-            if(!rol){
+            }else{
                 rol = new Rol()
                 rol.empleado=e
                 rol.mes=mes
@@ -187,25 +188,29 @@ class RolController extends Shield {
                     }
                     def prestamo = Prestamo.withCriteria {
                         eq("empleado",e)
-                        le("inicio",inicio)
+                        ge("inicio",inicio)
+                        le("inicio",fin)
                         ge("fin",fin)
                     }
                     println "prestamo "+prestamo
-                    if(prestamo.size()>0){
-                        prestamo=prestamo.pop()
-                        def dt = new DetalleRol()
-                        dt.rol=rol
-                        dt.usuario=session.usuario.login
-                        dt.descripcion="Prestamo (${prestamo.monto})"
-                        dt.valor=prestamo.valorCuota.round(2)
-                        dt.signo=-1
-                        totalEgresos+=dt.valor
-                        if(!dt.save(flush: true))
-                            println "error save dt "+dt.errors
+
+                    prestamo.each {pre->
+                        def detalle = DetallePrestamo.findByMesAndPrestamo(mes,pre)
+                        if(detalle){
+                            println "hay detalle prestamo! "+detalle
+                            def dr = new DetalleRol()
+                            dr.descripcion="Prestamo (${detalle.saldo.toDouble().round(2)}/${detalle.prestamo.monto})"
+                            dr.codigo="PRST"
+                            dr.detallePrestamo=detalle
+                            dr.rol=rol
+                            dr.signo=-1
+                            dr.usuario=session.usuario.login
+                            dr.valor=detalle.cuota.toDouble().round(2)
+                            totalEgresos+=dr.valor
+                            if(!dr.save(flush: true))
+                                println "error save detalle rol "+dr.errors
+                        }
                     }
-
-
-
 
                     rol.totalEgresos=totalEgresos
                     rol.totalIngresos=totalIngresos
@@ -285,7 +290,6 @@ class RolController extends Shield {
     }
 
     def aprobarRoles_ajax(){
-        println "params "+params
         def mes = MesNomina.get(params.mes)
         def empleados = []
         if(params.empleado=="0")
@@ -332,8 +336,37 @@ class RolController extends Shield {
 
     }
 
+    def rolContable(){
+        def meses = MesNomina.findAllByCodigoLessThanEquals((new Date().format("yyyy")+"13").toInteger(),[sort:"codigo"])
+        [meses:meses]
+    }
 
 
-//
+    def getRolMesContable_ajax(){
+        def mes = MesNomina.get(params.id)
+        def roles
+        def tipos = ["1":"Ingreso","-1":"Egreso"]
+        roles = Rol.findAllByMesAndEstadoInList(mes,["A","C"])
+        roles = roles.sort{it.empleado.apellido}
+        [roles:roles,mes:mes,tipos:tipos]
+    }
+
+    def detalleRol_ajax(){
+        def rol= Rol.get(params.rol)
+        [rol:rol]
+    }
+
+    def aprobarContable_ajax(){
+        def mes = MesNomina.get(params.mes)
+
+        Rol.findAllByMesAndEstado(mes,"A").each {r->
+            if(r.estado=="A"){
+                r.estado="C"
+                if(!r.save(flush: true))
+                    println "error save rol aprobar "+r.errors
+            }
+        }
+        redirect(action: 'getRolMesContable_ajax',params: ["id":params.mes,"empleado":params.empleado])
+    }
 
 }

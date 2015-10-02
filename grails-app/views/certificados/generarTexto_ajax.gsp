@@ -22,5 +22,6 @@ Que ${empleado.sexo=="M"?"el señor":"la señora"} ${empleado}, identificado con
 <script>
     $("#print").click(function(){
         $(".frm").submit()
-    })
+    });
+
 </script>
