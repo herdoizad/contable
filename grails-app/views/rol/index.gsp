@@ -57,22 +57,30 @@
 <script>
 
     $(".mes").click(function(){
+
+        $($("#activo").val()).html("")
         $("#activo").val($(this).attr("href"))
         var div = $($(this).attr("href"))
         var mes = $(this).attr("mes")
+        if($("#empleado").val()!="null" && $("#empleado").val()!=null ){
+            openLoader()
+            $.ajax({
+                type: "POST",
+                url: "${createLink(controller:'rol', action:'getRolMes_ajax')}",
+                data: "id="+mes+"&empleado="+$("#empleado").val(),
+                success: function (msg) {
+                    closeLoader()
+                    div.html(msg)
+                } //success
+            }); //ajax
+        }
 
-        openLoader()
-        $.ajax({
-            type: "POST",
-            url: "${createLink(controller:'rol', action:'getRolMes_ajax')}",
-            data: "id="+mes+"&empleado="+$("#empleado").val(),
-            success: function (msg) {
-                closeLoader()
-                div.html(msg)
-            } //success
-        }); //ajax
     })
     $('.select').combobox();
+    $(".select").change(function(){
+        var div =  $($("#activo").val())
+        div.html("")
+    })
     $("#ver").click(function(){
         if($("#empleados").val()!=""){
             openLoader()

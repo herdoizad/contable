@@ -177,7 +177,7 @@
             }
             function createEditPrevisionGastos(id) {
                 var title = id ? "Editar" : "Crear";
-                var data = id ? { id: id ,empleado:${empleado?.id}} : {empleado:${empleado?.id}};
+                var data = id ? ({ id: id ,empleado:"${empleado?.id}"}) : ({empleado:"${empleado?.id}"});
                 $.ajax({
                     type    : "POST",
                     url     : "${createLink(controller:'previsionGastos', action:'form_ajax')}",

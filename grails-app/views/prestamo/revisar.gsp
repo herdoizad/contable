@@ -149,52 +149,8 @@
         </div>
     </div>
 </g:if>
-<div class="row fila">
-    <div class="col-md-11" >
-        <div class="panel-completo" style="margin-left: 10px;min-height: 20px">
-            <div class="row">
-                <div class="col-md-12 titulo-panel">
-                    Historial de prestamos
-                </div>
-            </div>
-            <div class="row fila">
-                <div class="col-md-12">
-                    <table class="table table-condensed table-hover table-bordered">
-                        <thead>
-                        <tr>
-                            <th>Empleado</th>
-                            <th>Tipo</th>
-                            <th>Estado</th>
-                            <th>Monto</th>
-                            <th>Interes</th>
-                            <th>Plazo</th>
-                            <th>Cuota</th>
-                            <th>Inicio</th>
-                            <th>Fin</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <g:each in="${prestamos}" var="p">
-                            <tr>
-                                <td>${p.empleado}</td>
-                                <td>${p.tipo}</td>
-                                <td  style="text-align: center">${p.getEstadoString()}</td>
-                                <td style="text-align: right"><g:formatNumber number="${p.monto}" type="currency"/></td>
-                                <td style="text-align: right"><g:formatNumber number="${p.interes}" type="currency"/></td>
-                                <td  style="text-align: right">${p.plazo}</td>
-                                <td  style="text-align: right"><g:formatNumber number="${p.valorCuota}" type="currency"/></td>
-                                <td style="text-align: center">${p.inicio?.format("dd-MM-yyyy")}</td>
-                                <td style="text-align: center">${p.fin?.format("dd-MM-yyyy")}</td>
-                            </tr>
-                        </g:each>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-<div class="row fila" style="margin-bottom: 100px">
+
+<div class="row fila" style="">
     <div class="col-md-11">
         <div class="panel-completo" style="margin-left: 10px;min-height: 20px">
             <div class="row">
@@ -210,7 +166,7 @@
                     <label>Fecha del primer pago: <br/>(Solo en caso de aprobación)</label>
                 </div>
                 <div class="col-md-2">
-                    <elm:datepicker name="inicio" class="form-control input-sm"/>
+                    <elm:datepicker name="inicio" class="form-control input-sm"  minDate="${min}" value="${max}"/>
                 </div>
             </div>
             <div class="row fila">
@@ -231,6 +187,53 @@
         </div>
     </div>
 
+</div>
+<div class="row fila">
+    <div class="col-md-11" >
+        <div class="panel-completo" style="margin-left: 10px;min-height: 20px;margin-bottom: 200px">
+            <div class="row">
+                <div class="col-md-12 titulo-panel">
+                    Historial de prestamos
+                </div>
+            </div>
+            <div class="row fila">
+                <div class="col-md-12">
+                    <table class="table table-condensed table-hover table-bordered">
+                        <thead>
+                        <tr>
+                            <th>Empleado</th>
+                            <th>Tipo</th>
+                            <th>Estado</th>
+                            <th>Solicitado</th>
+                            <th>Monto</th>
+                            <th>Interes</th>
+                            <th>Plazo</th>
+                            <th>Cuota</th>
+                            <th>Inicio</th>
+                            <th>Fin</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <g:each in="${prestamos}" var="p">
+                            <tr>
+                                <td>${p.empleado}</td>
+                                <td>${p.tipo}</td>
+                                <td style="text-align: center">${p.getEstadoString()}</td>
+                                <td style="text-align: center">${p.solicitado?.format("dd-MM-yyyy")}</td>
+                                <td style="text-align: right"><g:formatNumber number="${p.monto}" type="currency"/></td>
+                                <td style="text-align: right"><g:formatNumber number="${p.interes}" type="currency"/></td>
+                                <td style="text-align: right">${p.plazo}</td>
+                                <td style="text-align: right"><g:formatNumber number="${p.valorCuota}" type="currency"/></td>
+                                <td style="text-align: center">${p.inicio?.format("dd-MM-yyyy")}</td>
+                                <td style="text-align: center">${p.fin?.format("dd-MM-yyyy")}</td>
+                            </tr>
+                        </g:each>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 <script type="text/javascript">
     $(".panel-heading").css({cursor:"pointer"}).click(function(){
@@ -254,6 +257,7 @@
         if($("#inicio_input").val()!="") {
             bootbox.confirm("Está seguro?", function (result) {
                 if (result) {
+                    openLoader()
                     $.ajax({
                         type: "POST",
                         url: "${createLink(controller:'prestamo', action:'aprobar_ajax')}",
@@ -274,6 +278,7 @@
         if($("#inicio_input").val()!="") {
             bootbox.confirm("Está seguro?", function (result) {
                 if (result) {
+                    openLoader()
                     $.ajax({
                         type: "POST",
                         url: "${createLink(controller:'prestamo', action:'revisar_ajax')}",
@@ -294,6 +299,7 @@
 
         bootbox.confirm("Está seguro?", function (result) {
             if (result) {
+                openLoader()
                 $.ajax({
                     type: "POST",
                     url: "${createLink(controller:'prestamo', action:'negar_ajax')}",

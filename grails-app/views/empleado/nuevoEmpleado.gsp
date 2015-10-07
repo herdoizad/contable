@@ -251,7 +251,7 @@
                 <label>Fin:</label>
             </div>
             <div class="col-md-2">
-                <elm:datepicker name="sueldoFin" value="${sueldo?.fin?.format('dd-MM-yyyy')}" class="form-control input-sm"/>
+                <elm:datepicker name="sueldoFin"  value="${sueldo?.fin?.format('dd-MM-yyyy')}" class="form-control input-sm"/>
             </div>
             <g:if test="${empleado.id}">
                 <div class="col-md-1">

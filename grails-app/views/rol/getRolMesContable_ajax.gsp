@@ -88,7 +88,7 @@
     $("#aprobar").click(function(){
         var btn =$(this)
         var div = $($("#activo").val())
-        bootbox.confirm("Está seguro? está acción no puede revertirse",function(result){
+        bootbox.confirm("Está seguro?. Al aprobar el rol se generarán los asientos contables",function(result){
             if(result){
                 openLoader()
                 $.ajax({

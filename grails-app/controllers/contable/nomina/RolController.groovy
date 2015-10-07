@@ -57,6 +57,7 @@ class RolController extends Shield {
             empleados.add(Empleado.get(params.empleado))
         def mes = MesNomina.get(params.mes)
         def inicio = new Date().parse("yyyyMMdd",""+mes.codigo+"01")
+
         def mesNum = inicio.format("MM").toInteger()
         Calendar cal = Calendar.getInstance();
         cal.set(Calendar.MONTH, inicio.format("MM").toInteger()-1);
@@ -65,7 +66,7 @@ class RolController extends Shield {
         cal.set(Calendar.DATE, cal.getActualMaximum(Calendar.DATE));
         def fin  = cal.getTime();
         def resultados=[:]
-
+        println "inicio "+inicio.format("dd-MM-yyy")+" fin "+fin
 //        println "inicio "+inicio+"  fin "+fin
         empleados.each {e->
 //            println "empleado "+e
@@ -97,7 +98,7 @@ class RolController extends Shield {
                 else{
                     def rubros = RubroEmpleado.withCriteria {
                         eq("empleado",e)
-                        le("inicio",inicio)
+                        le("inicio",fin)
                         or{
                             ge("fin",fin)
                             isNull("fin")

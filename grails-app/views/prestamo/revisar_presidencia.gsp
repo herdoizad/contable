@@ -247,6 +247,7 @@
         if($("#inicio_input").val()!="") {
             bootbox.confirm("Está seguro?", function (result) {
                 if (result) {
+                    openLoader()
                     $.ajax({
                         type: "POST",
                         url: "${createLink(controller:'prestamo', action:'aprobar_ajax')}",
@@ -267,6 +268,7 @@
         if($("#inicio_input").val()!="") {
             bootbox.confirm("Está seguro?", function (result) {
                 if (result) {
+                    openLoader()
                     $.ajax({
                         type: "POST",
                         url: "${createLink(controller:'prestamo', action:'revisar_ajax')}",
@@ -287,6 +289,7 @@
 
         bootbox.confirm("Está seguro?", function (result) {
             if (result) {
+                openLoader()
                 $.ajax({
                     type: "POST",
                     url: "${createLink(controller:'prestamo', action:'negar_ajax')}",

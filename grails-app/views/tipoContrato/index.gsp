@@ -28,6 +28,8 @@
 					
 						<g:sortableColumn property="descripcion" title="${message(code: 'tipoContrato.descripcion.label', default: 'Descripcion')}" />
 					
+						<g:sortableColumn property="procedimiento" title="${message(code: 'tipoContrato.procedimiento.label', default: 'Procedimiento')}" />
+					
 					</tr>
 				</thead>
 				<tbody>
@@ -37,6 +39,8 @@
 						<td><g:link action="show" id="${tipoContratoInstance.id}">${fieldValue(bean: tipoContratoInstance, field: "codigo")}</g:link></td>
 					
 						<td>${fieldValue(bean: tipoContratoInstance, field: "descripcion")}</td>
+					
+						<td>${fieldValue(bean: tipoContratoInstance, field: "procedimiento")}</td>
 					
 					</tr>
 				</g:each>

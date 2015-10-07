@@ -155,7 +155,18 @@ class PrestamoController extends Shield {
 
 
     def solicitar(){
-
+        def empleado = Empleado.findByUsuario(session.usuario.login)
+        def prestmos = Prestamo.findAllByEstado("A",[sort: "fin",order: "desc"])
+        def puede = true
+        def now = new Date()
+        def fecha
+        if(prestmos.size()>0){
+            if(prestmos.first().fin.plus(90)>now){
+                puede=false
+                fecha=prestmos.first().fin.plus(90)
+            }
+        }
+        [puede:puede,fecha:fecha]
     }
 
 
@@ -495,7 +506,27 @@ class PrestamoController extends Shield {
             sueldo=sueldo.pop()
         def roles = Rol.findAllByEmpleado(sol.empleado,[sort: "registro",order:"desc",max:2])
         def prestamos = Prestamo.findAllByEmpleado(sol.empleado)
-        [sol:sol,sueldo: sueldo,roles:roles,prestamos:prestamos]
+        def min = sol.solicitado.plus(sol.tipo.diasDeGracia)
+        Calendar cal = Calendar.getInstance();
+        cal.set(Calendar.MONTH, sol.solicitado.format("MM").toInteger()-1);
+        cal.set(Calendar.YEAR, sol.solicitado.format("yyyy").toInteger());
+        cal.set(Calendar.DAY_OF_MONTH, 1);// This is necessary to get proper results
+        cal.set(Calendar.DATE, cal.getActualMaximum(Calendar.DATE));
+        def fin  = cal.getTime();
+        def max
+        if(sol.tipo.diasDeGracia==30){
+            fin = fin.plus(1)
+            cal.set(Calendar.MONTH, fin.format("MM").toInteger()-1);
+            cal.set(Calendar.YEAR, fin.format("yyyy").toInteger());
+            cal.set(Calendar.DAY_OF_MONTH, 1);// This is necessary to get proper results
+            cal.set(Calendar.DATE, cal.getActualMaximum(Calendar.DATE));
+            max = cal.getTime();
+        }else{
+            max = fin
+        }
+
+
+        [sol:sol,sueldo: sueldo,roles:roles,prestamos:prestamos,min:min,max:max]
     }
 
     def revisar_ajax(){

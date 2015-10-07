@@ -4,6 +4,7 @@ class RubroContrato {
 
     Rubro rubro
     TipoContrato tipoContrato
+    Integer mes
     static auditable = [ignore: []]
 
     /**
@@ -19,10 +20,11 @@ class RubroContrato {
             id column:'ID'
             rubro column: 'RUBRO_ID'
             tipoContrato column: 'TIPO_CONTRATO_ID'
+            mes column: 'MES'
         }
     }
 
     static constraints = {
-
+        mes(nullable: true,blank:true)
     }
 }

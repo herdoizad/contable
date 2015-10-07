@@ -60,15 +60,7 @@
                         <input type="hidden" name="signo" id="signo-txt" value="1">
                     </div>
                 </div>
-                <div class="row fila">
-                    <div class="col-md-2">
-                        <label>Cuenta</label>
-                    </div>
-                    <div class="col-md-10">
-                        <g:select name="cuenta" from="${contable.core.Cuenta.findAllByAgrupa(1)}" optionKey="numero" value="${rubro?.cuenta?.getNumeroPad()}"
-                                  id="cuenta"  class="form-control input-sm select " noSelection="['':'']" ></g:select>
-                    </div>
-                </div>
+
                 <div class="row fila">
                     <div class="col-md-2">
                         <label>Código</label>
@@ -77,6 +69,34 @@
                         <input type="text" id="codigo" maxlength="5" class="form-control input-sm  " name="codigo" value="${rubro?.codigo}">
                     </div>
                 </div>
+
+                <div class="row fila">
+                    <div class="col-md-2">
+                        <label>Cuenta</label>
+                    </div>
+                    <div class="col-md-10">
+                        <g:select name="cuenta" from="${contable.core.Cuenta.findAllByAgrupa(1)}" optionKey="numero" value="${rubro?.cuenta?.getNumeroPad()}"
+                                  id="cuenta"   class="form-control input-sm select " noSelection="['':'']" ></g:select>
+                    </div>
+                </div>
+                <div class="row fila">
+                    <div class="col-md-2">
+                        <label>Signo contable</label>
+                    </div>
+                    <div class="col-md-3">
+                        <input type="checkbox" class="chk" id="signoContable" name="signo_chk" value="1" checked>
+                        <input type="hidden" name="signoContable" id="signoContable-txt" value="1">
+                    </div>
+                </div>
+                <div class="row fila">
+                    <div class="col-md-2">
+                        <label>Tipo descuento</label>
+                    </div>
+                    <div class="col-md-3">
+                        <g:select name="tipo" value="${rubro?.tipo}" from="${tipos}" class="form-control input-sm" optionKey="key" optionValue="value"/>
+                    </div>
+                </div>
+
             </g:form>
             <div class="row fila">
                 <div class="col-md-2">
@@ -141,6 +161,10 @@
                 $("#signo-txt").val("1")
             else
                 $("#signo-txt").val("-1")
+            if( $("#signoContable").bootstrapSwitch("state"))
+                $("#signoContable-txt").val("1")
+            else
+                $("#signoContable-txt").val("-1")
             $(".frm-rubro").submit()
         }else{
             bootbox.alert(msg)
@@ -152,12 +176,22 @@
         offText:"-",
         offColor:"primary"
     });
+
+    <g:if test="${rubro}">
     <g:if test="${rubro?.signo==1}">
     $("#signo").bootstrapSwitch("state",true)
     </g:if>
     <g:else>
     $("#signo").bootstrapSwitch("state",false)
     </g:else>
+    <g:if test="${rubro?.signoContable==1}">
+    $("#signoContable").bootstrapSwitch("state",true)
+    </g:if>
+    <g:else>
+    $("#signoContable").bootstrapSwitch("state",false)
+    </g:else>
+    </g:if>
+
     $('.select').combobox();
     $(".copiar").click(function(){
         $("#formula").val($("#formula").val()+$(this).attr("codigo"))

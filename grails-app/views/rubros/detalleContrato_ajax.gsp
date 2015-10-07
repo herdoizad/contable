@@ -5,7 +5,12 @@
     <div class="col-md-3">
         <g:select name="rubros" id="rubros" from="${contable.nomina.Rubro.list([sort: 'nombre'])}" optionKey="id" optionValue="nombre" class="form-control input-sm"/>
     </div>
-
+    <div class="col-md-1">
+        <label>Mes:</label>
+    </div>
+    <div class="col-md-2">
+        <g:select name="mes" id="mes" from="${meses}" optionKey="key" optionValue="value" class="form-control input-sm"/>
+    </div>
     <div class="col-md-1">
         <a href="#" id="agregar" class="btn btn-verde btn-sm">
             <i class="fa fa-plus"></i> Agregar
@@ -19,6 +24,7 @@
             <tr>
                 <th>Rubro</th>
                 <th>Tipo</th>
+                <th>Mes</th>
                 <th style="width: 40px"></th>
             </tr>
             </thead>
@@ -27,6 +33,7 @@
                 <tr data-id="${r.id}" class="r-${r.rubro.id}">
                     <td>${r.rubro.nombre}</td>
                     <td style="text-align: center">${r.rubro.signo==1?'Ingreso':'Egreso'}</td>
+                    <td style="text-align: center">${meses[""+r.mes]}</td>
                     <td style="text-align: center">
                         <a href="#" class="btn btn-danger btn-xs borrar" iden="${r.id}" title="Borrar"><i class="fa fa-trash"></i></a>
                     </td>
@@ -60,6 +67,7 @@
                 data: {
                     tipo:"${tipo.id}",
                     rubro:$("#rubros").val(),
+                    mes:$("#mes").val(),
                     descuenta:descuenta
                 },
                 success: function (msg) {

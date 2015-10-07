@@ -13,18 +13,27 @@
                     Solicitud
                 </div>
             </div>
-            <div class="row fila">
-                <div class="col-md-2">
-                    <label>Tipo de prestamo:</label>
+            <g:if test="${puede}">
+                <div class="row fila">
+                    <div class="col-md-2">
+                        <label>Tipo de prestamo:</label>
+                    </div>
+                    <div class="col-md-2" style="margin-left: -15px">
+                        <g:select name="tipo" id="tipo" from="${contable.nomina.TipoPrestamo.list()}"
+                                  noSelection="['':'']" class="form-control input-sm select" optionKey="id"/>
+                    </div>
+                    <div class="col-md-1">
+                        <a href="#" id="solicitar" class="btn btn-verde btn-sm"><i class="fa fa-list-alt"></i> Solicitar</a>
+                    </div>
                 </div>
-                <div class="col-md-2" style="margin-left: -15px">
-                    <g:select name="tipo" id="tipo" from="${contable.nomina.TipoPrestamo.list()}"
-                              noSelection="['':'']" class="form-control input-sm select" optionKey="id"/>
+            </g:if>
+            <g:else>
+                <div class="row fila">
+                    <div class="col-md-12">
+                        Usted podrá solicitar un nuevo prestamo el ${fecha.format("dd-MM-yyyy")}
+                    </div>
                 </div>
-                <div class="col-md-1">
-                    <a href="#" id="solicitar" class="btn btn-verde btn-sm"><i class="fa fa-list-alt"></i> Solicitar</a>
-                </div>
-            </div>
+            </g:else>
         </div>
     </div>
 </div>

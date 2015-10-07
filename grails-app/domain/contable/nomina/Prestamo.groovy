@@ -11,7 +11,7 @@ class Prestamo {
     Date fin
     TipoPrestamo tipo
     String estado = "S"
-
+    Date solicitado = new Date()
     Date fechaRevision
     String usuarioAprueba
     String observaciones
@@ -34,6 +34,7 @@ class Prestamo {
             plazo column: 'PLAZO'
             interes column: 'INTERES'
             valorCuota column: 'VALOR_CUOTA'
+            solicitado column: 'FECHA_SOLICITADO'
             inicio column: 'FECHA_INICIO'
             fin column: 'FECHA_FIN'
             tipo column: 'TIPO_PRESTAMO_ID'
@@ -53,6 +54,7 @@ class Prestamo {
         usuarioAprueba(nullable: true,size: 1..20)
         observaciones(nullable: true,size: 1..255)
         garante(nullable: true)
+        solicitado(nullable: true)
     }
 
 

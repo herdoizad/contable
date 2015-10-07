@@ -19,6 +19,10 @@
             <g:textField name="descripcion" maxlength="100" required="" class="form-control  required" value="${tipoPrestamoInstance?.descripcion}"/>
         </elm:fieldRapido>
         
+        <elm:fieldRapido claseLabel="col-sm-2" label="Dias De Gracia" claseField="col-sm-2">
+            <g:textField name="diasDeGracia" value="${tipoPrestamoInstance.diasDeGracia}" class="digits form-control "/>
+        </elm:fieldRapido>
+        
     </g:form>
         </div>
 

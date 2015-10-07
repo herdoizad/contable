@@ -26,8 +26,10 @@ class MesNominaController extends Shield {
      */
     def getList(params, all) {
         params = params.clone()
-        params.max = params.max ? Math.min(params.max.toInteger(), 100) : 10
+        params.max = params.max ? Math.min(params.max.toInteger(), 100) : 12
         params.offset = params.offset ?: 0
+        params.sort="codigo"
+        params.order="desc"
         if (all) {
             params.remove("max")
             params.remove("offset")

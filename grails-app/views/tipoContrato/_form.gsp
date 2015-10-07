@@ -18,3 +18,11 @@
 	<g:textField name="descripcion" maxlength="100" required="" class="form-control  required" value="${tipoContratoInstance?.descripcion}"/>
 </div>
 
+<div class="fieldcontain ${hasErrors(bean: tipoContratoInstance, field: 'procedimiento', 'error')} ">
+	<label for="procedimiento">
+		<g:message code="tipoContrato.procedimiento.label" default="Procedimiento" />
+		
+	</label>
+	<g:textField name="procedimiento" maxlength="100" class="form-control " value="${tipoContratoInstance?.procedimiento}"/>
+</div>
+
