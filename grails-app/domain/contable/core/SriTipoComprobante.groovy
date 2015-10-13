@@ -1,6 +1,6 @@
 package contable.core
 
-class SriTipoComprobante {
+class SriTipoComprobante implements Serializable {
 
     String codigo
     String descripcion

@@ -1,6 +1,6 @@
 package contable.core
 
-class Tabla {
+class Tabla implements Serializable {
 
     String codigo
     String descripcion

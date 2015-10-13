@@ -1,6 +1,6 @@
 package contable.core
 
-class Banco {
+class Banco implements Serializable {
 
     String codigo
     Cuenta cuenta

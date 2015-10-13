@@ -1,6 +1,6 @@
 package contable.core
 
-class BancoOcp {
+class BancoOcp implements Serializable {
     String codigo
     String descripcion
     Date creacion

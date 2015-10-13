@@ -66,10 +66,8 @@ class ReportesComprobantesRangoController {
             def  comp = Comprobante.findAll("from Comprobante where empresa='${session.empresa.codigo}' and numero=${it} and tipo=${params.tipo} and mes=${mes}")
             if(comp.size()>0) {
                 comp = comp.pop()
-                if (cont > 0 && cont %2 ==0)
+                if (cont > 0)
                     document.newPage()
-                else
-                    document.add(new Paragraph("\n\n\n\n\n", titulo))
                 cont++
                 imprimeComprobante(comp, document, header, titulo, contenido, hf,writer)
             }
