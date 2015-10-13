@@ -46,7 +46,7 @@ class RubrosController extends Shield {
         try{
             println "formula  "+formula
             def res = Eval.me(formula)
-            render res
+            render res.toDouble().round(2)
         }catch (e){
             println "error test "+e
             response.sendError(500)
@@ -179,7 +179,7 @@ class RubrosController extends Shield {
                 ge("fin",new Date())
             }
         }
-        def meses = ["0":"Todos","1":"Enero","2":"Febero","3":"Marzo","4":"Abril","5":"Mayo","6":"Junio","7":"Juilo","8":"Agosto","9":"Septiembre","10":"Octubre","11":"Noviembre","12":"Diciembre"]
+        def meses = ["0":"Todos","1":"Enero","2":"Febero","3":"Marzo","4":"Abril","5":"Mayo","6":"Junio","7":"Juilo","8":"Agosto","9":"Septiembre","10":"Octubre","11":"Noviembre","12":"Diciembre","13":"Décimo tercero","14":"Décimo cuarto","15":"Utilidades"]
         [empleado:empleado,rubros: rubros,meses:meses,fijos:fijos]
     }
 
@@ -247,7 +247,7 @@ class RubrosController extends Shield {
     def detalleContrato_ajax(){
         def tipo = TipoContrato.get(params.id)
         def rubros = RubroContrato.findAllByTipoContrato(tipo)
-        def meses = ["0":"Todos","1":"Enero","2":"Febero","3":"Marzo","4":"Abril","5":"Mayo","6":"Junio","7":"Juilo","8":"Agosto","9":"Septiembre","10":"Octubre","11":"Noviembre","12":"Diciembre"]
+        def meses = ["0":"Todos","1":"Enero","2":"Febero","3":"Marzo","4":"Abril","5":"Mayo","6":"Junio","7":"Juilo","8":"Agosto","9":"Septiembre","10":"Octubre","11":"Noviembre","12":"Diciembre","13":"Décimo tercero","14":"Décimo cuarto","15":"Utilidades"]
         [tipo:tipo,rubros: rubros,meses:meses]
     }
 

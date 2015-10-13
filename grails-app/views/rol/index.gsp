@@ -5,10 +5,14 @@
     <meta name="layout" content="main">
     <style>
     .pestania{
-        width: 82px;
+        width: 70px;
+        font-size: 10px !important;
     }
-    .pestania a{
+    .link-tab{
         background: #EFEFF0;
+    }
+    .nav>li>a{
+        padding-left: 3px !important;
     }
 
 
@@ -19,7 +23,7 @@
 <body>
 <input type="hidden" id="activo">
 <div class="row fila">
-    <div class="col-md-11" >
+    <div class="col-md-12" >
         <div class="panel-completo" style="margin-left: 10px;min-height: 20px">
             <div class="row">
                 <div class="col-md-12 titulo-panel">
@@ -39,7 +43,7 @@
                     <ul class="nav nav-tabs" role="tablist">
                         <g:each in="${meses}" var="m">
                             <li role="presentation" class="pestania">
-                                <a href="#${m.id}" class="mes m-${m.id}" mes="${m.id}" aria-controls="${m.id}" role="tab" data-toggle="tab">${m.descripcion}</a>
+                                <a href="#${m.id}" class="mes m-${m.id} link-tab" mes="${m.id}" aria-controls="${m.id}" role="tab" data-toggle="tab">${m.descripcion}</a>
                             </li>
                         </g:each>
                     </ul>
