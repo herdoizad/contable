@@ -6,7 +6,7 @@ import contable.seguridad.Shield
 class PagosPrestamosController extends Shield {
 
     def pendientes() {
-        def meses = MesNomina.findAllByCodigoLessThanEquals((new Date().format("yyyy")+"13").toInteger(),[sort:"codigo"])
+        def meses = MesNomina.findAllByCodigoLessThanEquals((new Date().format("yyyy")+"12").toInteger(),[sort:"codigo"])
         [meses:meses]
     }
 
@@ -169,5 +169,15 @@ class PagosPrestamosController extends Shield {
 
     }
 
+
+    def desaprobar_ajax(){
+        def detalle = DetallePrestamo.get(params.id)
+        detalle.estado="R"
+        detalle.save(flush: true)
+        def detRol = DetalleRol.findByDetallePrestamo(detalle)
+        if(detRol)
+            detRol.delete(flush: true)
+        render "ok"
+    }
 
 }

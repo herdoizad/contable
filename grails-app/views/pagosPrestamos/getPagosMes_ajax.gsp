@@ -65,8 +65,13 @@
                     </td>
                 </g:if>
                 <g:else>
-                    <td colspan="3" style="text-align: center">
+                    <td colspan="2" style="text-align: center">
                         Aprobado
+                    </td>
+                    <td style="text-align: center;width: 40px">
+                        <a href="#" class="btn btn-warning btn-sm desaprobar" title="Cambiar estado"  mes="${p.mes.id}" iden="${p.id}">
+                            <i class="fa fa-refresh"></i>
+                        </a>
                     </td>
                 </g:else>
             </tr>
@@ -166,6 +171,44 @@
                 }); //ajax
             }
         })
+
+    })
+
+    $(".desaprobar").click(function(){
+        var id=$(this).attr("iden")
+        var mes = $(this).attr("mes")
+        bootbox.confirm("Está seguro?",function(result){
+            if(result){
+                $.ajax({
+                    type: "POST",
+                    url: "${createLink(controller:'pagosPrestamos', action:'desaprobar_ajax')}",
+                    data:{
+                        id:id
+                    },
+                    success: function (msg) {
+                        closeLoader()
+                        if(msg=="ok"){
+                            var div = $($("#activo").val())
+                            $(".tab-pane").html("")
+                            openLoader()
+                            $.ajax({
+                                type: "POST",
+                                url: "${createLink(controller:'pagosPrestamos', action:'getPagosMes_ajax')}",
+                                data: "mes="+mes,
+                                success: function (msg) {
+                                    closeLoader()
+                                    div.html(msg)
+                                } //success
+                            }); //ajax
+                        }else{
+                            bootbox.alert(msg)
+                        }
+                    } //success
+                }); //ajax
+            }
+        })
+
+
 
     })
     $(".aprobar").click(function(){

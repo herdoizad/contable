@@ -279,7 +279,7 @@ class PrestamoController extends Shield {
             def email = "susana.barriga@petroleosyservicios.com"
             mailService.sendMail {
                 multipart true
-                to "valentinsvt@hotmail.com"
+                to "valentinsvt@hotmail.cola bm"
 //                to r.empleado.email
                 cc "valentinsvt@hotmail.com"
 //                cc email
@@ -591,7 +591,15 @@ class PrestamoController extends Shield {
 
         if(prestamo.tipo.codigo!="CSMO")
             taza=0
-        [prestamo:prestamo,det:det,taza:taza,lastCuota:lastCuota]
+        def saldo = prestamo.monto
+        if(det.size()>0){
+            saldo=det.last().saldo
+        }
+        def valorInteres = (saldo*((new Date()-lastCuota)+1)*((taza/100)/360)).toDouble().round(2)
+        if(valorInteres<0)
+            valorInteres=0
+
+        [prestamo:prestamo,det:det,taza:taza,lastCuota:lastCuota,valorInteres:valorInteres]
     }
 
 

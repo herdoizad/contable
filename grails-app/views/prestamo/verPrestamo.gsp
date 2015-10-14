@@ -65,7 +65,7 @@
 </g:else>
 
 <g:if test="${saldo>0}">
-    <g:set var="valor" value="${(saldo*((new Date()-lastCuota)+1)*((taza/100)/360)).toDouble().round(2)}"/>
+    <g:set var="valor" value="${valorInteres}"/>
     <div class="row fila">
         <div class="col-md-11" >
             <div class="panel-completo" style="margin-left: 10px;min-height: 20px">
