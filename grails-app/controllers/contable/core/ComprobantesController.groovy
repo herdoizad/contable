@@ -113,7 +113,8 @@ class ComprobantesController extends Shield {
         def cheque = null
         def cliente=null
         println "inicio "+inicio
-        def ultimo = Comprobante.findAll("from Comprobante where empresa='${session.empresa.codigo}' and tipo=${params.tipo} and numero>${inicio.format('yy')+'0000'} and tipoProcesamiento=4 and mes>201510 order by numero desc",["max":1])
+        def ultimo = Comprobante.findAll("from Comprobante where empresa='${session.empresa.codigo}' and tipo=${params.tipo}  and tipoProcesamiento=4 and mes>=201510 order by numero desc",["max":1])
+        println "ultimo "+ultimo.numero
         def siguiente=(""+inicio.format("yy")+"0001").toInteger()
         if(ultimo.size()>0) {
             ultimo = ultimo.pop()
@@ -652,7 +653,7 @@ class ComprobantesController extends Shield {
         println "params "+params
         def mes = params.mes.toInteger()
         def inicio = new Date().parse("yyyyMMdd",mes+"01")
-        def ultimo = Comprobante.findAll("from Comprobante where empresa='${session.empresa.codigo}' and tipo=${params.tipo} and numero>${inicio.format('yy')+'0000'} and tipoProcesamiento=4 and mes>201510 order by numero desc",["max":1])
+        def ultimo = Comprobante.findAll("from Comprobante where empresa='${session.empresa.codigo}' and tipo=${params.tipo} and numero>${inicio.format('yy')+'0000'} and tipoProcesamiento=4 and mes>=201510 order by numero desc",["max":1])
         def numero=(""+inicio.format("yy")+"0001").toInteger()
         if(ultimo.size()>0) {
             ultimo = ultimo.pop()
