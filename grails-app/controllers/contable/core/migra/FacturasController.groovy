@@ -23,7 +23,7 @@ class FacturasController  extends Shield {
             def file =  File.createTempFile('temp', '.txt')
             f.transferTo(file)
             file.eachLine {
-                println "tam "+it.length()
+//                println "tam "+it.length()
                 if(it.length()>14){
                     numeroDePrecios++
                     def condicion = it.substring(0,1)
@@ -32,6 +32,7 @@ class FacturasController  extends Shield {
                     def numero = it.substring(5,13)
                     def numSri = it.substring(13,26)
                     def fechaVenta = it.substring(26,34)
+                    fechaVenta=new Date().parse("yyyyMMdd",fechaVenta)
                     def moneda = it.substring(34,35)
 
                     def cliente = it.substring(35,43)
@@ -39,15 +40,16 @@ class FacturasController  extends Shield {
                     def tipoCliente = it.substring(56,57)
 
                     def plazo = it.substring(57,60)
-                    println "cond "+condicion+" sitio "+sitio+" ciudad "+ciudad+" numero "+numero+" num sri "+numSri
-                    println "vence "+vence+" moneda "+moneda+" tipoCli "+tipoCliente+" plazo "+plazo
+//                    println "cond "+condicion+" sitio "+sitio+" ciudad "+ciudad+" numero "+numero+" num sri "+numSri
+//                    println "vence "+fechaVenta+" moneda "+moneda+" tipoCli "+tipoCliente+" plazo "+plazo
                     def tipoVenta = it.substring(60,61)
                     def codigoDependencia = it.substring(61,63)
                     def pagoFactura = it.substring(63,75)
                     pagoFactura=pagoFactura.toDouble()/100
                     def fechaSistema = it.substring(75,83)
+                    fechaSistema=new Date().parse("yyyyMMdd",fechaSistema)
                     def horaSistema = it.substring(83,89)
-                    println "pago "+pagoFactura+" fechaS "+fechaSistema+"  hora "+horaSistema
+//                    println "pago "+pagoFactura+" fechaS "+fechaSistema+"  hora "+horaSistema
                     def codigoTerminal = it.substring(89,93)
                     def codigoUsuario = it.substring(93,100)
                     def totalProvincia = it.substring(100,102)
@@ -70,9 +72,10 @@ class FacturasController  extends Shield {
                     def valorNC=it.substring(167,179).toDouble()
                     valorNC=valorNC/100
                     def vencimiento=it.substring(179,187)
-                    println "vencimiento "+vencimiento
+//                    println "vencimiento "+vencimiento
+                    vencimiento=new Date().parse("yyyyMMdd",vencimiento)
                     def nuermoAutorizacion = it.substring(187,it.length())
-                    println "numaut "+nuermoAutorizacion
+//                    println "numaut "+nuermoAutorizacion
                     def existe=false
                     def sql ="SELECT NUMERO_FACTURA\n" +
                             "\t\t\t\tFROM FACTURA\n" +
@@ -82,67 +85,72 @@ class FacturasController  extends Shield {
                         existe=true
                     }
                     if(!existe){
-                          sql ="INSERT INTO FACTURA (NUMERO_FACTURA,\n" +
-                                  "\t\t\t\t\t\t\t\t\t\tNUMERO_FACTURA_SRI,\n" +
-                                  "\t\t\t\t\t\t\t\t\t\tCODIGO_CLIENTE,\n" +
-                                  "\t\t\t\t\t\t\t\t\t\tCODIGO_BANCO,\n" +
-                                  "\t\t\t\t\t\t\t\t\t\tCODIGO_CONDICION,\n" +
-                                  "\t\t\t\t\t\t\t\t\t\tCODIGO_MEDIDA,\t\t\t\t\t\t\t\n" +
-                                  "\t\t\t\t\t\t\t\t\t\tCODIGO_MONEDA,\n" +
-                                  "\t\t\t\t\t\t\t\t\t\tCODIGO_PRODUCTO,\n" +
-                                  "\t\t\t\t\t\t\t\t\t\tCODIGO_TERMINAL,\n" +
-                                  "\t\t\t\t\t\t\t\t\t\tCODIGO_PRECIO,\n" +
-                                  "\t\t\t\t\t\t\t\t\t\tCIUDAD_FACTURA,\n" +
-                                  "\t\t\t\t\t\t\t\t\t\tFECHA_VENTA,\n" +
-                                  "\t\t\t\t\t\t\t\t\t\tTIPO_CLIENTE,\n" +
-                                  "\t\t\t\t\t\t\t\t\t\tPLAZO_VENTA,\n" +
-                                  "\t\t\t\t\t\t\t\t\t\tTIPO_VENTA,\n" +
-                                  "\t\t\t\t\t\t\t\t\t\tFECHA_SISTEMA,\n" +
-                                  "\t\t\t\t\t\t\t\t\t\tHORA_SISTEMA,\n" +
-                                  "\t\t\t\t\t\t\t\t\t\tVOLUMEN_VENTA,\n" +
-                                  "\t\t\t\t\t\t\t\t\t\tPAGO_FACTURA,\n" +
-                                  "\t\t\t\t\t\t\t\t\t\tEMPLEADO_CREA,\n" +
-                                  "\t\t\t\t\t\t\t\t\t\tFECHA_CREA,\n" +
-                                  "\t\t\t\t\t\t\t\t\t\tRUC,\n" +
-                                  "\t\t\t\t\t\t\t\t\t\tVAL_INTERES,\n" +
-                                  "\t\t\t\t\t\t\t\t\t\tNC,\n" +
-                                  "\t\t\t\t\t\t\t\t\t\tND,\n" +
-                                  "\t\t\t\t\t\t\t\t\t\tFECHA_VENCIMIENTO,\n" +
-                                  "\t\t\t\t\t\t\t\t\t\tNUM_AUTO_SRI,\n" +
-                                  "\t\t\t\t\t\t\t\t\t\tEMISION_FACELEC,\n" +
-                                  "\t\t\t\t\t\t\t\t\t\tIVA_FACELEC)\n" +
-                                  "\t\t\t\n" +
-                                  "\t\t\t\t\t\t\tVALUES ( ${numero}, \n" +
-                                  "\t\t\t\t\t\t\t\t\t\t'${numSri}',\n" +
-                                  "\t\t\t\t\t\t\t\t\t\t${cliente},\n" +
-                                  "\t\t\t\t\t\t\t\t\t\t'${sitio}',\n" +
-                                  "\t\t\t\t\t\t\t\t\t\t${condicion}, \n" +
-                                  "\t\t\t\t\t\t\t\t\t\t${unidadMedida}, \n" +
-                                  "\t\t\t\t\t\t\t\t\t\t${moneda},\n" +
-                                  "\t\t\t\t\t\t\t\t\t\t${producto},\n" +
-                                  "\t\t\t\t\t\t\t\t\t\t${codigoDependencia},\n" +
-                                  "\t\t\t\t\t\t\t\t\t\t:${codigoPrecio},\n" +
-                                  "\t\t\t\t\t\t\t\t\t\t${ciudad},\n" +
-                                  "\t\t\t\t\t\t\t\t\t\t${fechaVenta.format('MM-dd-yyyy')}, \n" +
-                                  "\t\t\t\t\t\t\t\t\t\t${tipoCliente}, \n" +
-                                  "\t\t\t\t\t\t\t\t\t\t${plazo}, \n" +
-                                  "\t\t\t\t\t\t\t\t\t\t${tipoVenta}, \n" +
-                                  "\t\t\t\t\t\t\t\t\t\t${fechaSistema?.format('MM-dd-yyyy')},\n" +
-                                  "\t\t\t\t\t\t\t\t\t\t${horaSistema},\n" +
-                                  "\t\t\t\t\t\t\t\t\t\t${volumenVendido},\n" +
-                                  "\t\t\t\t\t\t\t\t\t\t${pagoFactura},\n" +
-                                  "\t\t\t\t\t\t\t\t\t\t${session.usuario.login},\n" +
-                                  "\t\t\t\t\t\t\t\t\t\t${new Date().format('MM-dd-yyyy')},\n" +
-                                  "\t\t\t\t\t\t\t\t\t\t${ruc},\n" +
-                                  "\t\t\t\t\t\t\t\t\t\t${interes},\n" +
-                                  "\t\t\t\t\t\t\t\t\t\t${valorNC},\n" +
-                                  "\t\t\t\t\t\t\t\t\t\t${valorND},\n" +
-                                  "\t\t\t\t\t\t\t\t\t\t${vencimiento.format('MM-dd-yyyy')},\n" +
-                                  "\t\t\t\t\t\t\t\t\t\t${nuermoAutorizacion},\n" +
-                                  "\t\t\t\t\t\t\t\t\t\t0,\n" +
-                                  "\t\t\t\t\t\t\t\t\t\t0)"
+                        sql ="INSERT INTO FACTURA (NUMERO_FACTURA,\n" +
+                                "\t\t\t\t\t\t\t\t\t\tNUMERO_FACTURA_SRI,\n" +
+                                "\t\t\t\t\t\t\t\t\t\tCODIGO_CLIENTE,\n" +
+                                "\t\t\t\t\t\t\t\t\t\tCODIGO_BANCO,\n" +
+                                "\t\t\t\t\t\t\t\t\t\tCODIGO_CONDICION,\n" +
+                                "\t\t\t\t\t\t\t\t\t\tCODIGO_MEDIDA,\t\t\t\t\t\t\t\n" +
+                                "\t\t\t\t\t\t\t\t\t\tCODIGO_MONEDA,\n" +
+                                "\t\t\t\t\t\t\t\t\t\tCODIGO_PRODUCTO,\n" +
+                                "\t\t\t\t\t\t\t\t\t\tCODIGO_TERMINAL,\n" +
+                                "\t\t\t\t\t\t\t\t\t\tCODIGO_PRECIO,\n" +
+                                "\t\t\t\t\t\t\t\t\t\tCIUDAD_FACTURA,\n" +
+                                "\t\t\t\t\t\t\t\t\t\tFECHA_VENTA,\n" +
+                                "\t\t\t\t\t\t\t\t\t\tTIPO_CLIENTE,\n" +
+                                "\t\t\t\t\t\t\t\t\t\tPLAZO_VENTA,\n" +
+                                "\t\t\t\t\t\t\t\t\t\tTIPO_VENTA,\n" +
+                                "\t\t\t\t\t\t\t\t\t\tFECHA_SISTEMA,\n" +
+                                "\t\t\t\t\t\t\t\t\t\tHORA_SISTEMA,\n" +
+                                "\t\t\t\t\t\t\t\t\t\tVOLUMEN_VENTA,\n" +
+                                "\t\t\t\t\t\t\t\t\t\tPAGO_FACTURA,\n" +
+                                "\t\t\t\t\t\t\t\t\t\tEMPLEADO_CREA,\n" +
+                                "\t\t\t\t\t\t\t\t\t\tFECHA_CREA,\n" +
+                                "\t\t\t\t\t\t\t\t\t\tRUC,\n" +
+                                "\t\t\t\t\t\t\t\t\t\tVAL_INTERES,\n" +
+                                "\t\t\t\t\t\t\t\t\t\tNC,\n" +
+                                "\t\t\t\t\t\t\t\t\t\tND,\n" +
+                                "\t\t\t\t\t\t\t\t\t\tFECHA_VENCIMIENTO,\n" +
+                                "\t\t\t\t\t\t\t\t\t\tNUM_AUTO_SRI,\n" +
+                                "\t\t\t\t\t\t\t\t\t\tEMISION_FACELEC,\n" +
+                                "\t\t\t\t\t\t\t\t\t\tIVA_FACELEC)\n" +
+                                "\t\t\t\n" +
+                                "\t\t\t\t\t\t\tVALUES ( ${numero}, \n" +
+                                "\t\t\t\t\t\t\t\t\t\t'${numSri}',\n" +
+                                "\t\t\t\t\t\t\t\t\t\t'${cliente}',\n" +
+                                "\t\t\t\t\t\t\t\t\t\t'${sitio}',\n" +
+                                "\t\t\t\t\t\t\t\t\t\t'${condicion}', \n" +
+                                "\t\t\t\t\t\t\t\t\t\t'${unidadMedida}', \n" +
+                                "\t\t\t\t\t\t\t\t\t\t'${moneda}',\n" +
+                                "\t\t\t\t\t\t\t\t\t\t'${producto}',\n" +
+                                "\t\t\t\t\t\t\t\t\t\t'${codigoDependencia}',\n" +
+                                "\t\t\t\t\t\t\t\t\t\t'${codigoPrecio}',\n" +
+                                "\t\t\t\t\t\t\t\t\t\t'${ciudad}',\n" +
+                                "\t\t\t\t\t\t\t\t\t\t'${fechaVenta.format('MM-dd-yyyy')}', \n" +
+                                "\t\t\t\t\t\t\t\t\t\t'${tipoCliente}', \n" +
+                                "\t\t\t\t\t\t\t\t\t\t${plazo}, \n" +
+                                "\t\t\t\t\t\t\t\t\t\t${tipoVenta}, \n" +
+                                "\t\t\t\t\t\t\t\t\t\t'${fechaSistema?.format('MM-dd-yyyy')}',\n" +
+                                "\t\t\t\t\t\t\t\t\t\t'${horaSistema}',\n" +
+                                "\t\t\t\t\t\t\t\t\t\t${volumenVendido},\n" +
+                                "\t\t\t\t\t\t\t\t\t\t${pagoFactura},\n" +
+                                "\t\t\t\t\t\t\t\t\t\t'${session.usuario.login}',\n" +
+                                "\t\t\t\t\t\t\t\t\t\t'${new Date().format('MM-dd-yyyy')}',\n" +
+                                "\t\t\t\t\t\t\t\t\t\t'${ruc}',\n" +
+                                "\t\t\t\t\t\t\t\t\t\t${interes},\n" +
+                                "\t\t\t\t\t\t\t\t\t\t${valorNC},\n" +
+                                "\t\t\t\t\t\t\t\t\t\t${valorND},\n" +
+                                "\t\t\t\t\t\t\t\t\t\t'${vencimiento.format('MM-dd-yyyy')}',\n" +
+                                "\t\t\t\t\t\t\t\t\t\t'${nuermoAutorizacion}',\n" +
+                                "\t\t\t\t\t\t\t\t\t\t0,\n" +
+                                "\t\t\t\t\t\t\t\t\t\t0)"
+                        println sql
+                        if(cn.execute(sql.toString())==false){
+                            insertados++
+                        }
                     }else{
-                        mensajes.add("El precio ${codigoPrecio} ya existe en la base de datos")                    }
+                        mensajes.add("El precio ${codigoPrecio} ya existe en la base de datos")
+                    }
 
                 }
 
