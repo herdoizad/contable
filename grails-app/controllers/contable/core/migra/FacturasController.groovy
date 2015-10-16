@@ -8,7 +8,7 @@ class FacturasController  extends Shield {
     def dataSource_pys
 
     def index() {
-        [mensajes: params.mensajes]
+        [mensajes: session.mensajes]
     }
 
     def subirArchivo_ajax(){
@@ -17,7 +17,7 @@ class FacturasController  extends Shield {
         def mensajes = []
         mensajes.add("")
         def insertados = 0
-        def numeroDePrecios = 0
+        def numeroDeRegistros = 0
         if(f && !f.empty){
 //            println "delete "+ cn.execute("delete from PRECIO_TEMPORAL")
             def file =  File.createTempFile('temp', '.txt')
@@ -25,7 +25,7 @@ class FacturasController  extends Shield {
             file.eachLine {
 //                println "tam "+it.length()
                 if(it.length()>14){
-                    numeroDePrecios++
+                    numeroDeRegistros++
                     def condicion = it.substring(0,1)
                     def sitio = it.substring(1,3)
                     def ciudad = it.substring(3,5)
@@ -38,7 +38,8 @@ class FacturasController  extends Shield {
                     def cliente = it.substring(35,43)
                     def ruc = it.substring(43,56)
                     def tipoCliente = it.substring(56,57)
-
+                    if(tipoCliente=="E")
+                        tipoCliente=0
                     def plazo = it.substring(57,60)
 //                    println "cond "+condicion+" sitio "+sitio+" ciudad "+ciudad+" numero "+numero+" num sri "+numSri
 //                    println "vence "+fechaVenta+" moneda "+moneda+" tipoCli "+tipoCliente+" plazo "+plazo
@@ -115,7 +116,7 @@ class FacturasController  extends Shield {
                                 "\t\t\t\t\t\t\t\t\t\tEMISION_FACELEC,\n" +
                                 "\t\t\t\t\t\t\t\t\t\tIVA_FACELEC)\n" +
                                 "\t\t\t\n" +
-                                "\t\t\t\t\t\t\tVALUES ( ${numero}, \n" +
+                                "\t\t\t\t\t\t\tVALUES ( '${numero}', \n" +
                                 "\t\t\t\t\t\t\t\t\t\t'${numSri}',\n" +
                                 "\t\t\t\t\t\t\t\t\t\t'${cliente}',\n" +
                                 "\t\t\t\t\t\t\t\t\t\t'${sitio}',\n" +
@@ -127,7 +128,7 @@ class FacturasController  extends Shield {
                                 "\t\t\t\t\t\t\t\t\t\t'${codigoPrecio}',\n" +
                                 "\t\t\t\t\t\t\t\t\t\t'${ciudad}',\n" +
                                 "\t\t\t\t\t\t\t\t\t\t'${fechaVenta.format('MM-dd-yyyy')}', \n" +
-                                "\t\t\t\t\t\t\t\t\t\t'${tipoCliente}', \n" +
+                                "\t\t\t\t\t\t\t\t\t\t${tipoCliente}, \n" +
                                 "\t\t\t\t\t\t\t\t\t\t${plazo}, \n" +
                                 "\t\t\t\t\t\t\t\t\t\t${tipoVenta}, \n" +
                                 "\t\t\t\t\t\t\t\t\t\t'${fechaSistema?.format('MM-dd-yyyy')}',\n" +
@@ -144,12 +145,16 @@ class FacturasController  extends Shield {
                                 "\t\t\t\t\t\t\t\t\t\t'${nuermoAutorizacion}',\n" +
                                 "\t\t\t\t\t\t\t\t\t\t0,\n" +
                                 "\t\t\t\t\t\t\t\t\t\t0)"
-                        println sql
-                        if(cn.execute(sql.toString())==false){
-                            insertados++
+                        try{
+                            if(cn.execute(sql.toString())==false){
+                                insertados++
+                            }
+                        }catch (e){
+                            mensajes.add("No se pudo insertar la factura No. "+numero+". "+e.message)
                         }
+
                     }else{
-                        mensajes.add("El precio ${codigoPrecio} ya existe en la base de datos")
+                        mensajes.add("La factura No. ${numero} ya existe en la base de datos")
                     }
 
                 }
@@ -157,8 +162,11 @@ class FacturasController  extends Shield {
             }
 
         }
-        mensajes.add("Se insertarón ${insertados} de ${numeroDePrecios} registros ")
-        redirect(action: "index",params: [mensajes:mensajes])
+        mensajes.add("Se insertarón ${insertados} de ${numeroDeRegistros} registros ")
+        println "llego???"
+        session.mensajes=mensajes
+        redirect(action: "index")
+        return
     }
 
     def resultado(){
