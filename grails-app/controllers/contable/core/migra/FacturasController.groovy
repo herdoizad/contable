@@ -8,7 +8,9 @@ class FacturasController  extends Shield {
     def dataSource_pys
 
     def index() {
-        [mensajes: session.mensajes]
+        def mensajes = session.mensajes
+        session.mensajes=null
+        [mensajes: mensajes]
     }
 
     def subirArchivo_ajax(){
@@ -163,7 +165,6 @@ class FacturasController  extends Shield {
 
         }
         mensajes.add("Se insertarón ${insertados} de ${numeroDeRegistros} registros ")
-        println "llego???"
         session.mensajes=mensajes
         redirect(action: "index")
         return

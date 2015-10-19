@@ -32,7 +32,7 @@
                         </label>
                     </div>
                     <div class="col-md-3">
-                        <input type="password" id="new" name="new" maxlength="12" mixlength="7" class="form-control input-sm required">
+                        <input type="password" id="new" name="new" maxlength="12" class="form-control input-sm required">
                     </div>
                     <div class="col-md-7">
                         Entre 7 y 12 caracteres
@@ -45,7 +45,7 @@
                         </label>
                     </div>
                     <div class="col-md-3">
-                        <input type="password" id="check" class="form-control input-sm required">
+                        <input type="password" id="check"  maxlength="12" class="form-control input-sm required">
                     </div>
                 </div>
                 <div class="row fila">

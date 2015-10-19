@@ -8,7 +8,9 @@ class MigraController extends Shield {
     def dataSource_pys
 
     def index() {
-        [mensajes: params.mensajes]
+        def mensajes = session.mensajes
+        session.mensajes=null
+        [mensajes: mensajes]
     }
 
     def subirArchivo_ajax(){
@@ -122,7 +124,8 @@ class MigraController extends Shield {
 
         }
         mensajes.add("Se insertarón ${insertados} de ${numeroDePrecios} registros ")
-        redirect(action: "index",params: [mensajes:mensajes])
+        session.mensajes=mensajes
+        redirect(action: "index")
     }
 
     def resultado(){
