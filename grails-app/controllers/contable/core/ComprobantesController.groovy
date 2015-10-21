@@ -659,10 +659,6 @@ class ComprobantesController extends Shield {
             ultimo = ultimo.pop()
             numero=ultimo.numero+1
         }
-        if(ultimo.size()>0) {
-            ultimo = ultimo.pop()
-            numero=ultimo.numero+1
-        }
         def comp
         comp=Comprobante.findAll("from Comprobante where empresa='${session.empresa.codigo}' and tipo=${params.tipo} and mes=${mes} and numero=${params.numero} order by numero desc",["max":1])
         if(comp.size()>0) {

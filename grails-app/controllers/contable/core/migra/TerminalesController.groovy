@@ -25,8 +25,6 @@ class TerminalesController extends Shield {
             def file = File.createTempFile('temp', '.txt')
             f.transferTo(file)
             file.eachLine {
-                println "linea !"+it+"!"
-                println "tam "+it.length()
                 if (it.length() > 14) {
                     numeroDeRegistros++
 
@@ -113,12 +111,15 @@ class TerminalesController extends Shield {
                             codProdAux=r["CODIGO_PRODUCTO"]
 
                         }
-
-
-//                        IF ( isnull(ls_codigo_control) OR ls_codigo_control="" ) AND ( ls_codigo_control1 = ls_codter) AND
-//                        (ld_volumen = ld_volumen_despachado ) AND (ls_codigo_producto = ls_codigo_producto_aux)
-
-
+                        println "----------------------------------"
+                        println "codigo control "+codigoControl
+                        println "codigo control 1 "+codigoControl1
+                        println "codigo terminal "+codigoTerminal
+                        println "ld volumen "+ldVolumen
+                        println "volumen despacho "+volumenDespacho
+                        println "codigo producto "+codigoProducto
+                        println "codigo producto aux "+codProdAux
+                        println "----------------------------------"
                         if(codigoControl==null && codigoControl1==codigoTerminal && ldVolumen==volumenDespacho && codigoProducto==codProdAux){
 //                            println "paso el if"
                             sql ="INSERT INTO ORDEN_TERMINALES ( NUMERO_ORDEN, \n" +
@@ -181,7 +182,7 @@ class TerminalesController extends Shield {
                             }
 
                         }else{
-                            mensajes.add("La orden No. ${numeroOrden} ya existe en la base de datos. Error ed validación")
+                            mensajes.add("La orden No. ${numeroOrden} ya existe en la base de datos. Error de validación")
                         }
                     }
 
