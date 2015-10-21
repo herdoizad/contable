@@ -47,20 +47,22 @@
 </div>
 <script type="text/javascript">
     $("#ver-facturas").click(function(){
-        openLoader("");
-        $.ajax({
-            type    : "POST",
-            url     : "${g.createLink(action: 'cargaTablaFacturas_ajax')}",
-            data    : "fecha="+$("#facturas_input").val(),
-            success : function (msg) {
-                closeLoader()
-                $("#tabla-facturas").html(msg)
-            },
-            error: function() {
-                log("Ha ocurrido un error interno", "Error");
-                closeLoader();
-            }
-        });
+        if($("#facturas_input").val()!=""){
+            openLoader("");
+            $.ajax({
+                type    : "POST",
+                url     : "${g.createLink(action: 'cargaTablaFacturas_ajax')}",
+                data    : "fecha="+$("#facturas_input").val(),
+                success : function (msg) {
+                    closeLoader()
+                    $("#tabla-facturas").html(msg)
+                },
+                error: function() {
+                    log("Ha ocurrido un error interno", "Error");
+                    closeLoader();
+                }
+            });
+        }
     })
 
 </script>

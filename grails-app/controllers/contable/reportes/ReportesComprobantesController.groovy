@@ -487,16 +487,16 @@ class ReportesComprobantesController extends Shield {
                     cell = new PdfPCell(new Paragraph("Contador", contenido));
                     cell.setHorizontalAlignment(Element.ALIGN_CENTER)
                     table.addCell(cell);
-                    cell = new PdfPCell(new Paragraph("Jefe financiero", contenido));
-                    cell.setHorizontalAlignment(Element.ALIGN_CENTER)
-                    table.addCell(cell);
                     cell = new PdfPCell(new Paragraph("Auditoría interna", contenido));
                     cell.setHorizontalAlignment(Element.ALIGN_CENTER)
                     table.addCell(cell);
-                    cell = new PdfPCell(new Paragraph("Presidente ejecutivo", contenido));
+                    cell = new PdfPCell(new Paragraph("Jefe financiero", contenido));
                     cell.setHorizontalAlignment(Element.ALIGN_CENTER)
                     table.addCell(cell);
-                    cell = new PdfPCell(new Paragraph("Presidente de directorio", contenido));
+                    cell = new PdfPCell(new Paragraph("Presidencia ejecutiva", contenido));
+                    cell.setHorizontalAlignment(Element.ALIGN_CENTER)
+                    table.addCell(cell);
+                    cell = new PdfPCell(new Paragraph("Presidencia directorio", contenido));
                     cell.setHorizontalAlignment(Element.ALIGN_CENTER)
                     table.addCell(cell);
                     cell = new PdfPCell(new Paragraph("Recibí conforme", contenido));
@@ -526,16 +526,16 @@ class ReportesComprobantesController extends Shield {
                     cell = new PdfPCell(new Paragraph("Contador", contenido));
                     cell.setHorizontalAlignment(Element.ALIGN_CENTER)
                     table.addCell(cell);
-                    cell = new PdfPCell(new Paragraph("Jefe financiero", contenido));
-                    cell.setHorizontalAlignment(Element.ALIGN_CENTER)
-                    table.addCell(cell);
                     cell = new PdfPCell(new Paragraph("Auditoría interna", contenido));
                     cell.setHorizontalAlignment(Element.ALIGN_CENTER)
                     table.addCell(cell);
-                    cell = new PdfPCell(new Paragraph("Presidente ejecutivo", contenido));
+                    cell = new PdfPCell(new Paragraph("Jefe financiero", contenido));
                     cell.setHorizontalAlignment(Element.ALIGN_CENTER)
                     table.addCell(cell);
-                    cell = new PdfPCell(new Paragraph("Presidente de directorio", contenido));
+                    cell = new PdfPCell(new Paragraph("Presidencia ejecutiva", contenido));
+                    cell.setHorizontalAlignment(Element.ALIGN_CENTER)
+                    table.addCell(cell);
+                    cell = new PdfPCell(new Paragraph("Presidencia directorio", contenido));
                     cell.setHorizontalAlignment(Element.ALIGN_CENTER)
                     table.addCell(cell);
                     document.add(table)

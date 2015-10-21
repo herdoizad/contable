@@ -10,7 +10,6 @@ class ConciliacionController extends Shield {
     }
 
     def cargaTablaFacturas_ajax(){
-        println "tabla fac"
         def cn = new Sql(dataSource_pys)
         def fecha = new Date().parse("dd-MM-yyyy",params.fecha)
         def sql = "up_optimiza_concilia_fecha '${fecha.format('MM-dd-yyyy')}' "
