@@ -112,9 +112,9 @@ class ComprobantesController extends Shield {
         def rets = []
         def cheque = null
         def cliente=null
-        println "inicio "+inicio
+//        println "inicio "+inicio
         def ultimo = Comprobante.findAll("from Comprobante where empresa='${session.empresa.codigo}' and tipo=${params.tipo} and numero>${inicio.format('yy')+'0000'} and tipoProcesamiento=4 order by numero desc",["max":1])
-        println "ultimo "+ultimo.numero
+//        println "ultimo "+ultimo.numero
         def siguiente=(""+inicio.format("yy")+"0001").toInteger()
         if(ultimo.size()>0) {
             ultimo = ultimo.pop()
@@ -142,7 +142,11 @@ class ComprobantesController extends Shield {
         def tipoComp = TipoDocumento.findAllByDescripcionNotEqual("----------")
         def cuentas = Cuenta.findAllByAgrupa(1)
         def clientes = Cliente.list([sort: 'cp'])
-        [mes:mes,mesSolo:mesSolo,tipo:params.tipo,tipoString:tipoString,siguiente:siguiente,inicio: inicio,fin:fin,tipos:tipos,tiposRet:tiposRet,tipoIva:tipoIva,tipoComp:tipoComp,cuentas:cuentas,clientes:clientes,comp:comp,cheque:cheque,detalles:detalles,rets:rets,cliente:cliente]
+        cal.set(Calendar.DAY_OF_MONTH, new Date().format("dd").toInteger());
+        def fecha = cal.getTime()
+        if(fecha>fin)
+            fecha=fin
+        [mes:mes,mesSolo:mesSolo,tipo:params.tipo,tipoString:tipoString,siguiente:siguiente,inicio: inicio,fin:fin,tipos:tipos,tiposRet:tiposRet,tipoIva:tipoIva,tipoComp:tipoComp,cuentas:cuentas,clientes:clientes,comp:comp,cheque:cheque,detalles:detalles,rets:rets,cliente:cliente,fecha:fecha]
     }
 
 

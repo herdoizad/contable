@@ -106,7 +106,7 @@ class LoginController {
         def horario = Horario.findByUsuarioAndDia(user,dia)
         if(!horario)
             return false
-        println "horario "+horario.dia+" "+horario.inicio+" "+horario.fin
+       // println "horario "+horario.dia+" "+horario.inicio+" "+horario.fin
         def inicio = new Date().parse("dd-MM-yy HH:mm:ss",now.format("dd-MM-yy "+horario.inicio))
         def fin = new Date().parse("dd-MM-yy HH:mm:ss",now.format("dd-MM-yy "+horario.fin))
         if(now.before(fin) && now.after(inicio)){
@@ -140,7 +140,7 @@ class LoginController {
         }
 
         session.permisos = hp
-        println "session permisos "+session.permisos
+        //println "session permisos "+session.permisos
     }
 
     def cambiaColor_ajax(){
