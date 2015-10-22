@@ -14,7 +14,7 @@
             <label>Acreditación</label>
         </div>
         <div class="col-md-4">
-            <elm:datepicker name="fechaNuevo" value="${new java.util.Date()}" class="form-control input-sm"/>
+            <elm:datepicker name="fechaNuevo" value="${fechaVenta}" minDate="${fechaVenta}" class="form-control input-sm"/>
         </div>
     </div>
     <div class="row fila">

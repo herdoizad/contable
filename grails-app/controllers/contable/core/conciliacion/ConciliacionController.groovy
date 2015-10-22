@@ -64,7 +64,16 @@ class ConciliacionController extends Shield {
     def conciliaForm_ajax(){
         def fact = params.numero
         def bancos = BancoConciliacion.list([sort:"descripcion"])
-        [fact:fact,bancos:bancos,fechaLista:params.fechaLista]
+        def fechaVenta
+        def cn = new Sql(dataSource_pys)
+        def sql ="SELECT CODIGO_CONDICION,FECHA_VENCIMIENTO,FECHA_VENTA\n" +
+                "\tFROM FACTURA\n" +
+                "\tWHERE NUMERO_FACTURA ='${params.numero}'"
+        cn.eachRow(sql.toString()){r->
+            fechaVenta=r["FECHA_VENTA"]
+        }
+        cn.close()
+        [fact:fact,bancos:bancos,fechaLista:params.fechaLista,fechaVenta:fechaVenta]
     }
 
     def saveConciliaForm_ajax(){
