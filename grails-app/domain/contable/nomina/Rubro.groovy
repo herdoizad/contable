@@ -8,8 +8,13 @@ class Rubro {
     String nombre
     Double valor
     Integer signo
-    Cuenta cuenta
     String codigo
+
+    String tipo
+    Integer signoContable
+    Cuenta cuenta
+
+
     static auditable = [ignore: []]
 
     /**
@@ -29,6 +34,8 @@ class Rubro {
             signo column:'SIGNO'
             cuenta column: 'CTA_CUENTA'
             codigo column: 'CODIGO'
+            tipo column: 'TIPO'
+            signoContable column: 'SIGNO_CONTABLE'
         }
     }
 
@@ -38,6 +45,8 @@ class Rubro {
         codigo(nullable: true,size: 1..5)
         valor(nullable: true)
         cuenta(nullable: true)
+        tipo(nullable: true,blank: true,size: 1..1)
+        signoContable(nullable: true)
 
     }
 }

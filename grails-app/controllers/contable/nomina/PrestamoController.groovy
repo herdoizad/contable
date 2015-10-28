@@ -155,7 +155,18 @@ class PrestamoController extends Shield {
 
 
     def solicitar(){
-
+        def empleado = Empleado.findByUsuario(session.usuario.login)
+        def prestmos = Prestamo.findAllByEstado("A",[sort: "fin",order: "desc"])
+        def puede = true
+        def now = new Date()
+        def fecha
+        if(prestmos.size()>0){
+            if(prestmos.first().fin.plus(90)>now){
+                puede=false
+                fecha=prestmos.first().fin.plus(90)
+            }
+        }
+        [puede:puede,fecha:fecha]
     }
 
 
@@ -206,6 +217,20 @@ class PrestamoController extends Shield {
         prestamo.valorCuota=prestamo.monto
         if(!prestamo.save(flush: true)){
             println "error save prestamo"
+        }else{
+            def email = "susana.barriga@petroleosyservicios.com"
+            mailService.sendMail {
+                multipart true
+                to "valentinsvt@hotmail.com"
+//                to r.empleado.email
+                cc "valentinsvt@hotmail.com"
+//                cc email
+                subject "Solicitud de anticipo"
+                body( view:"mailSolicitud",
+                        model:[prestamo:prestamo,usuario:session.usuario.login,titulo:'Solicitud de anticipo'])
+                inline 'logo','image/png',grailsApplication.mainContext.getResource('/images/logo-login.png').getFile().readBytes()
+//            inline 'logo','image/png', new File('./web-app///images/logo-login.png').readBytes()
+            }
         }
 
         redirect(action: "historialPrestamos")
@@ -250,6 +275,56 @@ class PrestamoController extends Shield {
         prestamo.valorCuota=(prestamo.monto/prestamo.plazo).toDouble().round(2)
         if(!prestamo.save(flush: true)){
             println "error save prestamo"
+        }else{
+            def email = "susana.barriga@petroleosyservicios.com"
+            mailService.sendMail {
+                multipart true
+                to "valentinsvt@hotmail.cola bm"
+//                to r.empleado.email
+                cc "valentinsvt@hotmail.com"
+//                cc email
+                subject "Solicitud de prestamo emergente"
+                body( view:"mailSolicitud",
+                        model:[prestamo:prestamo,usuario:session.usuario.login,titulo:'Solicitud de prestamo emergente'])
+                inline 'logo','image/png',grailsApplication.mainContext.getResource('/images/logo-login.png').getFile().readBytes()
+//            inline 'logo','image/png', new File('./web-app///images/logo-login.png').readBytes()
+            }
+        }
+
+        redirect(action: "historialPrestamos")
+    }
+    def saveConsumo_ajax(){
+        def empleado = Empleado.findByUsuario(session.usuario.login)
+        def tipo = TipoPrestamo.findByCodigo("CSMO")
+//        println "tipo "+tipo
+        def valor =params.monto
+        def prestamo = new Prestamo()
+        prestamo.empleado=empleado
+        prestamo.tipo=tipo
+        prestamo.monto=valor.toDouble()
+        prestamo.plazo=params.plazo.toInteger()
+        prestamo.interes=params.interes.toDouble()
+        def interes = prestamo.interes/prestamo.plazo/100
+        def cuota = interes*Math.pow(1+interes,prestamo.plazo)
+        cuota=cuota/(Math.pow(1+interes,prestamo.plazo)-1)
+        cuota=cuota*prestamo.monto
+        prestamo.valorCuota=cuota
+        if(!prestamo.save(flush: true)){
+            println "error save prestamo"
+        }else{
+            def email = "susana.barriga@petroleosyservicios.com"
+            mailService.sendMail {
+                multipart true
+                to "valentinsvt@hotmail.com"
+//                to r.empleado.email
+                cc "valentinsvt@hotmail.com"
+//                cc email
+                subject "Solicitud de prestamo de consumo"
+                body( view:"mailSolicitud",
+                        model:[prestamo:prestamo,usuario:session.usuario.login,titulo:'Solicitud de prestamo emergente'])
+                inline 'logo','image/png',grailsApplication.mainContext.getResource('/images/logo-login.png').getFile().readBytes()
+//            inline 'logo','image/png', new File('./web-app///images/logo-login.png').readBytes()
+            }
         }
 
         redirect(action: "historialPrestamos")
@@ -281,11 +356,23 @@ class PrestamoController extends Shield {
         def monto = params.monto.toDouble()
         def taza = params.interes.toDouble()
         def plazo = params.plazo.toInteger()
-        def cuota = ((monto*(1+(taza/100)))/plazo).toDouble().round(2)
+        def interes = taza/plazo/100
+        def cuota = interes*Math.pow(1+interes,plazo)
+//        println "cuota "+cuota
+        cuota=cuota/(Math.pow(1+interes,plazo)-1)
+//        println "cuota "+cuota
+        cuota=cuota*monto
+//        println "cuota --> "+cuota
         def datos=[]
         def inicio = new Date()
         def tmp = [:]
         def saldo = monto
+        Calendar cal = Calendar.getInstance();
+        cal.set(Calendar.MONTH, inicio.format("MM").toInteger()-1);
+        cal.set(Calendar.YEAR, inicio.format("yyyy").toInteger());
+        cal.set(Calendar.DAY_OF_MONTH, 1);// This is necessary to get proper results
+        cal.set(Calendar.DATE, cal.getActualMaximum(Calendar.DATE));
+        inicio  = cal.getTime();
         tmp["fecha"]=inicio
         tmp["saldo"]=monto
         tmp["taza"]=0
@@ -293,9 +380,10 @@ class PrestamoController extends Shield {
         tmp["cuota"]=0
         tmp["capital"]=0
         datos.add(tmp)
+        inicio = inicio.plus(1)
         /*Todo calcular el interes primero! (con las fechas) no depende de la cuota!!!!*/
         plazo.times{
-            Calendar cal = Calendar.getInstance();
+            cal = Calendar.getInstance();
             cal.set(Calendar.MONTH, inicio.format("MM").toInteger()-1);
             cal.set(Calendar.YEAR, inicio.format("yyyy").toInteger());
             cal.set(Calendar.DAY_OF_MONTH, 1);// This is necessary to get proper results
@@ -305,19 +393,25 @@ class PrestamoController extends Shield {
             tmp = [:]
             tmp["fecha"]=fin
             tmp["taza"]=taza
-            if(it==0)
-                tmp["interes"]=(saldo*((fin-inicio))*((taza/100)/360)).toDouble().round(2)
-            else
-                tmp["interes"]=(saldo*((fin-inicio)+1)*((taza/100)/360)).toDouble().round(2)
+            tmp["interes"]=(saldo*((fin-inicio)+1)*((taza/100)/360)).toDouble().round(2)
             tmp["cuota"]=cuota
             tmp["capital"]=(cuota-tmp["interes"]).toDouble().round(2)
             tmp["saldo"]=(saldo-tmp["capital"]).toDouble().round(2)
-            datos.add(tmp)
+
             inicio = fin
             inicio = inicio.plus(1)
             saldo-=tmp["capital"]
             saldo = saldo.toDouble().round(2)
+            if(it==plazo-1){
+                if(saldo!=0){
+                    tmp["cuota"]+=saldo
+                    tmp["capital"]+=saldo
+                    tmp["saldo"]=0
+                }
+            }
+            datos.add(tmp)
         }
+
 
 
         [ monto:monto,taza:taza,plazo:plazo,cuota:cuota,datos:datos]
@@ -325,24 +419,215 @@ class PrestamoController extends Shield {
     }
 
     def pendientesAnticipos(){
-
+        def tipo = TipoPrestamo.findByCodigo("ANTC")
+        def sol = Prestamo.findAllByEstadoAndTipo("S",tipo)
+        [sol:sol]
     }
 
     def pendientesEmergentes(){
-
+        def tipo = TipoPrestamo.findByCodigo("EMRG")
+        def sol = Prestamo.findAllByEstadoAndTipo("S",tipo)
+        [sol:sol]
     }
 
     def pendientesConsumo(){
-
+        def tipo = TipoPrestamo.findByCodigo("CSMO")
+        def sol = Prestamo.findAllByEstadoAndTipo("S",tipo)
+        [sol:sol]
     }
 
     def aprobar_ajax(){
-
+        def prestamo = Prestamo.get(params.id)
+        if(prestamo.estado=="A"){
+            render "error"
+            return
+        }else{
+            prestamo.estado="A"
+            if(params.observaciones)
+                prestamo.observaciones=params.observaciones
+            if(params.inicio)
+                prestamo.inicio=new Date().parse("dd-MM-yyyy",params.inicio)
+            if(prestamo.tipo.codigo=="ANTC")
+                prestamo.fin=prestamo.inicio
+            else{
+                def fin
+                def inicio = prestamo.inicio
+                prestamo.plazo.times {
+                    def cal = Calendar.getInstance();
+                    cal.set(Calendar.MONTH, inicio.format("MM").toInteger() - 1);
+                    cal.set(Calendar.YEAR, inicio.format("yyyy").toInteger());
+                    cal.set(Calendar.DAY_OF_MONTH, 1);// This is necessary to get proper results
+                    cal.set(Calendar.DATE, cal.getActualMaximum(Calendar.DATE));
+                    fin = cal.getTime();
+                    inicio=fin
+                    inicio=inicio.plus(1)
+                }
+                prestamo.fin=fin
+            }
+            prestamo.usuarioAprueba=session.usuario.login
+            prestamo.fechaRevision = new Date()
+            prestamo.save(flush: true)
+            mailService.sendMail {
+                multipart true
+                to "valentinsvt@hotmail.com"
+//                to prestamo.empleado.email
+                subject "Prestamo aprobado"
+                body( view:"mailResultado",
+                        model:[prestamo:prestamo,usuario:session.usuario.login,titulo:'Prestamo aprobado'])
+                inline 'logo','image/png',grailsApplication.mainContext.getResource('/images/logo-login.png').getFile().readBytes()
+//            inline 'logo','image/png', new File('./web-app///images/logo-login.png').readBytes()
+            }
+            render "ok"
+        }
     }
 
     def negar_ajax(){
+        def prestamo = Prestamo.get(params.id)
+        if(prestamo.estado!="S"){
+            render "error"
+            return
+        }else{
+            prestamo.estado="N"
+            prestamo.observaciones=params.observaciones
+            prestamo.usuarioAprueba=session.usuario
+            prestamo.fechaRevision = new Date()
+            prestamo.fin=new Date()
+            prestamo.save(flush: true)
+            render "ok"
+        }
+    }
+
+    def revisar(){
+        def sol = Prestamo.get(params.id)
+        if(sol.estado!="S")
+            response.sendError(403)
+        def sueldo = Sueldo.findAllByEmpleado(sol.empleado,[sort:"inicio"])
+        if(sueldo.size()>0)
+            sueldo=sueldo.pop()
+        def roles = Rol.findAllByEmpleado(sol.empleado,[sort: "registro",order:"desc",max:2])
+        def prestamos = Prestamo.findAllByEmpleado(sol.empleado)
+        def min = sol.solicitado.plus(sol.tipo.diasDeGracia)
+        Calendar cal = Calendar.getInstance();
+        cal.set(Calendar.MONTH, sol.solicitado.format("MM").toInteger()-1);
+        cal.set(Calendar.YEAR, sol.solicitado.format("yyyy").toInteger());
+        cal.set(Calendar.DAY_OF_MONTH, 1);// This is necessary to get proper results
+        cal.set(Calendar.DATE, cal.getActualMaximum(Calendar.DATE));
+        def fin  = cal.getTime();
+        def max
+        if(sol.tipo.diasDeGracia==30){
+            fin = fin.plus(1)
+            cal.set(Calendar.MONTH, fin.format("MM").toInteger()-1);
+            cal.set(Calendar.YEAR, fin.format("yyyy").toInteger());
+            cal.set(Calendar.DAY_OF_MONTH, 1);// This is necessary to get proper results
+            cal.set(Calendar.DATE, cal.getActualMaximum(Calendar.DATE));
+            max = cal.getTime();
+        }else{
+            max = fin
+        }
+
+
+        [sol:sol,sueldo: sueldo,roles:roles,prestamos:prestamos,min:min,max:max]
+    }
+
+    def revisar_ajax(){
+        def prestamo = Prestamo.get(params.id)
+        if(prestamo.estado!="S"){
+            render "error"
+            return
+        }else{
+            prestamo.estado="R"
+            prestamo.observaciones=params.observaciones
+            if(params.inicio)
+                prestamo.inicio=new Date().parse("dd-MM-yyyy",params.inicio)
+            prestamo.usuarioAprueba=session.usuario.login
+            prestamo.fechaRevision = new Date()
+            prestamo.save(flush: true)
+            render "ok"
+        }
+    }
+
+
+
+    def historial(){
 
     }
+
+
+    def historialTipo_ajax(){
+        def tipo = TipoPrestamo.findByCodigo(params.tipo)
+        def solicitados = Prestamo.findAllByTipoAndEstadoInList(tipo,["S","R"])
+        def aprobados = Prestamo.findAllByTipoAndEstado(tipo,"A")
+        def negados = Prestamo.findAllByTipoAndEstado(tipo,"N")
+        [solicitados:solicitados,aprobados:aprobados,negados:negados]
+    }
+
+    def pendientes(){
+        def prestamos = Prestamo.findAllByEstado("R")
+        [prestamos:prestamos]
+    }
+
+
+    def revisar_presidencia(){
+        def sol = Prestamo.get(params.id)
+        if(sol.estado!="R")
+            response.sendError(403)
+        def sueldo = Sueldo.findAllByEmpleado(sol.empleado,[sort:"inicio"])
+        if(sueldo.size()>0)
+            sueldo=sueldo.pop()
+        def roles = Rol.findAllByEmpleado(sol.empleado,[sort: "registro",order:"desc",max:2])
+        def prestamos = Prestamo.findAllByEmpleado(sol.empleado)
+        [sol:sol,sueldo: sueldo,roles:roles,prestamos:prestamos]
+    }
+
+
+    def verPrestamo(){
+        def prestamo = Prestamo.get(params.id)
+        def det = DetallePrestamo.findAllByPrestamoAndEstado(prestamo,"A",[sort:"fechaDePago"])
+        def taza = Variable.findByCodigo("TINT")?.valor
+        def lastCuota = new Date().parse("yyyyMMdd",prestamo.inicio.format("yyyyMM")+"01")
+        if(det.size()>0){
+            lastCuota=det.last().fechaDePago
+        }
+
+        if(prestamo.tipo.codigo!="CSMO")
+            taza=0
+        def saldo = prestamo.monto
+        if(det.size()>0){
+            saldo=det.last().saldo
+        }
+        def valorInteres = (saldo*((new Date()-lastCuota)+1)*((taza/100)/360)).toDouble().round(2)
+        if(valorInteres<0)
+            valorInteres=0
+
+        [prestamo:prestamo,det:det,taza:taza,lastCuota:lastCuota,valorInteres:valorInteres]
+    }
+
+
+    def savePago_ajax(){
+        def pretamo = Prestamo.get(params.prestamo)
+        def last = DetallePrestamo.findAllByPrestamoAndEstado(pretamo,"A",[sort: "fechaDePago"])
+        def saldo = pretamo.monto
+        if(last.size()>0) {
+            last = last.last()
+            saldo = last.saldo
+        }
+        def dp = new DetallePrestamo()
+        def taza = Variable.findByCodigo("TINT")?.valor
+        dp.prestamo=pretamo
+        dp.fechaDePago=new Date()
+        dp.usuario=session.usuario.login
+        dp.registro=new Date()
+        dp.estado="A"
+        dp.cuota=params.valor.toDouble().round(2)
+        dp.interes=params.interes.toDouble().round(2)
+        dp.taza=taza
+        dp.capital=(dp.cuota-dp.interes).toDouble().round(2)
+        dp.saldo= (saldo-dp.capital).toDouble().round(2)
+        dp.save(flush: true)
+        render "ok"
+    }
+
+
 
 
 }

@@ -18,3 +18,11 @@
 	<g:textField name="descripcion" maxlength="100" required="" class="form-control  required" value="${tipoPrestamoInstance?.descripcion}"/>
 </div>
 
+<div class="fieldcontain ${hasErrors(bean: tipoPrestamoInstance, field: 'diasDeGracia', 'error')} ">
+	<label for="diasDeGracia">
+		<g:message code="tipoPrestamo.diasDeGracia.label" default="Dias De Gracia" />
+		
+	</label>
+	<g:textField name="diasDeGracia" value="${tipoPrestamoInstance.diasDeGracia}" class="digits form-control "/>
+</div>
+

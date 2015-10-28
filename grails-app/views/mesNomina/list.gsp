@@ -58,7 +58,7 @@
                             
                             <td>${mesNominaInstance.descripcion}</td>
                             
-                            <td><g:fieldValue bean="${mesNominaInstance}" field="codigo"/></td>
+                            <td>${mesNominaInstance.codigo}</td>
                             
                             <td><g:fieldValue bean="${mesNominaInstance}" field="diasLaborables"/></td>
                             

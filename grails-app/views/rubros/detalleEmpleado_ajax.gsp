@@ -60,7 +60,7 @@
                 <th>Rubro</th>
                 <th>Tipo</th>
                 <th style="width: 50px">Descuenta</th>
-                <th style="width: 30px">Mes</th>
+                <th style="width: 60px">Mes</th>
                 <th>Inicio</th>
                 <th>Fin</th>
                 <th style="width: 40px"></th>
@@ -103,7 +103,7 @@
             </thead>
             <tbody>
             <g:each in="${fijos}" status="i" var="r">
-                <tr data-id="${r.id}" class="r-${r.id}">
+                <tr data-id="${r.id}" class="rf-${r.id}">
                     <td>${r.descripcion}</td>
                     <td style="text-align: center">${r.signo==1?'Ingreso':'Egreso'}</td>
                     <td style="text-align: center">${meses[""+r.mes]}</td>

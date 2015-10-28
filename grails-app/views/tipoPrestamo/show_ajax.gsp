@@ -33,5 +33,18 @@
             </div>
         </g:if>
     
+        <g:if test="${tipoPrestamoInstance?.diasDeGracia}">
+            <div class="row">
+                <div class="col-sm-3 show-label">
+                    Dias De Gracia
+                </div>
+                
+                <div class="col-sm-4">
+                    <g:fieldValue bean="${tipoPrestamoInstance}" field="diasDeGracia"/>
+                </div>
+                
+            </div>
+        </g:if>
+    
     </div>
 </g:else>

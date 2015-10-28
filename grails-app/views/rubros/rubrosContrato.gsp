@@ -48,6 +48,9 @@
 </div>
 <script>
     $('.select').combobox();
+    $(".select").change(function(){
+        $("#detalle").html("")
+    })
     $("#ver").click(function(){
         if($("#empleados").val()!=""){
             openLoader()

@@ -1,6 +1,6 @@
 package contable.core
 
-class Cuenta {
+class Cuenta implements Serializable{
     String numero
     Empresa empresa
     String descripcion

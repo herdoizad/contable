@@ -98,7 +98,7 @@
             <label>Fecha:</label>
         </div>
         <div class="col-md-2">
-            <elm:datepicker name="fecha" class="form-control input-sm" minDate="${inicio}" maxDate="${fin}" value="${comp?.fecha?:inicio}"></elm:datepicker>
+            <elm:datepicker name="fecha" class="form-control input-sm" minDate="${inicio}" maxDate="${fin}" value="${comp?.fecha?:fecha}"></elm:datepicker>
         </div>
         <div class="col-md-1">
             <label>Usar prototipo:</label>
@@ -451,8 +451,8 @@
             haber+=$(this).attr("haber")*1
         })
         $("#tot_debe").html(number_format(debe,2,".",""))
-        $("#tot_debe").attr("valor",debe)
-        $("#tot_haber").attr("valor",haber)
+        $("#tot_debe").attr("valor",debe.toFixed(2))
+        $("#tot_haber").attr("valor",haber.toFixed(2))
         $("#tot_haber").html(number_format(haber,2,".",""))
     }
     function calcularTotalesDoc(){

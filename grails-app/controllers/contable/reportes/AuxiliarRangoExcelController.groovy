@@ -107,7 +107,7 @@ class AuxiliarRangoExcelController extends Shield  {
 
         def sql = "CONTABLE..up_rpt_auxiliar_por_cta  'PS' , ${inicio.format('yyyy').toInteger()}00 ,'${inicio.format('MM/dd/yyyy')}' , '${fin.format('MM/dd/yyyy')}','${cuenta.trim()}', 'S'"
         cn.call(sql.toString())
-        sql = "select * from CONTABLE..COMPROBANTES_TMP "
+        sql = "select * from CONTABLE..COMPROBANTES_TMP   order by CON_FECHA, COM_NUMERO"
 
         def debe = 0
         def haber = 0

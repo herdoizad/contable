@@ -16,7 +16,7 @@
         <g:each in="${datos}" var="d">
             <tr>
                 <td>${d["fecha"].format("dd-MM-yyyy")}</td>
-                <td style="text-align: right">${d["taza"]}</td>
+                <td style="text-align: right">${d["taza"]}%</td>
                 <td style="text-align: right"><g:formatNumber number="${d["interes"]}" type="currency" currencySymbol=""/></td>
                 <td style="text-align: right"><g:formatNumber number="${d['cuota']}" type="currency" currencySymbol=""/></td>
                 <td style="text-align: right"><g:formatNumber number="${d['capital']}" type="currency" currencySymbol=""/></td>

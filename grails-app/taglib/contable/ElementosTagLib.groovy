@@ -318,7 +318,7 @@ class ElementosTagLib {
         def idHiddenHour = id + "_hour"
         def idHiddenMin = id + "_minute"
         
-        def readonly = attrs.readonly ?: true
+        def readonly = attrs.readonly =="true"?true: false
         def value = attrs.value
 
         def clase = attrs["class"] ?: ""

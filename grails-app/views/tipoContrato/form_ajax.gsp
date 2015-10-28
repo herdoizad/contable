@@ -19,6 +19,10 @@
             <g:textField name="descripcion" maxlength="100" required="" class="form-control  required" value="${tipoContratoInstance?.descripcion}"/>
         </elm:fieldRapido>
         
+        <elm:fieldRapido claseLabel="col-sm-2" label="Procedimiento" claseField="col-sm-6">
+            <g:textField name="procedimiento" maxlength="100" class="form-control " value="${tipoContratoInstance?.procedimiento}"/>
+        </elm:fieldRapido>
+        
     </g:form>
         </div>
 

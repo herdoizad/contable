@@ -36,7 +36,7 @@
                 </div>
             </div>
             <div class="row fila">
-                <div class="col-md-12">
+                <div class="col-md-12" id="detalle">
                     <table class="table table-bordered table-sm table-darkblue table-hover table-condensed">
                         <thead>
                         <tr>
@@ -101,6 +101,9 @@
         location.href="${g.createLink(action: 'index')}/?empleado="+$("#empleado").val()
     })
     $('.select').combobox();
+    $(".select").change(function(){
+        $("#detalle").html("")
+    })
     $("#guardar").click(function(){
         openLoader();
         var data =""

@@ -68,7 +68,7 @@ class AuxiliarController extends Shield  {
         def sql = "CONTABLE..up_rpt_auxiliar_por_cta  'PS' , ${inicio.format('yyyy').toInteger()}00 ,'${inicio.format('MM/dd/yyyy')}' , '${fin.format('MM/dd/yyyy')}','${cuenta.numero.trim()}', 'S'"
       // println "sql "+sql
         cn.call(sql.toString())
-        sql = "select * from CONTABLE..COMPROBANTES_TMP "
+        sql = "select * from CONTABLE..COMPROBANTES_TMP    order by CON_FECHA, COM_NUMERO "
        // println "sql "+sql
         def cont = 0
         def table = new PdfPTable(6);

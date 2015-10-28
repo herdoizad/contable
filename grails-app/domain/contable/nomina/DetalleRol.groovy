@@ -11,6 +11,7 @@ class DetalleRol {
     Date modificacion
     Rubro rubro
     String codigo
+    DetallePrestamo detallePrestamo
     static auditable = [ignore: []]
     /**
      * Define el mapeo entre los campos del dominio y las columnas de la base de datos
@@ -32,6 +33,7 @@ class DetalleRol {
             modificacion column:'FECHA_MODIFICACION'
             rubro column: 'RUBRO_ID'
             codigo column: 'CODIGO'
+            detallePrestamo column: 'DETALLE_PRESTAMO_ID'
         }
     }
 
@@ -41,6 +43,6 @@ class DetalleRol {
         codigo(size: 1..5,nullable: true)
         modificacion(nullable: true)
         rubro(nullable: true)
-
+        detallePrestamo(nullable: true)
     }
 }

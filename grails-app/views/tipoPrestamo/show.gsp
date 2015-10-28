@@ -41,6 +41,15 @@
 				</li>
 				</g:if>
 			
+				<g:if test="${tipoPrestamoInstance?.diasDeGracia}">
+				<li class="fieldcontain">
+					<span id="diasDeGracia-label" class="property-label"><g:message code="tipoPrestamo.diasDeGracia.label" default="Dias De Gracia" /></span>
+					
+						<span class="property-value" aria-labelledby="diasDeGracia-label"><g:fieldValue bean="${tipoPrestamoInstance}" field="diasDeGracia"/></span>
+					
+				</li>
+				</g:if>
+			
 			</ol>
 			<g:form url="[resource:tipoPrestamoInstance, action:'delete']" method="DELETE">
 				<fieldset class="buttons">

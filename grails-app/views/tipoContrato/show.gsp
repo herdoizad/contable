@@ -41,6 +41,15 @@
 				</li>
 				</g:if>
 			
+				<g:if test="${tipoContratoInstance?.procedimiento}">
+				<li class="fieldcontain">
+					<span id="procedimiento-label" class="property-label"><g:message code="tipoContrato.procedimiento.label" default="Procedimiento" /></span>
+					
+						<span class="property-value" aria-labelledby="procedimiento-label"><g:fieldValue bean="${tipoContratoInstance}" field="procedimiento"/></span>
+					
+				</li>
+				</g:if>
+			
 			</ol>
 			<g:form url="[resource:tipoContratoInstance, action:'delete']" method="DELETE">
 				<fieldset class="buttons">

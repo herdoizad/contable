@@ -33,5 +33,18 @@
             </div>
         </g:if>
     
+        <g:if test="${tipoContratoInstance?.procedimiento}">
+            <div class="row">
+                <div class="col-sm-3 show-label">
+                    Procedimiento
+                </div>
+                
+                <div class="col-sm-4">
+                    <g:fieldValue bean="${tipoContratoInstance}" field="procedimiento"/>
+                </div>
+                
+            </div>
+        </g:if>
+    
     </div>
 </g:else>

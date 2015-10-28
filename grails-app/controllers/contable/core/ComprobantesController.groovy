@@ -112,8 +112,10 @@ class ComprobantesController extends Shield {
         def rets = []
         def cheque = null
         def cliente=null
-        def ultimo = Comprobante.findAll("from Comprobante where empresa='${session.empresa.codigo}' and tipo=${params.tipo} and mes=${mes} and tipoProcesamiento=4 order by numero desc",["max":1])
-        def siguiente=(""+inicio.format("yyMM")+"01").toInteger()
+//        println "inicio "+inicio
+        def ultimo = Comprobante.findAll("from Comprobante where empresa='${session.empresa.codigo}' and tipo=${params.tipo} and numero>${inicio.format('yy')+'0000'} and tipoProcesamiento=4 order by numero desc",["max":1])
+//        println "ultimo "+ultimo.numero
+        def siguiente=(""+inicio.format("yy")+"0001").toInteger()
         if(ultimo.size()>0) {
             ultimo = ultimo.pop()
             siguiente=ultimo.numero+1
@@ -140,7 +142,11 @@ class ComprobantesController extends Shield {
         def tipoComp = TipoDocumento.findAllByDescripcionNotEqual("----------")
         def cuentas = Cuenta.findAllByAgrupa(1)
         def clientes = Cliente.list([sort: 'cp'])
-        [mes:mes,mesSolo:mesSolo,tipo:params.tipo,tipoString:tipoString,siguiente:siguiente,inicio: inicio,fin:fin,tipos:tipos,tiposRet:tiposRet,tipoIva:tipoIva,tipoComp:tipoComp,cuentas:cuentas,clientes:clientes,comp:comp,cheque:cheque,detalles:detalles,rets:rets,cliente:cliente]
+        cal.set(Calendar.DAY_OF_MONTH, new Date().format("dd").toInteger());
+        def fecha = cal.getTime()
+        if(fecha>fin)
+            fecha=fin
+        [mes:mes,mesSolo:mesSolo,tipo:params.tipo,tipoString:tipoString,siguiente:siguiente,inicio: inicio,fin:fin,tipos:tipos,tiposRet:tiposRet,tipoIva:tipoIva,tipoComp:tipoComp,cuentas:cuentas,clientes:clientes,comp:comp,cheque:cheque,detalles:detalles,rets:rets,cliente:cliente,fecha:fecha]
     }
 
 
@@ -651,8 +657,8 @@ class ComprobantesController extends Shield {
         println "params "+params
         def mes = params.mes.toInteger()
         def inicio = new Date().parse("yyyyMMdd",mes+"01")
-        def ultimo = Comprobante.findAll("from Comprobante where empresa='${session.empresa.codigo}' and tipo=${params.tipo} and mes=${mes} and tipoProcesamiento=4 order by numero desc",["max":1])
-        def numero =(""+inicio.format("yyMM")+"01").toInteger()
+        def ultimo = Comprobante.findAll("from Comprobante where empresa='${session.empresa.codigo}' and tipo=${params.tipo} and tipoProcesamiento=4 and mes>=201510 order by numero desc",["max":1])
+        def numero=(""+inicio.format("yy")+"0001").toInteger()
         if(ultimo.size()>0) {
             ultimo = ultimo.pop()
             numero=ultimo.numero+1
@@ -678,7 +684,7 @@ class ComprobantesController extends Shield {
         comp.concepto=params.concepto
         comp.fecha=new Date().parse("dd-MM-yyyy",params.fecha_input)
         comp.usuario=session.usuario.login
-        comp.ip=session.ip
+        comp.ipMod=session.ip
         comp.control=9
         comp.numeroCheque=0
         comp.bancoCliente=BancoOcp.findByCodigo(params.bancoCliente)

@@ -28,6 +28,8 @@
 					
 						<g:sortableColumn property="descripcion" title="${message(code: 'tipoPrestamo.descripcion.label', default: 'Descripcion')}" />
 					
+						<g:sortableColumn property="diasDeGracia" title="${message(code: 'tipoPrestamo.diasDeGracia.label', default: 'Dias De Gracia')}" />
+					
 					</tr>
 				</thead>
 				<tbody>
@@ -37,6 +39,8 @@
 						<td><g:link action="show" id="${tipoPrestamoInstance.id}">${fieldValue(bean: tipoPrestamoInstance, field: "codigo")}</g:link></td>
 					
 						<td>${fieldValue(bean: tipoPrestamoInstance, field: "descripcion")}</td>
+					
+						<td>${fieldValue(bean: tipoPrestamoInstance, field: "diasDeGracia")}</td>
 					
 					</tr>
 				</g:each>

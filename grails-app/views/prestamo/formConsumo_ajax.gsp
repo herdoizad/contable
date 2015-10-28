@@ -1,4 +1,4 @@
-<g:form class="frm" action="saveEmergente_ajax">
+<g:form class="frm" action="saveConsumo_ajax">
     <div class="row fila">
         <div class="col-md-1">
             <label>Empleado</label>
@@ -40,7 +40,8 @@
         </div>
         <div class="col-md-2">
             <div class="input-group">
-                <g:textField name="interes" id="interes" value="${interes}" class="monto digits form-control  required" required="" style="text-align: right"  disabled="true" aria-describedby="basic-addon2"/>
+                <input type="hidden" value="${interes}" name="interes">
+                <g:textField name="interesTxt" id="interes" value="${interes}" class="monto digits form-control  required" required="" style="text-align: right"  disabled="true" aria-describedby="basic-addon2"/>
                 <span class="input-group-addon" id="basic-addon2">%</span>
             </div>
         </div>
@@ -70,6 +71,7 @@
                 var b = bootbox.dialog({
                     id: "dlgDetalles",
                     message: msg,
+                    title:"Tabla de amortización referencial",
                     buttons: {
                         cerrar: {
                             label: "Cerrar",

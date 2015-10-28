@@ -348,6 +348,7 @@ class EmpleadoController extends Shield {
     }
 
     def saveCon_ajax(){
+        flash.message=""
         println "saveCon_ajax "+params
         def empleado = Empleado.get(params.empleado.id)
         def cap = new Contrato()
@@ -411,7 +412,29 @@ class EmpleadoController extends Shield {
         }
         if(!cap.save(flush: true))
             println "error cap "+cap.errors
-        flash.message="Datos guardados"
+        else{
+            def rubrosContrato = RubroContrato.findAllByTipoContrato(cap.tipo)
+            if(rubrosContrato.size()==0) {
+                flash.tipo = "warning"
+                flash.message = "El tipo de contrato ${cap.tipo.descripcion} no tiene rubros asignados. Se deberá asignar manualmente los rubros del empleado ${cap.empleado} antes de generar el rol"
+            }
+            rubrosContrato.each {rc->
+                def r = RubroEmpleado.findByRubroAndEmpleado(rc.rubro,cap.empleado)
+                if(!r){
+                    r = new RubroEmpleado()
+                    r.empleado=cap.empleado
+                    if(rc.mes)
+                        r.mes=rc.mes
+                    else
+                        r.mes=0
+                    r.inicio=cap.empleado.registro
+                    r.rubro=rc.rubro
+                    r.save(flush: true)
+                }
+            }
+        }
+        if(flash.message=="")
+            flash.message="Datos guardados"
         redirect(action: "contratos",id: empleado.id)
     }
 

@@ -1,15 +1,20 @@
 package contable.nomina
 
+import contable.core.Cuenta
 import contable.seguridad.Shield
 import groovy.sql.Sql
+import jxl.Cell
+import jxl.Sheet
+import jxl.Workbook
 
 class RubrosController extends Shield {
     def dataSource
     def nuevoRubro(){
         def rubro = null
+        def tipos = ["I":"Individual","G":"Grupal"]
         if(params.id)
             rubro=Rubro.get(params.id)
-        [rubro:rubro]
+        [rubro:rubro,tipos:tipos]
     }
 
     def rubros(){
@@ -41,7 +46,7 @@ class RubrosController extends Shield {
         try{
             println "formula  "+formula
             def res = Eval.me(formula)
-            render res
+            render res.toDouble().round(2)
         }catch (e){
             println "error test "+e
             response.sendError(500)
@@ -75,10 +80,19 @@ class RubrosController extends Shield {
     }
 
     def save_ajax(){
+//        println "params "+params
+        def codigoCuenta = params.remove("cuenta")
         def rubro = new Rubro()
         if(params.id)
             rubro=Rubro.get(params.id)
         rubro.properties=params
+        if(codigoCuenta!="" && codigoCuenta){
+            def cuenta=Cuenta.findByNumero(codigoCuenta)
+            rubro.cuenta=cuenta
+//            println "cuenta "+cuenta
+        }else{
+            rubro.cuenta=null
+        }
         if(!rubro.save(flush: true)){
             println "error save rubro "+params
         }
@@ -87,11 +101,13 @@ class RubrosController extends Shield {
     }
 
     def addRubroContrato_ajax(){
+        println "params "+params
         def tipo = TipoContrato.get(params.tipo)
         def rubro = Rubro.get(params.rubro)
         def re = new RubroContrato()
         re.tipoContrato=tipo
         re.rubro=rubro
+        re.mes=params.mes.toInteger()
         if(!re.save(flush: true))
             println "error save rubro "+re.errors
         redirect(action: 'detalleContrato_ajax',id: tipo.id)
@@ -152,7 +168,7 @@ class RubrosController extends Shield {
         def empleados = Empleado.findAllByEstado("A",[sort: "apellido"])
         [empleado:empleado,rubros:rubros,empleados:empleados]
     }
-    
+
     def detalleEmpleado_ajax(){
         def empleado = Empleado.get(params.id)
         def rubros = RubroEmpleado.findAllByEmpleado(empleado)
@@ -163,7 +179,7 @@ class RubrosController extends Shield {
                 ge("fin",new Date())
             }
         }
-        def meses = ["0":"Todos","1":"Enero","2":"Febero","3":"Marzo","4":"Abril","5":"Mayo","6":"Junio","7":"Juilo","8":"Agosto","9":"Septiembre","10":"Octubre","11":"Noviembre","12":"Diciembre"]
+        def meses = ["0":"Todos","1":"Enero","2":"Febero","3":"Marzo","4":"Abril","5":"Mayo","6":"Junio","7":"Juilo","8":"Agosto","9":"Septiembre","10":"Octubre","11":"Noviembre","12":"Diciembre","13":"Décimo tercero","14":"Décimo cuarto","15":"Utilidades"]
         [empleado:empleado,rubros: rubros,meses:meses,fijos:fijos]
     }
 
@@ -231,7 +247,7 @@ class RubrosController extends Shield {
     def detalleContrato_ajax(){
         def tipo = TipoContrato.get(params.id)
         def rubros = RubroContrato.findAllByTipoContrato(tipo)
-        def meses = ["0":"Todos","1":"Enero","2":"Febero","3":"Marzo","4":"Abril","5":"Mayo","6":"Junio","7":"Juilo","8":"Agosto","9":"Septiembre","10":"Octubre","11":"Noviembre","12":"Diciembre"]
+        def meses = ["0":"Todos","1":"Enero","2":"Febero","3":"Marzo","4":"Abril","5":"Mayo","6":"Junio","7":"Juilo","8":"Agosto","9":"Septiembre","10":"Octubre","11":"Noviembre","12":"Diciembre","13":"Décimo tercero","14":"Décimo cuarto","15":"Utilidades"]
         [tipo:tipo,rubros: rubros,meses:meses]
     }
 
@@ -254,12 +270,79 @@ class RubrosController extends Shield {
                 re.rubro=r.rubro
                 re.empleado=empleado
                 re.inicio=empleado.registro
-                re.mes=0
+                if(r.mes)
+                    re.mes=r.mes
+                else
+                    re.mes=0
                 if(!re.save(flush: true))
                     println "error save rubro empleado con plantilla "+re.errors
             }
         }
         redirect(action: 'detalleEmpleado_ajax',id: empleado.id)
     }
+
+
+    def subirArchivoSupermaxi(){
+        def meses = MesNomina.list(["sort":"codigo"])
+        [meses:meses]
+    }
+
+    def subirArchivoFybeca(){
+        def meses = MesNomina.list(["sort":"codigo"])
+        [meses:meses]
+    }
+
+    def procesarchivoSupermaxi_ajax(){
+
+        def f = request.getFile('file')
+        def file = new File()
+        println "class "+f.class
+        def ext2
+        if(f && !f.empty) {
+            def nombre = f.getOriginalFilename()
+            def parts2 = nombre.split("\\.")
+            nombre = ""
+            parts2.eachWithIndex { obj, i ->
+                if (i < parts2.size() - 1) {
+                    nombre += obj
+                } else {
+                    ext2 = obj
+                }
+            }
+            if (ext2 == 'xls' || ext2 == 'XLS' || ext2 == 'XLSX' || ext2 == 'xlsx' ) {
+                f.transferTo(file)
+                Workbook workbook = Workbook.getWorkbook(file)
+                Sheet s = workbook.getSheet(0)
+                def row
+                s.getRows().times { i ->
+                    row = s.getRow(i)
+                    if (row.length > 0) {
+                        if (i == 0) {
+                            row.length.times { j ->
+                                if (!row[j].isHidden()) {
+                                    println "row!! "+row[j].getContents()
+                                }//if row ! hidden
+                            } //foreach cell
+//                            println cols
+                        }
+                    }
+                }
+
+
+
+            }else{
+                flash.message="El archivo tiene una extención no soportada."
+                redirect(action: 'subirArchivoSupermaxi')
+            }
+        }
+
+
+
+
+    }
+    def procesarchivoFybeca_ajax(){
+
+    }
+
 
 }

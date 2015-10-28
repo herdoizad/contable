@@ -1,6 +1,6 @@
 package contable.core
 
-class TipoPago {
+class TipoPago implements Serializable{
 
     String codigo
     String descripcion

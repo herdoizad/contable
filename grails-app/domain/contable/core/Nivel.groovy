@@ -1,6 +1,6 @@
 package contable.core
 
-class Nivel {
+class Nivel implements Serializable {
 
     String codigo
     Integer nivel1

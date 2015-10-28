@@ -11,6 +11,11 @@ class Prestamo {
     Date fin
     TipoPrestamo tipo
     String estado = "S"
+    Date solicitado = new Date()
+    Date fechaRevision
+    String usuarioAprueba
+    String observaciones
+    Empleado garante
     static auditable = [ignore: []]
 
     /**
@@ -29,10 +34,15 @@ class Prestamo {
             plazo column: 'PLAZO'
             interes column: 'INTERES'
             valorCuota column: 'VALOR_CUOTA'
+            solicitado column: 'FECHA_SOLICITADO'
             inicio column: 'FECHA_INICIO'
             fin column: 'FECHA_FIN'
             tipo column: 'TIPO_PRESTAMO_ID'
             estado column: 'ESTADO'
+            fechaRevision column: 'FECHA_REVISION'
+            usuarioAprueba column: 'USUARIO_APRUEBA'
+            observaciones column: 'OBSERVACIONES'
+            garante column: 'EMPLEADO_GARANTE'
         }
     }
 
@@ -40,6 +50,11 @@ class Prestamo {
         inicio(nullable: true)
         fin(nullable: true)
         estado(size: 1..1)
+        fechaRevision(nullable: true)
+        usuarioAprueba(nullable: true,size: 1..20)
+        observaciones(nullable: true,size: 1..255)
+        garante(nullable: true)
+        solicitado(nullable: true)
     }
 
 
@@ -53,6 +68,9 @@ class Prestamo {
                 break;
             case "N":
                 return "Negado"
+                break;
+            case "R":
+                return "Revisado"
                 break;
         }
     }
