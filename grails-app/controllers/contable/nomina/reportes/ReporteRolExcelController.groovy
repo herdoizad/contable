@@ -1,15 +1,17 @@
-package contable.reportes
+package contable.nomina.reportes
 
-import contable.core.Banco
-import contable.seguridad.Shield
-import groovy.sql.Sql
+import contable.nomina.DetalleRol
+import contable.nomina.Empleado
+import contable.nomina.MesNomina
+import contable.nomina.Rol
+import contable.nomina.Rubro
+import contable.nomina.Sueldo
 import org.apache.poi.ss.usermodel.CellStyle
 import org.apache.poi.ss.usermodel.ClientAnchor
 import org.apache.poi.ss.usermodel.CreationHelper
 import org.apache.poi.ss.usermodel.DataFormat
 import org.apache.poi.ss.usermodel.Drawing
 import org.apache.poi.ss.usermodel.Font
-import org.apache.poi.ss.usermodel.Picture
 import org.apache.poi.ss.util.CellRangeAddress
 import org.apache.poi.xssf.usermodel.XSSFCell
 import org.apache.poi.xssf.usermodel.XSSFColor
@@ -17,26 +19,22 @@ import org.apache.poi.xssf.usermodel.XSSFRow
 import org.apache.poi.xssf.usermodel.XSSFSheet
 import org.apache.poi.xssf.usermodel.XSSFWorkbook
 
-class DiarioGeneralExcelController extends Shield{
-    def dataSource
+class ReporteRolExcelController {
+
     def index() {
-        def inicio = new Date().parse("dd-MM-yyyy",params.inicio)
-        def fin = new Date().parse("dd-MM-yyyy",params.fin)
-        //def cierre = "01/01/2015"
-        //def banco = Banco.findByCodigo(params.banco)
-        def cn = new Sql(dataSource)
-        def sql = "CONTABLE..up_rpt_diario_general  'PS' ,'${inicio.format('MM/dd/yyyy')}' , '${fin.format('MM/dd/yyyy')}'"
-        println "-----" +sql
-        cn.call(sql.toString())
         def iniRow = 0
         def iniCol = 0
+        def fecha = new Date()
+        def rol = Rol.get(params.id)
+        def meses = ["0":"Todos","1":"Enero","2":"Febero","3":"Marzo","4":"Abril","5":"Mayo","6":"Junio","7":"Juilo","8":"Agosto","9":"Septiembre","10":"Octubre","11":"Noviembre","12":"Diciembre"]
+        def ingresos = DetalleRol.findAllByRolAndSigno(rol,1)
+        def egresos = DetalleRol.findAllByRolAndSigno(rol,-1)
+        def celda
         def img = grailsApplication.mainContext.getResource('/images/favicons/apple-touch-icon-57x57.png').getFile()
         def curRow = iniRow
-        //def curCol = iniCol
         XSSFWorkbook wb = new XSSFWorkbook()
-        XSSFSheet sheet = wb.createSheet("Diario General")
+        XSSFSheet sheet = wb.createSheet("Reporte Rol Empleados")
         int pictureIdx = wb.addPicture(img.readBytes(), XSSFWorkbook.PICTURE_TYPE_PNG);
-
         CreationHelper helper = wb.getCreationHelper();
         Drawing drawing = sheet.createDrawingPatriarch();
         ClientAnchor anchor = helper.createClientAnchor();
@@ -44,7 +42,6 @@ class DiarioGeneralExcelController extends Shield{
         anchor.setCol1(0);
         anchor.setRow2(1);
         anchor.setCol2(1);
-        //Picture pict = drawing.createPicture(anchor, pictureIdx);
 
         DataFormat format = wb.createDataFormat();
         Font fontTitulo = wb.createFont()
@@ -109,7 +106,7 @@ class DiarioGeneralExcelController extends Shield{
         cellTitulo.setCellValue("Petróleos y servicios" )
         cellTitulo.setCellStyle(styleTitulo)
         XSSFCell cellSubtitulo = row2.createCell((short) iniCol)
-        cellSubtitulo.setCellValue("DIARIO GENERAL del "+inicio.format("dd-MM-yyyy")+" hasta "+fin.format("dd-MM-yyyy"))
+        cellSubtitulo.setCellValue("Rol de Pagos del mes de " + meses[new Date().parse("yyyyMMdd",+rol.mes.codigo+"01").format("M")].toUpperCase())
         cellSubtitulo.setCellStyle(styleSubtitulo)
         sheet.addMergedRegion(new CellRangeAddress(
                 iniRow, //first row (0-based)
@@ -123,8 +120,8 @@ class DiarioGeneralExcelController extends Shield{
                 0, //first column (0-based)
                 8  //last column  (0-based)
         ))
-        sheet.setColumnWidth(1,4000)
-        sheet.setColumnWidth(2,15000)
+        sheet.setColumnWidth(1,8000)
+        sheet.setColumnWidth(2,8000)
         sheet.setColumnWidth(3,5000)
         sheet.setColumnWidth(4,5000)
         sheet.setColumnWidth(5,5000)
@@ -132,91 +129,104 @@ class DiarioGeneralExcelController extends Shield{
         sheet.setColumnWidth(7,5000)
         sheet.setColumnWidth(8,5000)
 
+        row = sheet.createRow((short) curRow)
+        celda =  row.createCell((short) 1)
+        celda.setCellValue("Apellido")
+        celda.setCellStyle(styleHeader)
+        celda =  row.createCell((short) 2)
+        celda.setCellValue("Nombre")
+        celda.setCellStyle(styleHeader)
 
+        def rubros =  Rubro.list([sort: "signo",order: "desc"])
+        def signo = null
+        def num =3
+        def cont = 3
 
-        sql = "select * from CONTABLE..COMPROBANTES_TMP  order by COM_NUMERO"
+        rubros.eachWithIndex{ r, i ->
 
-        def celda
-        def td = 0,th=0
-        def last = null
-        def table = null
-        def cell
-
-        cn.eachRow(sql.toString()){r->
-            if(last!=r["COM_NUMERO"]){
-                // println "bvbv" + r
-
-                row = sheet.createRow((short) curRow)
-                celda =  row.createCell((short) 3)
-                celda.setCellValue(imprimeNumero_ajax(r["COM_NUMERO"]))
-                celda.setCellStyle(styleNegrilla)
-                curRow++
-                row = sheet.createRow((short) curRow)
-                celda =  row.createCell((short) 1)
-                celda.setCellValue(r["COM_CONCEPTO"])
-                celda.setCellStyle(styleNegrilla)
-
+            if (signo!=r.signo && signo ){
+                celda =  row.createCell((short)i+num)
+                celda.setCellValue("TOTAL INGRESOS")
+                celda.setCellStyle(styleHeader)
+                num++
+                cont++
             }
-            last=r["COM_NUMERO"]
+            signo=r.signo
+            celda =  row.createCell((short)i+num)
+            celda.setCellValue(r.nombre)
+            celda.setCellStyle(styleHeader)
+            cont++
+        }
 
+        celda =  row.createCell((short)cont)
+        celda.setCellValue("TOTAL EGRESOS")
+        celda.setCellStyle(styleHeader)
+        celda =  row.createCell((short)cont +1)
+        celda.setCellValue("A RECIBIR")
+        celda.setCellStyle(styleHeader)
 
-        //cn.eachRow(sql.toString()){r->
-            curRow++
+        curRow++
+        println "pat4"
+        curRow++
+        def mes = MesNomina.get(params.id)
+        def roles = Rol.findAllByMes(mes)
+
+        roles.each{r->
             row = sheet.createRow((short) curRow)
             celda =  row.createCell((short) 1)
-            celda.setCellValue(r["CTA_CUENTA"])
-            celda.setCellStyle(styleTable)
+            celda.setCellValue(r.empleado.apellido)
+            curRow++
             celda =  row.createCell((short) 2)
-            celda.setCellValue(r["CTA_DESCRIPCION"])
-            //celda.setCellStyle(styleHeader)
-            celda =  row.createCell((short) 3)
-            celda.setCellValue("PS-"+r["COM_MES_CODIGO"]+"-D-"+r["COM_NUMERO"])
-            //celda.setCellStyle(styleHeader)
-            celda =  row.createCell((short) 4)
-            celda.setCellValue(r["COM_DEBE"])
-            celda.setCellStyle(styleTable)
-            celda =  row.createCell((short) 5)
-            celda.setCellValue(r["COM_HABER"])
-            celda.setCellStyle(styleTable)
+            celda.setCellValue(r.empleado.nombre)
+            def suma = 0
+            def resta = 0
+            num=3
+            signo = null
+            rubros.eachWithIndex{ ru, i ->
+                if (signo!=ru.signo && signo ){
+                    celda =  row.createCell((short)i+num)
+                    celda.setCellValue(suma)
+                    celda.setCellStyle(styleFooter)
+                    num++
+                }
+                signo=ru.signo
 
-            def debe = r["COM_DEBE"]
-            def haber = r["COM_HABER"]
-            td+=debe
-            th+=haber
+                def dr = DetalleRol.findByRolAndRubro(r, ru)
+                if (dr){
+                    celda =  row.createCell((short) i+num)
+                    celda.setCellValue(dr.valor * dr.signo)
+                    celda.setCellStyle(styleTable)
+                    if(dr.signo > 0){
+                        suma = dr.valor + suma
+                    }
+                    else {
+                        resta = dr.valor + resta
+                    }
+                }
+                else{
+                    celda =  row.createCell((short) i+num)
+                    celda.setCellValue(0)
+                }
+            }
+            def recibir = suma - resta
+            //println "+" + suma
+            //println "-" + resta
+            celda =  row.createCell((short) cont)
+            celda.setCellValue(resta)
+            celda.setCellStyle(styleFooter)
+            celda =  row.createCell((short) cont +1)
+            celda.setCellValue(recibir)
+            celda.setCellStyle(styleFooter)
 
-           //println "---!!  "+r
-        //}
-        //}
+
         }
-        //curRow++
-        row = sheet.createRow((short) curRow)
-        celda =  row.createCell((short) 3)
-        celda.setCellValue("TOTALES")
-        celda.setCellStyle(styleNegrilla)
-        celda =  row.createCell((short) 4)
-        celda.setCellValue(td)
-        celda.setCellStyle(styleFooter)
-        celda =  row.createCell((short) 5)
-        celda.setCellValue(th)
-        celda.setCellStyle(styleFooter)
-
-
-
         def output = response.getOutputStream()
-        def header = "attachment; filename=" + "diarioGeneral.xlsx"
+        def header = "attachment; filename=" + "reporteRolEmpleados.xlsx"
         response.setContentType("application/application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
         response.setHeader("Content-Disposition", header)
         wb.write(output)
         output.flush()
-    }
-    def imprimeNumero_ajax(numero){
-        def res ="-"
-        def num = numero.toString().trim()
-        (8-num.length()).times {
-            res+="0"
-        }
-        res+=num
-        res+="-"
-        return res
+
+
     }
 }
