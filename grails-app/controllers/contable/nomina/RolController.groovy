@@ -203,7 +203,7 @@ class RolController extends Shield {
                     }
                     def fijos = RubroFijoEmpleado.withCriteria {
                         eq("empleado",e)
-                        le("inicio",inicio)
+                        le("inicio",fin)
                         or{
                             ge("fin",fin)
                             isNull("fin")
@@ -231,7 +231,7 @@ class RolController extends Shield {
                     rubros = rubros.sort{it.rubro.signo*-1}
                     def finales = []
                     rubros.each {r->
-                        println "rubro! "+r.rubro.nombre
+                        println " rubro! "+r.rubro.nombre
                         if(r.rubro.codigo!="IRNTA"){
                             if(r.rubro.formula=~"@TIngresos") {
                                 finales.add(r)

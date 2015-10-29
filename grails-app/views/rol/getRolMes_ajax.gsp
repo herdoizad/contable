@@ -90,6 +90,7 @@
                 <g:set var="totalI" value="${0}"></g:set>
                 <g:set var="totalE" value="${0}"></g:set>
                 <g:set var="band" value="${true}"></g:set>
+                <g:set var="q1" value="${0}"></g:set>
 
                 <tr>
                     <th colspan="5" style="color: #ffffff">Ingresos</th>
@@ -111,6 +112,9 @@
                             <th colspan="5">Egresos</th>
                         </tr>
                         <g:set var="band" value="${false}"></g:set>
+                    </g:if>
+                    <g:if test="${d.rubro?.codigo=='Q1'}">
+                        <g:set var="q1" value="${d.valor}"></g:set>
                     </g:if>
                     <tr>
                         <g:set var="total" value="${total+(d.signo*d.valor)}"></g:set>
@@ -173,6 +177,16 @@
                     </td>
                     <td style="text-align: right;font-weight: bold"  class="total-${r.id}">
                         <g:formatNumber number="${total}" type="currency" currencySymbol="" />
+                    </td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td colspan="2" style="text-align: right">
+                        <label>A pagar</label>
+                    </td>
+                    <td style="text-align: right;font-weight: bold"  class="total-${r.id}">
+                        <g:formatNumber number="${total-q1}" type="currency" currencySymbol="" />
                     </td>
                     <td></td>
                     <td></td>

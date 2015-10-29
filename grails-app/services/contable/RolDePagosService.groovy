@@ -49,6 +49,12 @@ class RolDePagosService {
             fondosDeReserva.valor=(totalIngresos/12).toDouble().round(2)
             fondosDeReserva.save(flush: true)
         }
+        def aporteIess = DetalleRol.findByRolAndCodigo(rol,"IESS")
+        def porcentaje = Variable.findByCodigo("@AIess")
+        if(aporteIess){
+            aporteIess.valor=(totalIngresos*porcentaje.valor/100).toDouble().round(2)
+            aporteIess.save(flush: true)
+        }
         def dRenta = DetalleRol.findByRolAndCodigo(rol,"IRNTA")
         if(dRenta){
             def variables = Variable.list()
