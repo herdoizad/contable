@@ -3,7 +3,7 @@ package contable.core
 import contable.seguridad.Shield
 
 class ComprobantesController extends Shield {
-        def mailService
+    def mailService
     def diarios(){
         def meses = ["Enero":"01","Febrero":"02","Marzo":"03","Abril":"04","Mayo":"05","Junio":"06","Juilo":"07","Agosto":"08","Septiembre":"09","Octubre":"10","Noviembre":"11","Diciembre":"12"]
         def anio = new Date().format("yyyy")
@@ -859,13 +859,22 @@ class ComprobantesController extends Shield {
                 def ret
                 if(parts[0]!=""){
                     ret = Tabla.findByCodigo(parts[0]).cuenta
-                    if(ret)
-                        cuentas.put(ret, parts[1].toDouble())
+                    if(ret) {
+                        if(!cuentas[ret])
+                            cuentas.put(ret, parts[1].toDouble())
+                        else
+                            cuentas[ret]+=parts[1].toDouble()
+                    }
                 }
                 if(parts[2]!=""){
                     ret = Tabla.findByCodigo(parts[2]).cuenta
-                    if(ret)
-                        cuentas.put(ret,parts[3].toDouble())
+                    if(ret){
+                        if(!cuentas[ret])
+                            cuentas.put(ret,parts[3].toDouble())
+                        else
+                            cuentas[ret]+=parts[3].toDouble()
+                    }
+
                 }
 
             }
