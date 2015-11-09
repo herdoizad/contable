@@ -473,17 +473,20 @@ class ComprobantesController extends Shield {
         }
         switch (comp.tipo){
             case 1:
-                redirect(action:"ingresos",params:[mes:comp.fecha.format("MM"),numero: comp.numero])
+                redirect(action:"nuevoIngreso",params:[mes:comp.fecha.format("MM"),tipo: 1])
                 return
                 break;
             case 2:
-                redirect(action:"egresos",params:[mes:comp.fecha.format("MM"),numero: comp.numero])
+                redirect(action:"nuevoEgreso",params:[mes:comp.fecha.format("MM"),tipo: 2])
                 return
                 break;
             case 3:
-                redirect(action:"diarios",params:[mes:comp.fecha.format("MM"),numero: comp.numero])
+
+                redirect(action:"nuevo",params:[mes:comp.fecha.format("MM"),tipo:3])
                 return
                 break;
+
+
         }
 
     }
@@ -820,7 +823,9 @@ class ComprobantesController extends Shield {
         }
         session.comprobante=comp
 
-        redirect(action: "showEgreso")
+        redirect(action:"nuevoCash",params:[mes:comp.fecha.format("MM"),tipo:3])
+        return
+
     }
 
 
