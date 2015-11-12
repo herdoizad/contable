@@ -1,5 +1,6 @@
 package contable.nomina.reportes
 
+import contable.core.Mes
 import contable.nomina.DetalleRol
 import contable.nomina.Empleado
 import contable.nomina.MesNomina
@@ -25,10 +26,11 @@ class ReporteRolExcelController {
         def iniRow = 0
         def iniCol = 0
         def fecha = new Date()
-        def rol = Rol.get(params.id)
+
+        def mes = MesNomina.get(params.id)
+
         def meses = ["0":"Todos","1":"Enero","2":"Febero","3":"Marzo","4":"Abril","5":"Mayo","6":"Junio","7":"Juilo","8":"Agosto","9":"Septiembre","10":"Octubre","11":"Noviembre","12":"Diciembre"]
-        def ingresos = DetalleRol.findAllByRolAndSigno(rol,1)
-        def egresos = DetalleRol.findAllByRolAndSigno(rol,-1)
+
         def celda
         def img = grailsApplication.mainContext.getResource('/images/favicons/apple-touch-icon-57x57.png').getFile()
         def curRow = iniRow
@@ -103,10 +105,11 @@ class ReporteRolExcelController {
         styleTable.setDataFormat(format.getFormat("0.00"));
 
         XSSFCell cellTitulo = row.createCell((short) iniCol)
-        cellTitulo.setCellValue("Petróleos y servicios" )
+        cellTitulo.setCellValue("Petróleo y servicios" )
         cellTitulo.setCellStyle(styleTitulo)
         XSSFCell cellSubtitulo = row2.createCell((short) iniCol)
-        cellSubtitulo.setCellValue("Rol de Pagos del mes de " + meses[new Date().parse("yyyyMMdd",+rol.mes.codigo+"01").format("M")].toUpperCase())
+        cellSubtitulo.setCellValue("Rol de Pagos del mes de "+mes.descripcion.toUpperCase());
+        println meses
         cellSubtitulo.setCellStyle(styleSubtitulo)
         sheet.addMergedRegion(new CellRangeAddress(
                 iniRow, //first row (0-based)
@@ -168,7 +171,7 @@ class ReporteRolExcelController {
         curRow++
         println "pat4"
         curRow++
-        def mes = MesNomina.get(params.id)
+
         def roles = Rol.findAllByMes(mes)
 
         roles.each{r->
@@ -207,6 +210,11 @@ class ReporteRolExcelController {
                     celda =  row.createCell((short) i+num)
                     celda.setCellValue(0)
                 }
+            }
+            def otros = DetalleRol.findByRolAndCodigo(r,'OTRO')
+            def totalOtros =0
+            otros.each {otro->
+                totalOtros=otro.valor*otro.signo
             }
             def recibir = suma - resta
             //println "+" + suma

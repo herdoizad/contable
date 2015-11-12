@@ -34,13 +34,18 @@
             </a>
         </div>
         <div class="col-md-1">
-            <a href="${g.createLink(action: 'index',controller: 'reporteRolExcel',id: mes.id)}" class="btn btn-default btn-sm " id="reporte" empleado="${emp}" mes="${mes.id}">
-                <i class="fa fa-print"></i> Imprimir
+        <a href="${g.createLink(action: 'index',controller: 'reporteRolExcel',id: mes.id)}" class="btn btn-default btn-sm " id="reporte" empleado="${emp}" mes="${mes.id}">
+            <i class="fa fa-print"></i> Imprimir
+        </a>
+    </div>
+        <div class="col-md-2">
+            <a href="${g.createLink(action: 'index',controller: 'AcreditaBancosExcel',id: mes.id)}" class="btn btn-default btn-sm " id="reporte" empleado="${emp}" mes="${mes.id}">
+                <i class="fa fa-print"></i> Acreditacion Bancos
             </a>
         </div>
 
         <g:if test="${roles[0].estado!='C'}">
-            <div class="col-md-2">
+            <div class="col-md-1">
                 <a href="#" class="btn btn-verde btn-sm" id="generar"><i class="fa fa-copy"></i> Generar rol de pagos</a>
             </div>
         </g:if>
