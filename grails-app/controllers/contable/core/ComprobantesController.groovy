@@ -458,7 +458,10 @@ class ComprobantesController extends Shield {
             }
             if(sendMail){
                 def email = "ana.duque@petroleosyservicios.com"
-                def det = DetalleComprobante.findAll("from DetalleComprobante  where mes=${comp.mes} and numero=${comp.numero} and tipo=${comp.tipo} and empresa='${session.empresa.codigo}'")
+                def det = DetalleComprobante.findAll("from DetalleComprobante  where mes=${comp.mes} " +
+                        "and numero=${comp.numero} " +
+                        "and tipo=${comp.tipo} " +
+                        "and empresa='${session.empresa.codigo}'")
                 mailService.sendMail {
                     multipart true
                     to email

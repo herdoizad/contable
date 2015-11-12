@@ -5,6 +5,7 @@ import groovy.sql.Sql
 
 class ConciliacionController extends Shield {
     def dataSource_pys
+    def dataSource
     def index() {
 
     }
@@ -102,6 +103,128 @@ class ConciliacionController extends Shield {
         }
         cn.close()
         redirect(action: "cargaTablaFacturas_ajax",params: [fecha:params.fechaLista])
+    }
+
+
+
+    def contabilizar(){
+
+    }
+
+    def procesaEstaciones_ajax(){
+        println "params "+params
+        def fecha = new Date().parse("dd-MM-yyyy", params.fecha)
+        def dia = fecha.format("dd")
+        if(dia.length()<2)
+            dia="0"+dia
+        def numeroComp = "0330"+dia
+//        year(date(em_f_inicio.text))*100 + month(date(em_f_inicio.text))
+        def mes = fecha.format("yyyy").toInteger()*100+(fecha.format("MM").toInteger())
+
+        def sql = "SELECT COUNT(MES_CODIGO) num \n" +
+                "\t\tFROM\t COMPROBANTE_MAESTRO\n" +
+                "\t\tWHERE\t MES_CODIGO = ${mes} AND COM_NUMERO = ${numeroComp} " +
+                "AND EMP_CODIGO = 'PS' AND COM_TIPO_CODIGO = 3 AND COM_TIPO_PROCESAMIENTO=1"
+
+        def cn = new Sql(dataSource)
+        def cnpys = new Sql(dataSource_pys)
+        def count = 0
+        cn.eachRow(sql.toString()){r->
+            count=r["num"]
+        }
+        if(count>0){
+            render "Información ya procesada "
+            return
+        }
+        cnpys.execute("EXECUTE up_cuentas_concilia_contable '${fecha.format('MM-dd-yyyy')}'")
+        sql ="SELECT ISNULL(COUNT(CODIGO_CLIENTE),0) as num\n" +
+                "\t\t\tFROM\t CUENTAS_ERROR_TMP\n" +
+                "\t\t\tWHERE\t CTA_CUENTA='99999'"
+        count =0
+        cnpys.eachRow(sql.toString()){r->
+            count=r["num"]
+        }
+        if(count>0){
+            render "Atención!!!,Existen clientes sin Código Contable, por favor actualícelos"
+            return
+        }
+        cnpys.execute("EXECUTE up_cuentas_facturas_vencidas '${fecha.format('MM-dd-yyyy')}' ")
+        count = 0
+        sql ="SELECT COUNT(CODIGO_CLIENTE) as num\n" +
+                "\t\t\tFROM\t CUENTAS_ERROR_TMP"
+        cnpys.eachRow(sql.toString()){r->
+            count=r["num"]
+        }
+        if(count>0){
+            render " Atención!!!,Existen clientes sin Código Contable para Facturas Vencidas, por favor actualícelos"
+            return
+        }
+        cnpys.execute("EXECUTE up_conciliacion_debe_contable '${fecha.format('MM-dd-yyyy')}' ")
+        render "Proceso de Conciliación Terminado con éxito"
+        return
+    }
+    def procesaIndustrias_ajax(){
+        println "params "+params
+        def fecha = new Date().parse("dd-MM-yyyy", params.fecha)
+        def dia = fecha.format("dd")
+        if(dia.length()<2)
+            dia="0"+dia
+        def numeroComp = "0370"+dia
+//        year(date(em_f_inicio.text))*100 + month(date(em_f_inicio.text))
+        def mes = fecha.format("yyyy").toInteger()*100+(fecha.format("MM").toInteger())
+
+        def sql = "SELECT COUNT(MES_CODIGO) num \n" +
+                "\t\tFROM\t COMPROBANTE_MAESTRO\n" +
+                "\t\tWHERE\t MES_CODIGO = ${mes} AND COM_NUMERO = ${numeroComp} " +
+                "AND EMP_CODIGO = 'PS' AND COM_TIPO_CODIGO = 3 AND COM_TIPO_PROCESAMIENTO=1"
+
+        def cn = new Sql(dataSource)
+        def cnpys = new Sql(dataSource_pys)
+        def count = 0
+        cn.eachRow(sql.toString()){r->
+            count=r["num"]
+        }
+        if(count>0){
+            render "Información ya procesada "
+            return
+        }
+        cnpys.execute("EXECUTE up_clientes_timsa_concilia '${fecha.format('MM-dd-yyyy')}'")
+        sql ="SELECT ISNULL(COUNT(CODIGO_CLIENTE),0) as num\n" +
+                "\t\t\tFROM\t CUENTAS_ERROR_TMP\n" +
+                "\t\t\tWHERE\t CTA_CUENTA='99999'"
+        count =0
+        cnpys.eachRow(sql.toString()){r->
+            count=r["num"]
+        }
+        if(count>0){
+            render "Atención!!!,Existen clientes sin Código Contable, por favor actualícelos"
+            return
+        }
+
+        cnpys.execute("EXECUTE up_debe_contable_timsa '${fecha.format('MM-dd-yyyy')}' ")
+        render "Proceso de Conciliación Terminado con éxito"
+        return
+    }
+
+    def borrarDiario_ajax(){
+        def fecha = new Date().parse("dd-MM-yyyy", params.fecha)
+        def dia = fecha.format("dd")
+
+        if(dia.length()<2)
+            dia="0"+dia
+        def numeroComp=""
+        if(params.tipo=="1"){
+            numeroComp = "0330"+dia
+        }else{
+            numeroComp = "0370"+dia
+        }
+
+        def mes = fecha.format("yyyy").toInteger()*100+(fecha.format("MM").toInteger())
+        def cn = new Sql(dataSource)
+        def sql ="delete from COMPROBANTE_DETALLE where MES_CODIGO = ${mes} AND COM_NUMERO = ${numeroComp} \" +\n" +
+                "                \"AND EMP_CODIGO = 'PS' AND COM_TIPO_CODIGO = 3 AND COM_TIPO_PROCESAMIENTO=1"
+        sql ="delete from COMPROBANTE_MAESTRO where MES_CODIGO = ${mes} AND COM_NUMERO = ${numeroComp} \" +\n" +
+                "                \"AND EMP_CODIGO = 'PS' AND COM_TIPO_CODIGO = 3 AND COM_TIPO_PROCESAMIENTO=1"
     }
 
 
