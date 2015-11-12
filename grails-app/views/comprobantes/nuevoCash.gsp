@@ -180,7 +180,7 @@
             <input type="text" name="cheque.numero" class="form-control input-sm" id="cheque_cheque" value="${cheque?.numero}" readonly>
         </div>
         <div class="col-md-2">
-            <elm:datepicker name="chequefecha" class="form-control input-sm" minDate="${inicio}" maxDate="${fin}" value="${cheque?.entrega?:inicio}"></elm:datepicker>
+            <elm:datepicker name="chequefecha" class="form-control input-sm" minDate="${inicio}" maxDate="${fin}" value="${cheque?.entrega?:fecha}"></elm:datepicker>
         </div>
         <div class="col-md-1">
             <label>Valor:</label>

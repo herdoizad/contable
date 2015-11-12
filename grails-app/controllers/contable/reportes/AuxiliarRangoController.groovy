@@ -93,7 +93,7 @@ class AuxiliarRangoController extends Shield  {
 
     def auxiliarCuenta_ajax(cn,document,cuenta,inicio,fin,titulo,contenido){
         def sql = "CONTABLE..up_rpt_auxiliar_por_cta  'PS' , ${inicio.format('yyyy').toInteger()}00 ,'${inicio.format('MM/dd/yyyy')}' , '${fin.format('MM/dd/yyyy')}','${cuenta.trim()}', 'S'"
-//       println "sql "+sql
+//        println "sql "+sql
         cn.call(sql.toString())
         sql = "select * from CONTABLE..COMPROBANTES_TMP   order by CON_FECHA, COM_NUMERO"
         // println "sql "+sql
@@ -105,89 +105,95 @@ class AuxiliarRangoController extends Shield  {
         def cell
         def debe = 0
         def haber = 0
-        cn.eachRow(sql.toString()){r->
-            if(cont==0){
-                cell = new PdfPCell(new Paragraph(r["CTA_CUENTA"], titulo));
+        cn.eachRow(sql.toString()) { r ->
+            if (r["CON_FECHA"] >= inicio && r["CON_FECHA"] <= fin) {
+                if (r["CON_FECHA"] >= inicio && r["CON_FECHA"] <= fin) {
+
+                }
+                if (cont == 0) {
+                    cell = new PdfPCell(new Paragraph(r["CTA_CUENTA"], titulo));
+                    cell.setBorder(0)
+                    cell.setColspan(2)
+                    cell.setHorizontalAlignment(Element.ALIGN_LEFT)
+                    table.addCell(cell);
+                    cell = new PdfPCell(new Paragraph(r["CTA_DESCRIPCION"], titulo));
+                    cell.setBorder(0)
+                    cell.setColspan(1)
+                    cell.setHorizontalAlignment(Element.ALIGN_LEFT)
+                    table.addCell(cell);
+                    cell = new PdfPCell(new Paragraph("SALDO ANTERIOR", titulo));
+                    cell.setBorder(0)
+                    cell.setColspan(2)
+                    cell.setHorizontalAlignment(Element.ALIGN_RIGHT)
+                    table.addCell(cell);
+                    cell = new PdfPCell(new Paragraph(formatNumber(number: r["SALDO_INICIAL"], maxFractionDigits: 2, format: "###,##0", minFractionDigits: 2), titulo));
+                    cell.setBorder(0)
+                    cell.setColspan(1)
+                    cell.setHorizontalAlignment(Element.ALIGN_RIGHT)
+                    table.addCell(cell);
+
+                    cell = new PdfPCell(new Paragraph("\n", titulo));
+                    cell.setBorder(0)
+                    cell.setColspan(6)
+                    cell.setHorizontalAlignment(Element.ALIGN_RIGHT)
+                    table.addCell(cell);
+
+                    cell = new PdfPCell(new Paragraph("Fecha", titulo));
+                    cell.setBorder(0)
+                    cell.setHorizontalAlignment(Element.ALIGN_CENTER)
+                    table.addCell(cell);
+                    cell = new PdfPCell(new Paragraph("Código", titulo));
+                    cell.setBorder(0)
+                    cell.setHorizontalAlignment(Element.ALIGN_CENTER)
+                    table.addCell(cell);
+                    cell = new PdfPCell(new Paragraph("Descripción", titulo));
+                    cell.setBorder(0)
+                    cell.setHorizontalAlignment(Element.ALIGN_CENTER)
+                    table.addCell(cell);
+                    cell = new PdfPCell(new Paragraph("Debe", titulo));
+                    cell.setBorder(0)
+                    cell.setHorizontalAlignment(Element.ALIGN_CENTER)
+                    table.addCell(cell);
+                    cell = new PdfPCell(new Paragraph("Haber", titulo));
+                    cell.setBorder(0)
+                    cell.setHorizontalAlignment(Element.ALIGN_CENTER)
+                    table.addCell(cell);
+                    cell = new PdfPCell(new Paragraph("Saldo", titulo));
+                    cell.setBorder(0)
+                    cell.setHorizontalAlignment(Element.ALIGN_CENTER)
+                    table.addCell(cell);
+                }
+
+                debe += r["COM_DEBE"]
+                haber += r["COM_HABER"]
+                cell = new PdfPCell(new Paragraph(r["CON_FECHA"].format("dd-MM-yyyy"), contenido));
                 cell.setBorder(0)
-                cell.setColspan(2)
+                cell.setHorizontalAlignment(Element.ALIGN_CENTER)
+                table.addCell(cell);
+                cell = new PdfPCell(new Paragraph("PS-" + r["COM_MES_CODIGO"] + getTipo_ajax(r["COM_TIPO_CODIGO"]) + "-" + r["COM_NUMERO"], contenido));
+                cell.setBorder(0)
+                cell.setHorizontalAlignment(Element.ALIGN_CENTER)
+                table.addCell(cell);
+                cell = new PdfPCell(new Paragraph(r["COM_CONCEPTO"], contenido));
+                cell.setBorder(0)
                 cell.setHorizontalAlignment(Element.ALIGN_LEFT)
                 table.addCell(cell);
-                cell = new PdfPCell(new Paragraph(r["CTA_DESCRIPCION"], titulo));
+                cell = new PdfPCell(new Paragraph(formatNumber(number: r["COM_DEBE"], maxFractionDigits: 2, format: "###,##0", minFractionDigits: 2), contenido));
                 cell.setBorder(0)
-                cell.setColspan(1)
-                cell.setHorizontalAlignment(Element.ALIGN_LEFT)
-                table.addCell(cell);
-                cell = new PdfPCell(new Paragraph("SALDO ANTERIOR", titulo));
-                cell.setBorder(0)
-                cell.setColspan(2)
                 cell.setHorizontalAlignment(Element.ALIGN_RIGHT)
                 table.addCell(cell);
-                cell = new PdfPCell(new Paragraph(formatNumber(number:  r["SALDO_INICIAL"],maxFractionDigits: 2,format: "###,##0",minFractionDigits: 2 ), titulo));
+                cell = new PdfPCell(new Paragraph(formatNumber(number: r["COM_HABER"], maxFractionDigits: 2, format: "###,##0", minFractionDigits: 2), contenido));
                 cell.setBorder(0)
-                cell.setColspan(1)
                 cell.setHorizontalAlignment(Element.ALIGN_RIGHT)
                 table.addCell(cell);
+                cell = new PdfPCell(new Paragraph(formatNumber(number: r["COM_SALDO"], maxFractionDigits: 2, format: "###,##0", minFractionDigits: 2), contenido));
+                cell.setBorder(0)
+                cell.setHorizontalAlignment(Element.ALIGN_RIGHT)
+                table.addCell(cell);
+                cont++
 
-                cell = new PdfPCell(new Paragraph("\n", titulo));
-                cell.setBorder(0)
-                cell.setColspan(6)
-                cell.setHorizontalAlignment(Element.ALIGN_RIGHT)
-                table.addCell(cell);
 
-                cell = new PdfPCell(new Paragraph("Fecha", titulo));
-                cell.setBorder(0)
-                cell.setHorizontalAlignment(Element.ALIGN_CENTER)
-                table.addCell(cell);
-                cell = new PdfPCell(new Paragraph("Código", titulo));
-                cell.setBorder(0)
-                cell.setHorizontalAlignment(Element.ALIGN_CENTER)
-                table.addCell(cell);
-                cell = new PdfPCell(new Paragraph("Descripción", titulo));
-                cell.setBorder(0)
-                cell.setHorizontalAlignment(Element.ALIGN_CENTER)
-                table.addCell(cell);
-                cell = new PdfPCell(new Paragraph("Debe", titulo));
-                cell.setBorder(0)
-                cell.setHorizontalAlignment(Element.ALIGN_CENTER)
-                table.addCell(cell);
-                cell = new PdfPCell(new Paragraph("Haber", titulo));
-                cell.setBorder(0)
-                cell.setHorizontalAlignment(Element.ALIGN_CENTER)
-                table.addCell(cell);
-                cell = new PdfPCell(new Paragraph("Saldo", titulo));
-                cell.setBorder(0)
-                cell.setHorizontalAlignment(Element.ALIGN_CENTER)
-                table.addCell(cell);
             }
-
-            debe+=  r["COM_DEBE"]
-            haber+= r["COM_HABER"]
-            cell = new PdfPCell(new Paragraph(r["CON_FECHA"].format("dd-MM-yyyy"), contenido));
-            cell.setBorder(0)
-            cell.setHorizontalAlignment(Element.ALIGN_CENTER)
-            table.addCell(cell);
-            cell = new PdfPCell(new Paragraph("PS-"+r["COM_MES_CODIGO"]+getTipo_ajax(r["COM_TIPO_CODIGO"])+"-"+r["COM_NUMERO"], contenido));
-            cell.setBorder(0)
-            cell.setHorizontalAlignment(Element.ALIGN_CENTER)
-            table.addCell(cell);
-            cell = new PdfPCell(new Paragraph(r["COM_CONCEPTO"], contenido));
-            cell.setBorder(0)
-            cell.setHorizontalAlignment(Element.ALIGN_LEFT)
-            table.addCell(cell);
-            cell = new PdfPCell(new Paragraph(formatNumber(number:  r["COM_DEBE"],maxFractionDigits: 2,format: "###,##0",minFractionDigits: 2 ), contenido));
-            cell.setBorder(0)
-            cell.setHorizontalAlignment(Element.ALIGN_RIGHT)
-            table.addCell(cell);
-            cell = new PdfPCell(new Paragraph(formatNumber(number:  r["COM_HABER"],maxFractionDigits: 2,format: "###,##0",minFractionDigits: 2 ), contenido));
-            cell.setBorder(0)
-            cell.setHorizontalAlignment(Element.ALIGN_RIGHT)
-            table.addCell(cell);
-            cell = new PdfPCell(new Paragraph(formatNumber(number:  r["COM_SALDO"],maxFractionDigits: 2,format: "###,##0",minFractionDigits: 2 ), contenido));
-            cell.setBorder(0)
-            cell.setHorizontalAlignment(Element.ALIGN_RIGHT)
-            table.addCell(cell);
-
-            cont++
         }
         if(cont>0) {
             cell = new PdfPCell(new Paragraph("Suman: ", titulo));

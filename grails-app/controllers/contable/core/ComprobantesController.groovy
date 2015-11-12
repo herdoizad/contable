@@ -3,7 +3,7 @@ package contable.core
 import contable.seguridad.Shield
 
 class ComprobantesController extends Shield {
-        def mailService
+    def mailService
     def diarios(){
         def meses = ["Enero":"01","Febrero":"02","Marzo":"03","Abril":"04","Mayo":"05","Junio":"06","Juilo":"07","Agosto":"08","Septiembre":"09","Octubre":"10","Noviembre":"11","Diciembre":"12"]
         def anio = new Date().format("yyyy")
@@ -473,17 +473,20 @@ class ComprobantesController extends Shield {
         }
         switch (comp.tipo){
             case 1:
-                redirect(action:"ingresos",params:[mes:comp.fecha.format("MM"),numero: comp.numero])
+                redirect(action:"nuevoIngreso",params:[mes:comp.fecha.format("MM"),tipo: 1])
                 return
                 break;
             case 2:
-                redirect(action:"egresos",params:[mes:comp.fecha.format("MM"),numero: comp.numero])
+                redirect(action:"nuevoEgreso",params:[mes:comp.fecha.format("MM"),tipo: 2])
                 return
                 break;
             case 3:
-                redirect(action:"diarios",params:[mes:comp.fecha.format("MM"),numero: comp.numero])
+
+                redirect(action:"nuevo",params:[mes:comp.fecha.format("MM"),tipo:3])
                 return
                 break;
+
+
         }
 
     }
@@ -820,7 +823,9 @@ class ComprobantesController extends Shield {
         }
         session.comprobante=comp
 
-        redirect(action: "showEgreso")
+        redirect(action:"nuevoCash",params:[mes:comp.fecha.format("MM"),tipo:3])
+        return
+
     }
 
 
@@ -859,13 +864,22 @@ class ComprobantesController extends Shield {
                 def ret
                 if(parts[0]!=""){
                     ret = Tabla.findByCodigo(parts[0]).cuenta
-                    if(ret)
-                        cuentas.put(ret, parts[1].toDouble())
+                    if(ret) {
+                        if(!cuentas[ret])
+                            cuentas.put(ret, parts[1].toDouble())
+                        else
+                            cuentas[ret]+=parts[1].toDouble()
+                    }
                 }
                 if(parts[2]!=""){
                     ret = Tabla.findByCodigo(parts[2]).cuenta
-                    if(ret)
-                        cuentas.put(ret,parts[3].toDouble())
+                    if(ret){
+                        if(!cuentas[ret])
+                            cuentas.put(ret,parts[3].toDouble())
+                        else
+                            cuentas[ret]+=parts[3].toDouble()
+                    }
+
                 }
 
             }
