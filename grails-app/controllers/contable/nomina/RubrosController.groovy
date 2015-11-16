@@ -345,4 +345,53 @@ class RubrosController extends Shield {
     }
 
 
+    def rubroVariable(){
+        def empleados = Empleado.findAllByEstado("A",[sort:"apellido"])
+        def meses = MesNomina.findAllByCodigoGreaterThanEquals(new Date().format("yyyyMM").toInteger(),[sort: "codigo"])
+        def tipos = ["-1":"Descuento","1":"Ingreso"]
+        [empleados:empleados,meses: meses,tipos:tipos]
+    }
+
+    def guardarRubroVariable_ajax(){
+        flash.message="Rubro registrado"
+        def signo = params.tipo.toDouble()
+        def mes = MesNomina.get(params.mes)
+        def rubro = params.rubro
+        if(params.data && params.data!=""){
+            def data = params.data.split("W")
+            data.each {d->
+                if(d!=""){
+                    def parts = d.split(";")
+                    println "parts "+parts
+                    def empleado = Empleado.get(parts[0])
+                    def valor = parts[1].toDouble()
+                    def rol = Rol.findByEmpleadoAndMes(empleado,mes)
+                    if(!rol){
+                        rol=new Rol()
+                        rol.mes=mes
+                        rol.empleado=empleado
+                        rol.usuario=session.usuario
+                        rol.save(flush: true)
+                    }
+                    def det = DetalleRol.findByRolAndDescripcion(rol,rubro)
+                    if(!det){
+                        det = new DetalleRol()
+                    }
+                    det.rol=rol
+                    det.descripcion=rubro
+                    det.codigo="VRAB"
+                    det.valor=valor
+                    det.signo=signo
+                    det.usuario=session.usuario
+                    if(!det.save(flush: true)){
+                        println "error save det "+det.errors
+                    }
+                }
+
+            }
+        }
+        redirect(action: 'rubroVariable')
+    }
+
+
 }

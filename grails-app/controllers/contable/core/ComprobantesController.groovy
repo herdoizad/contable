@@ -826,7 +826,7 @@ class ComprobantesController extends Shield {
         }
         session.comprobante=comp
 
-        redirect(action:"nuevoCash",params:[mes:comp.fecha.format("MM"),tipo:3])
+        redirect(action: "showEgreso")
         return
 
     }

@@ -16,7 +16,7 @@ class DetalleComprobante implements Serializable{
 
     String usuario
     String ipMod
-
+    String origen="W"
 
     static auditable = [ignore: []]
 
@@ -44,6 +44,7 @@ class DetalleComprobante implements Serializable{
             creacion column: 'COM_FECHA_CREA'
             usuario column: 'USUARIO'
             ipMod column: 'IPCREA'
+            origen column: 'ORIGEN'
         }
     }
     static constraints = {
@@ -51,5 +52,6 @@ class DetalleComprobante implements Serializable{
         concilia(nullable: true,blank:true)
         usuario(size: 1..32,nullable: true,blank: true)
         ipMod(nullable: true,blank: true,size: 1..24)
+        origen(nullable: true,blank: true,size: 1..1)
     }
 }

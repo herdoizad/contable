@@ -101,7 +101,7 @@
                     <th colspan="5" style="color: #ffffff">Ingresos</th>
                 </tr>
 
-                <g:each in="${contable.nomina.DetalleRol.findAllByRol(r,[sort:'signo',order:'desc'])}" var="d">
+                <g:each in="${contable.nomina.DetalleRol.findAll('from DetalleRol where rol='+r.id+' order by signo desc,id  ')}" var="d">
                     <g:if test="${d.signo==-1 && band}">
                         <tr>
                             <td colspan="2" style="text-align: right">
@@ -319,6 +319,7 @@
                 } //success
             }); //ajax
         })
+        return false
     })
 
     $("#aprobar").click(function(){

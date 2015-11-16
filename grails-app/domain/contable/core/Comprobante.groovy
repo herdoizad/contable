@@ -24,6 +24,7 @@ class Comprobante  implements Serializable{
 
     String usuario
     String ipMod
+    String origen="W"
     static auditable = [ignore: []]
 
     /**
@@ -57,6 +58,7 @@ class Comprobante  implements Serializable{
             bancoCliente column: 'BANCO_CLIENTE'
             tipoCuenta column: 'TIPO_CUENTA_CLIENTE'
             ipMod column: 'IPCREA'
+            origen column: 'ORIGEN'
         }
     }
     static constraints = {
@@ -73,6 +75,7 @@ class Comprobante  implements Serializable{
         bancoCliente(nullable: true)
         tipoCuenta(nullable: true,blank:true,size: 1..5)
         ipMod(nullable: true,blank: true,size: 1..24)
+        origen(nullable: true,blank: true,size: 1..1)
     }
 
     def getTipoString(){

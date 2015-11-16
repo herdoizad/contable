@@ -173,10 +173,11 @@ class RolController extends Shield {
                     try{
                         def det = DetalleRol.findAllByRol(rol)
                         det.each {
-                            it.delete(flush: true)
+                            if(it.rubro!=null)
+                                it.delete(flush: true)
                         }
-                        rol.delete(flush: true)
-                        rol=null
+//                        rol.delete(flush: true)
+
                     }catch (er){
                         println "error delete rol "+er.printStackTrace()
                     }
@@ -184,167 +185,170 @@ class RolController extends Shield {
 
             }else{
                 rol = new Rol()
-                rol.empleado=e
-                rol.mes=mes
-                rol.estado="N"
-                rol.usuario=session.usuario.login
-                def totalIngresos = 0
-                def totalEgresos = 0
-                if(!rol.save(flush: true))
-                    println "error save rol "+rol.errors
-                else{
-                    def rubros = RubroEmpleado.withCriteria {
-                        eq("empleado",e)
-                        le("inicio",fin)
-                        or{
-                            ge("fin",fin)
-                            isNull("fin")
-                        }
+            }
+            rol.empleado=e
+            rol.mes=mes
+            rol.estado="N"
+            rol.usuario=session.usuario.login
+            def totalIngresos = 0
+            def totalEgresos = 0
+            if(!rol.save(flush: true))
+                println "error save rol "+rol.errors
+            else{
+                def rubros = RubroEmpleado.withCriteria {
+                    eq("empleado",e)
+                    le("inicio",fin)
+                    or{
+                        ge("fin",fin)
+                        isNull("fin")
                     }
-                    def fijos = RubroFijoEmpleado.withCriteria {
-                        eq("empleado",e)
-                        le("inicio",fin)
-                        or{
-                            ge("fin",fin)
-                            isNull("fin")
-                        }
+                }
+                def fijos = RubroFijoEmpleado.withCriteria {
+                    eq("empleado",e)
+                    le("inicio",fin)
+                    or{
+                        ge("fin",fin)
+                        isNull("fin")
                     }
-                    fijos.each {r->
-                        if(r.mes==0 || r.mes==mesNum){
-                            def dt = new DetalleRol()
-                            dt.rol=rol
-                            dt.usuario=session.usuario.login
-                            dt.descripcion=r.descripcion
-                            dt.rubro=null
-                            dt.codigo="OTRO"
-                            dt.valor=r.valor
-                            dt.valor=dt.valor.round(2)
-                            dt.signo=r.signo
-                            if(dt.signo>0)
-                                totalIngresos+=dt.valor
-                            else
-                                totalEgresos+=dt.valor
-                            if(!dt.save(flush: true))
-                                println "error save dt "+dt.errors
-                        }
+                }
+                fijos.each {r->
+                    if(r.mes==0 || r.mes==mesNum){
+                        def dt = DetalleRol.findByDescripcionAndRol(r.descripcion,rol)
+                        if(!dt)
+                            dt = new DetalleRol()
+                        dt.rol=rol
+                        dt.usuario=session.usuario.login
+                        dt.descripcion=r.descripcion
+                        dt.rubro=null
+                        dt.codigo="OTRO"
+                        dt.valor=r.valor
+                        dt.valor=dt.valor.round(2)
+                        dt.signo=r.signo
+                        if(dt.signo>0)
+                            totalIngresos+=dt.valor
+                        else
+                            totalEgresos+=dt.valor
+                        if(!dt.save(flush: true))
+                            println "error save dt "+dt.errors
                     }
-                    rubros = rubros.sort{it.rubro.signo*-1}
-                    def finales = []
-                    rubros.each {r->
-                        println " rubro! "+r.rubro.nombre
-                        if(r.rubro.codigo!="IRNTA"){
-                            if(r.rubro.formula=~"@TIngresos") {
-                                finales.add(r)
-                            }else{
-                                if(r.mes==0 || r.mes==mesNum){
-                                    def dt = new DetalleRol()
-                                    dt.rol=rol
-                                    dt.usuario=session.usuario.login
-                                    dt.descripcion=r.rubro.nombre
-                                    dt.rubro=r.rubro
-                                    dt.codigo=r.rubro.codigo
-                                    if(r.rubro.valor>0)
-                                        dt.valor=r.rubro.valor
-                                    else
-                                        dt.valor = procesaFormula_ajax(r.rubro.formula,e,mes,inicio,fin,variables,resultados)
-                                    dt.valor=dt.valor.round(2)
-                                    dt.signo=r.rubro.signo
-                                    if(dt.signo>0)
-                                        totalIngresos+=dt.valor
-                                    else
-                                        totalEgresos+=dt.valor
-                                    if(!dt.save(flush: true))
-                                        println "error save dt "+dt.errors
-                                }
-                            }
-
+                }
+                rubros = rubros.sort{it.rubro.signo*-1}
+                def finales = []
+                rubros.each {r->
+                    println " rubro! "+r.rubro.nombre
+                    if(r.rubro.codigo!="IRNTA"){
+                        if(r.rubro.formula=~"@TIngresos") {
+                            finales.add(r)
                         }else{
-                            /*Impuesto a la renta*/
-                            println "impuesto a la renta"
-                            def v = procesaFormula_ajax(r.rubro.formula,e,mes,inicio,fin,variables,resultados)
-                            println "v "+v
-                            def renta = ImpuestoRenta.findAll("from ImpuestoRenta where anio=${fin.format('yyyy')} and desde<= ${v} and hasta>=${v} order by desde")
-                            if(renta.size()==0)
-                                renta = ImpuestoRenta.findAll("from ImpuestoRenta where anio=${fin.format('yyyy').toInteger()-1} and desde<= ${v} and hasta>=${v} order by desde")
-                            println "renta ${e.cedula} "+renta
-                            if(renta.size()>0){
-                                renta=renta.pop()
-                                def pagar = renta.base+((v-renta.desde)*renta.impuesto/100)
-                                println "renta a pagar "+pagar
+                            if(r.mes==0 || r.mes==mesNum){
                                 def dt = new DetalleRol()
                                 dt.rol=rol
                                 dt.usuario=session.usuario.login
                                 dt.descripcion=r.rubro.nombre
                                 dt.rubro=r.rubro
                                 dt.codigo=r.rubro.codigo
-                                dt.valor=pagar/12
+                                if(r.rubro.valor>0)
+                                    dt.valor=r.rubro.valor
+                                else
+                                    dt.valor = procesaFormula_ajax(r.rubro.formula,e,mes,inicio,fin,variables,resultados)
                                 dt.valor=dt.valor.round(2)
-                                dt.signo=-1
-                                totalEgresos+=dt.valor
+                                dt.signo=r.rubro.signo
+                                if(dt.signo>0)
+                                    totalIngresos+=dt.valor
+                                else
+                                    totalEgresos+=dt.valor
                                 if(!dt.save(flush: true))
                                     println "error save dt "+dt.errors
                             }
-                            /*Fin impuesto a la renta*/
-
                         }
 
-                    }
-                    finales.each {r->
-                        println "final "+r.rubro.codigo
-                        if(r.mes==0 || r.mes==mesNum){
+                    }else{
+                        /*Impuesto a la renta*/
+                        println "------------------------impuesto a la renta----------------------"
+                        def v = procesaFormula_ajax(r.rubro.formula,e,mes,inicio,fin,variables,resultados)
+                        println "v "+v
+                        def renta = ImpuestoRenta.findAll("from ImpuestoRenta where anio=${fin.format('yyyy')} and desde<= ${v} and hasta>=${v} order by desde")
+                        if(renta.size()==0)
+                            renta = ImpuestoRenta.findAll("from ImpuestoRenta where anio=${fin.format('yyyy').toInteger()-1} and desde<= ${v} and hasta>=${v} order by desde")
+                        println "renta ${e.cedula} "+renta
+                        if(renta.size()>0){
+                            renta=renta.pop()
+                            def pagar = renta.base+((v-renta.desde)*renta.impuesto/100)
+                            println "renta a pagar "+pagar
                             def dt = new DetalleRol()
                             dt.rol=rol
                             dt.usuario=session.usuario.login
                             dt.descripcion=r.rubro.nombre
                             dt.rubro=r.rubro
                             dt.codigo=r.rubro.codigo
-                            if(r.rubro.valor>0)
-                                dt.valor=r.rubro.valor
-                            else
-                                dt.valor = procesaFormula_ajax(r.rubro.formula,e,mes,inicio,fin,variables,resultados)
+                            dt.valor=pagar/12
                             dt.valor=dt.valor.round(2)
-                            dt.signo=r.rubro.signo
-                            if(dt.signo>0)
-                                totalIngresos+=dt.valor
-                            else
-                                totalEgresos+=dt.valor
+                            dt.signo=-1
+                            totalEgresos+=dt.valor
                             if(!dt.save(flush: true))
                                 println "error save dt "+dt.errors
                         }
-                    }
+                        /*Fin impuesto a la renta*/
 
-                    def prestamo = Prestamo.withCriteria {
-                        eq("empleado",e)
-                        ge("inicio",inicio)
-                        le("inicio",fin)
-                        ge("fin",fin)
                     }
-                    println "prestamo "+prestamo
-
-                    prestamo.each {pre->
-                        def detalle = DetallePrestamo.findByMesAndPrestamo(mes,pre)
-                        if(detalle){
-                            println "hay detalle prestamo! "+detalle
-                            def dr = new DetalleRol()
-                            dr.descripcion="Prestamo (${detalle.saldo.toDouble().round(2)}/${detalle.prestamo.monto})"
-                            dr.codigo="PRST"
-                            dr.detallePrestamo=detalle
-                            dr.rol=rol
-                            dr.signo=-1
-                            dr.usuario=session.usuario.login
-                            dr.valor=detalle.cuota.toDouble().round(2)
-                            totalEgresos+=dr.valor
-                            if(!dr.save(flush: true))
-                                println "error save detalle rol "+dr.errors
-                        }
-                    }
-
-                    rol.totalEgresos=totalEgresos
-                    rol.totalIngresos=totalIngresos
-                    rol.save(flush: true)
 
                 }
+                finales.each {r->
+                    println "final "+r.rubro.codigo
+                    if(r.mes==0 || r.mes==mesNum){
+                        def dt = new DetalleRol()
+                        dt.rol=rol
+                        dt.usuario=session.usuario.login
+                        dt.descripcion=r.rubro.nombre
+                        dt.rubro=r.rubro
+                        dt.codigo=r.rubro.codigo
+                        if(r.rubro.valor>0)
+                            dt.valor=r.rubro.valor
+                        else
+                            dt.valor = procesaFormula_ajax(r.rubro.formula,e,mes,inicio,fin,variables,resultados)
+                        dt.valor=dt.valor.round(2)
+                        dt.signo=r.rubro.signo
+                        if(dt.signo>0)
+                            totalIngresos+=dt.valor
+                        else
+                            totalEgresos+=dt.valor
+                        if(!dt.save(flush: true))
+                            println "error save dt "+dt.errors
+                    }
+                }
+
+                def prestamo = Prestamo.withCriteria {
+                    eq("empleado",e)
+                    ge("inicio",inicio)
+                    le("inicio",fin)
+                    ge("fin",fin)
+                }
+                println "prestamo "+prestamo
+
+                prestamo.each {pre->
+                    def detalle = DetallePrestamo.findByMesAndPrestamo(mes,pre)
+                    if(detalle){
+                        println "hay detalle prestamo! "+detalle
+                        def dr = new DetalleRol()
+                        dr.descripcion="Prestamo (${detalle.saldo.toDouble().round(2)}/${detalle.prestamo.monto})"
+                        dr.codigo="PRST"
+                        dr.detallePrestamo=detalle
+                        dr.rol=rol
+                        dr.signo=-1
+                        dr.usuario=session.usuario.login
+                        dr.valor=detalle.cuota.toDouble().round(2)
+                        totalEgresos+=dr.valor
+                        if(!dr.save(flush: true))
+                            println "error save detalle rol "+dr.errors
+                    }
+                }
+
+                rol.totalEgresos=totalEgresos
+                rol.totalIngresos=totalIngresos
+                rol.save(flush: true)
+
             }
+
         }
 
         redirect(action: 'getRolMes_ajax',params: ["id":params.mes,"empleado":params.empleado])
@@ -352,14 +356,15 @@ class RolController extends Shield {
 
 
     def updateRubro_ajax(){
-        println "params "+params
+//        println "params "+params
         def dt = DetalleRol.get(params.id)
         dt.descripcion=params.desc
         dt.valor=params.valor.toDouble().round(2)
         dt.modificacion=new Date()
         if(!dt.save(flush: true))
             println "error "+dt.errors
-        rolDePagosService.calculaRol(dt.rol)
+        if(dt.rubro?.codigo!="IRNTA")
+            rolDePagosService.calculaRol(dt.rol)
         dt.rol.calculaTotal()
         redirect(action: "getRolMes_ajax",params: [id:dt.rol.mes.id,empleado: dt.rol.empleado.id])
     }

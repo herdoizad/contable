@@ -24,8 +24,8 @@ class RolDePagosService {
         def q1 = DetalleRol.findByRolAndCodigo(rol,"Q1")
         def q2 = DetalleRol.findByRolAndCodigo(rol,"Q2")
 
-        if(q2){
-            q2.valor=(sueldo-q1.valor).toDouble().round(2)
+        if(q2 && q1){
+            q2.valor=(sueldo-q1?.valor).toDouble().round(2)
             q2.save(flush: true)
         }
         detalles.each {d->
@@ -38,7 +38,7 @@ class RolDePagosService {
             }
         }
 
-        println "total ingresos "+totalIngresos
+//        println "total ingresos "+totalIngresos
         def d13 = DetalleRol.findByRolAndCodigo(rol,"S13")
         if(d13){
             d13.valor=(totalIngresos/12).toDouble().round(2)
