@@ -56,27 +56,36 @@ class RolDePagosService {
             aporteIess.save(flush: true)
         }
         def dRenta = DetalleRol.findByRolAndCodigo(rol,"IRNTA")
-        if(dRenta){
-            def variables = Variable.list()
-            def inicio = new Date().parse("yyyyMMdd",""+dRenta.rol.mes.codigo+"01")
-            Calendar cal = Calendar.getInstance();
-            cal.set(Calendar.MONTH, inicio.format("MM").toInteger()-1);
-            cal.set(Calendar.YEAR, inicio.format("yyyy").toInteger());
-            cal.set(Calendar.DAY_OF_MONTH, 1);// This is necessary to get proper results
-            cal.set(Calendar.DATE, cal.getActualMaximum(Calendar.DATE));
-            def fin  = cal.getTime();
-            def v = procesaFormula_ajax(dRenta.rubro.formula,dRenta.rol.empleado,dRenta.rol.mes,inicio,fin,variables,[:])
-            def renta = ImpuestoRenta.findAll("from ImpuestoRenta where anio=${fin.format('yyyy')} and desde<= ${v} and hasta>=${v} order by desde")
-            if(renta.size()==0)
-                renta = ImpuestoRenta.findAll("from ImpuestoRenta where anio=${fin.format('yyyy').toInteger()-1} and desde<= ${v} and hasta>=${v} order by desde")
-            if(renta.size()>0) {
-                renta = renta.pop()
-                def pagar = renta.base + ((v - renta.desde) * renta.impuesto / 100)
-                println "renta a pagar " + pagar
-                dRenta.valor=(pagar/12).toDouble().round(2)
-                dRenta.save(flush: true)
+        try{
+            if(dRenta){
+                def variables = Variable.list()
+                def inicio = new Date().parse("yyyyMMdd",""+dRenta.rol.mes.codigo+"01")
+                Calendar cal = Calendar.getInstance();
+                cal.set(Calendar.MONTH, inicio.format("MM").toInteger()-1);
+                cal.set(Calendar.YEAR, inicio.format("yyyy").toInteger());
+                cal.set(Calendar.DAY_OF_MONTH, 1);// This is necessary to get proper results
+                cal.set(Calendar.DATE, cal.getActualMaximum(Calendar.DATE));
+                def fin  = cal.getTime();
+                def v = procesaFormula_ajax(dRenta.rubro.formula,dRenta.rol.empleado,dRenta.rol.mes,inicio,fin,variables,[:])
+                // println "V "+v
+                if(v>0 && v !=null) {
+                    v -= v * 9.45 / 100
+                }
+                def renta = ImpuestoRenta.findAll("from ImpuestoRenta where anio=${fin.format('yyyy')} and desde<= ${v} and hasta>=${v} order by desde")
+                if(renta.size()==0)
+                    renta = ImpuestoRenta.findAll("from ImpuestoRenta where anio=${fin.format('yyyy').toInteger()-1} and desde<= ${v} and hasta>=${v} order by desde")
+                if(renta.size()>0) {
+                    renta = renta.pop()
+                    def pagar = renta.base + ((v - renta.desde) * renta.impuesto / 100)
+                    println "renta a pagar " + pagar
+                    dRenta.valor=(pagar/12).toDouble().round(2)
+                    dRenta.save(flush: true)
+                }
             }
+        }catch (e){
+            println "rol service impuesto a la renta error "+e.printStackTrace()
         }
+
 
     }
 

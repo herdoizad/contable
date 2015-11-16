@@ -266,7 +266,11 @@ class RolController extends Shield {
                         /*Impuesto a la renta*/
                         println "------------------------impuesto a la renta----------------------"
                         def v = procesaFormula_ajax(r.rubro.formula,e,mes,inicio,fin,variables,resultados)
-                        println "v "+v
+                       // println "v "+v
+                        if(v>0 && v !=null) {
+                            v -= v * 9.45 / 100
+                        }
+                        //println "v menos iess "+v
                         def renta = ImpuestoRenta.findAll("from ImpuestoRenta where anio=${fin.format('yyyy')} and desde<= ${v} and hasta>=${v} order by desde")
                         if(renta.size()==0)
                             renta = ImpuestoRenta.findAll("from ImpuestoRenta where anio=${fin.format('yyyy').toInteger()-1} and desde<= ${v} and hasta>=${v} order by desde")
