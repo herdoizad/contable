@@ -404,12 +404,15 @@ class UnidadController extends Shield {
 
 
     def cambiarFac_ajax(){
+//        println "cambiar "+params
         def empleado = Empleado.get(params.id)
+//        println "empleado "+empleado.sistemaDeFacturacion
         if(empleado.sistemaDeFacturacion=="S")
-            empleado.sistemaDeFacturacion=="N"
+            empleado.sistemaDeFacturacion="N"
         else
             empleado.sistemaDeFacturacion="S"
-        empleado.save(flush: true)
+        if(!empleado.save(flush: true))
+            println "error "+empleado.errors
         redirect(action: 'detalle_empleado_ajax',id: empleado.id)
     }
 
