@@ -297,6 +297,7 @@ class RolController extends Shield {
                     }
 
                 }
+                println "finales --------------------------------------"
                 finales.each {r->
                     println "final "+r.rubro.codigo
                     if(r.mes==0 || r.mes==mesNum){

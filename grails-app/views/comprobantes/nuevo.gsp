@@ -227,11 +227,6 @@
         var msg=""
         if(cuenta==""){
             msg+="<br/>Por favor, seleccione una cuenta"
-        }else{
-
-            if($("."+cuenta).length>0){
-                msg+="<br/>La cuenta "+cuenta+" ya esta presente en la tabla de detalle, seleccione otra o primero elimine la cuenta de la tabla."
-            }
         }
         if(valor==""){
             msg+="<br/>Por favor, ingrese un valor"

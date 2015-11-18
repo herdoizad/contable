@@ -229,6 +229,7 @@
 </div>
 <script>
 
+
     var validator = $(".frmCon").validate({
         errorClass     : "help-block",
         errorPlacement : function (error, element) {

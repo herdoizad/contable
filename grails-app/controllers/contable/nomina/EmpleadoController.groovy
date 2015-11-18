@@ -349,9 +349,18 @@ class EmpleadoController extends Shield {
 
     def saveCon_ajax(){
         flash.message=""
-        println "saveCon_ajax "+params
+
         def empleado = Empleado.get(params.empleado.id)
         def cap = new Contrato()
+        if(params.fin_input==""){
+            params.remove("fin_day")
+            params.remove("fin_month")
+            params.remove("fin_year")
+            params.remove("fin")
+            params.remove("fin_input")
+            params["fin"]=null
+        }
+        println "saveCon_ajax "+params
         if(params.id)
             cap=Contrato.get(params.id)
         cap.properties=params

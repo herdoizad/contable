@@ -29,7 +29,7 @@ class RolDePagosService {
             q2.save(flush: true)
         }
         detalles.each {d->
-            if(d.codigo!="FDRE" && d.codigo!="S13"  && d.codigo!="S14"){
+            if(d.codigo!="FDRE" && d.codigo!="S13"  && d.codigo!="S14" && d.codigo!="DVLDC"){
                 totalIngresos+=d.valor
                 if(d.codigo=="Q1")
                     q1=d.valor

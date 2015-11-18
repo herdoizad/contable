@@ -20,7 +20,7 @@ class RubrosController extends Shield {
     def rubros(){
         def rubros = getList(params, false)
         def count = getList(params, true).size()
-        return [rubros: rubros, count: count,params:["max":30]]
+        return [rubros: rubros, count: count]
     }
 
     def getEmpleados_ajax(){
@@ -135,6 +135,8 @@ class RubrosController extends Shield {
         params = params.clone()
         params.max = params.max ? Math.min(params.max.toInteger(), 100) : 20
         params.offset = params.offset ?: 0
+        params.sort="codigo"
+        params.order="desc"
         if (all) {
             params.remove("max")
             params.remove("offset")
