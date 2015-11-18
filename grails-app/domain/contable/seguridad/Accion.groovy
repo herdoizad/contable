@@ -3,7 +3,7 @@ package contable.seguridad
 /**
  * Clase para conectar con la tabla 'accn' de la base de datos
  */
-class Accion {
+class Accion implements Serializable{
     /**
      * Nombre de la acción
      */
