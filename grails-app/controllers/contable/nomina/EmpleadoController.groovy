@@ -427,20 +427,20 @@ class EmpleadoController extends Shield {
                 flash.tipo = "warning"
                 flash.message = "El tipo de contrato ${cap.tipo.descripcion} no tiene rubros asignados. Se deberá asignar manualmente los rubros del empleado ${cap.empleado} antes de generar el rol"
             }
-            rubrosContrato.each {rc->
-                def r = RubroEmpleado.findByRubroAndEmpleado(rc.rubro,cap.empleado)
-                if(!r){
-                    r = new RubroEmpleado()
-                    r.empleado=cap.empleado
-                    if(rc.mes)
-                        r.mes=rc.mes
-                    else
-                        r.mes=0
-                    r.inicio=cap.empleado.registro
-                    r.rubro=rc.rubro
-                    r.save(flush: true)
-                }
-            }
+//            rubrosContrato.each {rc->
+//                def r = RubroEmpleado.findByRubroAndEmpleado(rc.rubro,cap.empleado)
+//                if(!r){
+//                    r = new RubroEmpleado()
+//                    r.empleado=cap.empleado
+//                    if(rc.mes)
+//                        r.mes=rc.mes
+//                    else
+//                        r.mes=0
+//                    r.inicio=cap.empleado.registro
+//                    r.rubro=rc.rubro
+//                    r.save(flush: true)
+//                }
+//            }
         }
         if(flash.message=="")
             flash.message="Datos guardados"
