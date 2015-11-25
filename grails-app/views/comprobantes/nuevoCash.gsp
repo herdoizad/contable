@@ -559,6 +559,7 @@
         var fecha= $("#fecha").val()
         var debe =  $("#tot_debe").attr("valor")
         var haber =  $("#tot_haber").attr("valor")
+
         var msg =""
         var graba = 0
         var valor = $("#valor_cheque").val()

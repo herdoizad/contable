@@ -541,6 +541,22 @@
         var fecha= $("#fecha").val()
         var debe =  $("#tot_debe").attr("valor")
         var haber =  $("#tot_haber").attr("valor")
+
+        debe = (debe * 1).toFixed(2)
+        haber = (haber * 1).toFixed(2)
+
+        bootbox.alert({
+            message:debe,
+            title:"Total Debe",
+            className:"modal-error"
+        })
+
+        bootbox.alert({
+            message:haber,
+            title:"Total Haber",
+            className:"modal-error"
+        })
+
         var msg =""
         var graba = 0
         var valor = $("#valor_cheque").val()
