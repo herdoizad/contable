@@ -402,7 +402,7 @@ class RolController extends Shield {
                 }
             }
         }
-
+//354*10*0.20
         try{
             println "formula  "+formula
             def res = Eval.me(formula)

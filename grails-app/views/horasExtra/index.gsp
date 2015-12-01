@@ -72,7 +72,7 @@
                                         <g:set var="horaf" value="${contable.nomina.HorasExtraFacturacion.findByMesAndEmpleado(m,e)}"></g:set>
                                         <td style="text-align: center" class=" hora-container-f h-${e.id}" mes="${m.id}" emp="${e.id}">
                                             <label class="factor">0.25</label><input type="number" class="form-control input-sm hora f-1  ${e.id} m-${m.id}" max="10"  value="${horaf?.horas1x?.toInteger()}" min="0" mes="${m.id}" emp="${e.id}" ><br/>
-                                            <label class="factor">1.50</label><input type="number" class="form-control input-sm hora f-15  ${e.id} m-${m.id} " value="${horaf?.horas1x?.toInteger()}" max="10" min="0" mes="${m.id}" emp="${e.id}" ><br/>
+                                            <label class="factor">1.50</label><input type="number" class="form-control input-sm hora f-15  ${e.id} m-${m.id} " value="${horaf?.horas15x?.toInteger()}" max="10" min="0" mes="${m.id}" emp="${e.id}" ><br/>
                                             <label class="factor">2.00</label><input type="number" class="form-control input-sm hora f-2  ${e.id} m-${m.id}"  value="${horaf?.horas2x?.toInteger()}" max="10" min="0" mes="${m.id}" emp="${e.id}" ><br/>
 
                                         </td>

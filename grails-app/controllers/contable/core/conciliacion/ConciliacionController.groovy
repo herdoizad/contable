@@ -1,5 +1,7 @@
 package contable.core.conciliacion
 
+import contable.core.Comprobante
+import contable.core.DetalleComprobante
 import contable.seguridad.Shield
 import groovy.sql.Sql
 
@@ -129,12 +131,13 @@ class ConciliacionController extends Shield {
         def cn = new Sql(dataSource)
         def cnpys = new Sql(dataSource_pys)
         def count = 0
+        def mensaje
         cn.eachRow(sql.toString()){r->
             count=r["num"]
         }
         if(count>0){
-            render "Información ya procesada "
-            return
+            mensaje ="Información ya procesada "
+
         }
         cnpys.execute("EXECUTE up_cuentas_concilia_contable '${fecha.format('MM-dd-yyyy')}'")
         sql ="SELECT ISNULL(COUNT(CODIGO_CLIENTE),0) as num\n" +
@@ -145,8 +148,7 @@ class ConciliacionController extends Shield {
             count=r["num"]
         }
         if(count>0){
-            render "Atención!!!,Existen clientes sin Código Contable, por favor actualícelos"
-            return
+            mensaje= "Atención!!!,Existen clientes sin Código Contable, por favor actualícelos"
         }
         cnpys.execute("EXECUTE up_cuentas_facturas_vencidas '${fecha.format('MM-dd-yyyy')}' ")
         count = 0
@@ -156,17 +158,22 @@ class ConciliacionController extends Shield {
             count=r["num"]
         }
         if(count>0){
-            render " Atención!!!,Existen clientes sin Código Contable para Facturas Vencidas, por favor actualícelos"
-            return
+            mensaje =  " Atención!!!,Existen clientes sin Código Contable para Facturas Vencidas, por favor actualícelos"
+
         }
         cnpys.execute("EXECUTE up_conciliacion_debe_contable '${fecha.format('MM-dd-yyyy')}' ")
-        render "Proceso de Conciliación Terminado con éxito"
-        return
+        if(mensaje=="")
+            mensaje =  "Proceso de Conciliación Terminado con éxito"
+        def res = datosComprobante_ajax(numeroComp,mes)
+        def comprobante = res["comprobante"]
+        def detalle = res["detalles"]
+        [mensaje:mensaje,comprobante: comprobante,detalles: detalle]
     }
     def procesaIndustrias_ajax(){
-        println "params "+params
+        println "paramsi "+params
         def fecha = new Date().parse("dd-MM-yyyy", params.fecha)
         def dia = fecha.format("dd")
+        def mensaje=""
         if(dia.length()<2)
             dia="0"+dia
         def numeroComp = "0370"+dia
@@ -185,8 +192,8 @@ class ConciliacionController extends Shield {
             count=r["num"]
         }
         if(count>0){
-            render "Información ya procesada "
-            return
+            mensaje= "Información ya procesada "
+
         }
         cnpys.execute("EXECUTE up_clientes_timsa_concilia '${fecha.format('MM-dd-yyyy')}'")
         sql ="SELECT ISNULL(COUNT(CODIGO_CLIENTE),0) as num\n" +
@@ -197,13 +204,31 @@ class ConciliacionController extends Shield {
             count=r["num"]
         }
         if(count>0){
-            render "Atención!!!,Existen clientes sin Código Contable, por favor actualícelos"
-            return
+            mensaje= "Atención!!!,Existen clientes sin Código Contable, por favor actualícelos"
+
         }
 
         cnpys.execute("EXECUTE up_debe_contable_timsa '${fecha.format('MM-dd-yyyy')}' ")
-        render "Proceso de Conciliación Terminado con éxito"
-        return
+        if(mensaje=="")
+            mensaje= "Proceso de Conciliación Terminado con éxito"
+        def res = datosComprobante_ajax(numeroComp,mes)
+        def comprobante = res["comprobante"]
+        def detalle = res["detalles"]
+        println "mensaje "+mensaje
+        [mensaje:mensaje,comprobante: comprobante,detalles: detalle]
+    }
+
+    def datosComprobante_ajax(numero,mes){
+        def comprobante = Comprobante.findAll("from Comprobante  where numero=${numero} and mes=${mes} and empresa='PS' and tipo=3")
+        def detalles=[]
+        println "comprobante "+comprobante
+        println "numero "+numero+" mes "+mes
+        if(comprobante.size()>0){
+            comprobante=comprobante.pop()
+            detalles = DetalleComprobante.findAll("from DetalleComprobante  where numero=${numero} and mes=${mes} and empresa='PS' and tipo=3")
+        }
+        println "detalles"+ detalles
+        return [comprobante:comprobante,detalles:detalles]
     }
 
     def borrarDiario_ajax(){

@@ -93,7 +93,7 @@ class AuxiliarRangoController extends Shield  {
 
     def auxiliarCuenta_ajax(cn,document,cuenta,inicio,fin,titulo,contenido){
         def sql = "CONTABLE..up_rpt_auxiliar_por_cta  'PS' , ${inicio.format('yyyy').toInteger()}00 ,'${inicio.format('MM/dd/yyyy')}' , '${fin.format('MM/dd/yyyy')}','${cuenta.trim()}', 'S'"
-//        println "sql "+sql
+        println "sql "+sql
         cn.call(sql.toString())
         sql = "select * from CONTABLE..COMPROBANTES_TMP   order by CON_FECHA, COM_NUMERO"
         // println "sql "+sql
@@ -105,11 +105,11 @@ class AuxiliarRangoController extends Shield  {
         def cell
         def debe = 0
         def haber = 0
+        /*al ejecutar el sp si saca resultados de las que no salen.... escribir los headers en todas ?*/
         cn.eachRow(sql.toString()) { r ->
-            if (r["CON_FECHA"] >= inicio && r["CON_FECHA"] <= fin) {
-                if (r["CON_FECHA"] >= inicio && r["CON_FECHA"] <= fin) {
 
-                }
+            if (r["CON_FECHA"] >= inicio && r["CON_FECHA"] <= fin) {
+//                println "R-> "+r
                 if (cont == 0) {
                     cell = new PdfPCell(new Paragraph(r["CTA_CUENTA"], titulo));
                     cell.setBorder(0)
