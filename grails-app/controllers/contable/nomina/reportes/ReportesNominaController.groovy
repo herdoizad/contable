@@ -294,7 +294,7 @@ class ReportesNominaController extends Shield {
         def img = grailsApplication.mainContext.getResource('/images/favicons/apple-touch-icon-57x57.png').getFile()
         def curRow = iniRow
         XSSFWorkbook wb = new XSSFWorkbook()
-        XSSFSheet sheet = wb.createSheet("Reporte Descuento Empleado")
+        XSSFSheet sheet = wb.createSheet("Reporte Descuentos Empleado")
         int pictureIdx = wb.addPicture(img.readBytes(), XSSFWorkbook.PICTURE_TYPE_PNG);
         CreationHelper helper = wb.getCreationHelper();
         Drawing drawing = sheet.createDrawingPatriarch();

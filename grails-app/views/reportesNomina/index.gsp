@@ -83,7 +83,7 @@
         <div class="panel-completo" style="margin-left: 10px">
             <div class="row">
                 <div class="col-md-12 titulo-panel">
-                    Horas extra
+                    Horas Extras
                 </div>
             </div>
             <div class="row fila">

@@ -221,7 +221,7 @@ class ReporteRolExcelController {
             otros.each {otro->
 
                  totalOtros += otro.valor * otro.signo
-                println "jaja" +  otro.codigo
+                //println "jaja" +  otro.codigo
             }
             resta = resta*-1+totalOtros
             def recibir = suma + resta
