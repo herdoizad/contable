@@ -216,6 +216,7 @@ class ReporteRolExcelController {
             }
             def otros = DetalleRol.findAll("from DetalleRol where rol=${r.id} and signo=-1 and (codigo='OTRO' or codigo is null)")
 
+
             def totalOtros = 0
             //def total = 0
             otros.each {otro->

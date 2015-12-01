@@ -290,6 +290,7 @@ class ReportesNominaController extends Shield {
         def iniRow = 0
         def iniCol = 0
         //render "aqui hacer reporte"
+
         def celda
         def img = grailsApplication.mainContext.getResource('/images/favicons/apple-touch-icon-57x57.png').getFile()
         def curRow = iniRow
