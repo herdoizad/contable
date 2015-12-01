@@ -162,14 +162,17 @@ class ReporteRolExcelController {
         }
 
         celda =  row.createCell((short)cont)
-        celda.setCellValue("TOTAL EGRESOS")
+        celda.setCellValue("OTROS")
         celda.setCellStyle(styleHeader)
         celda =  row.createCell((short)cont +1)
+        celda.setCellValue("TOTAL EGRESOS")
+        celda.setCellStyle(styleHeader)
+        celda =  row.createCell((short)cont +2)
         celda.setCellValue("A RECIBIR")
         celda.setCellStyle(styleHeader)
 
         curRow++
-        println "pat4"
+        println "pat8"
         curRow++
 
         def roles = Rol.findAllByMes(mes)
@@ -211,18 +214,30 @@ class ReporteRolExcelController {
                     celda.setCellValue(0)
                 }
             }
-            def otros = DetalleRol.findByRolAndCodigo(r,'OTRO')
-            def totalOtros =0
+            def otros = DetalleRol.findAll("from DetalleRol where rol=${r.id} and signo=-1 and (codigo='OTRO' or codigo is null)")
+
+            def totalOtros = 0
+            //def total = 0
             otros.each {otro->
-                totalOtros=otro.valor*otro.signo
+
+                 totalOtros += otro.valor * otro.signo
+                println "jaja" +  otro.codigo
             }
-            def recibir = suma - resta
-            //println "+" + suma
+            resta = resta*-1+totalOtros
+            def recibir = suma + resta
+            //println "OTROss " + totalOtros
+            //println "RECIBIR " + recibir
+
+
+
             //println "-" + resta
             celda =  row.createCell((short) cont)
+            celda.setCellValue(totalOtros)
+            celda.setCellStyle(styleTable)
+            celda =  row.createCell((short) cont +1)
             celda.setCellValue(resta)
             celda.setCellStyle(styleFooter)
-            celda =  row.createCell((short) cont +1)
+            celda =  row.createCell((short) cont +2)
             celda.setCellValue(recibir)
             celda.setCellStyle(styleFooter)
 
