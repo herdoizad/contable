@@ -79,6 +79,7 @@
             </div>
         </div>
     </div>
+
     <div class="col-md-3">
         <div class="panel-completo" style="margin-left: 10px">
             <div class="row">
