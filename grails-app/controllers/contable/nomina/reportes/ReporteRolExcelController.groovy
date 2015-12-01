@@ -213,6 +213,7 @@ class ReporteRolExcelController {
                     celda =  row.createCell((short) i+num)
                     celda.setCellValue(0)
                 }
+
             }
             def otros = DetalleRol.findAll("from DetalleRol where rol=${r.id} and signo=-1 and (codigo='OTRO' or codigo is null)")
 
