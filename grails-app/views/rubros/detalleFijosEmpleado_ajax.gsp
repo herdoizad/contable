@@ -3,7 +3,7 @@
         <label>Rubro:</label>
     </div>
     <div class="col-md-3">
-        <input type="text" class="form-control input-sm" name="rubro" id="rubro">
+        <g:select name="rubro" id="rubro" from="${rubrosFijos}"  class="form-control input-sm"/>
     </div>
     <div class="col-md-1">
         <label>Valor:</label>

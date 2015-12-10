@@ -197,16 +197,17 @@ class RubrosController extends Shield {
         def empleado = null
         if(params.id)
             empleado=Empleado.get(params.id)
-        def rubros = Rubro.list([sort: "nombre"])
         def empleados = Empleado.findAllByEstado("A",[sort: "apellido"])
-        [empleado:empleado,rubros:rubros,empleados:empleados]
+
+        [empleado:empleado,empleados:empleados]
     }
 
     def detalleFijosEmpleado_ajax(){
         def empleado = Empleado.get(params.id)
+        def rubrosFijos = ["Supermaxi","Fybeca","Seguro dental y de vida","Génesis","Préstamo PyS","Ecuasanitas","Préstamo IESS","Multas","Otros"]
         def rubros = RubroFijoEmpleado.findAllByEmpleado(empleado)
         def meses = ["0":"Todos","1":"Enero","2":"Febero","3":"Marzo","4":"Abril","5":"Mayo","6":"Junio","7":"Juilo","8":"Agosto","9":"Septiembre","10":"Octubre","11":"Noviembre","12":"Diciembre"]
-        [empleado:empleado,rubros: rubros,meses:meses]
+        [empleado:empleado,rubros: rubros,meses:meses,rubrosFijos:rubrosFijos]
     }
 
     def borrarFijosRubroEmpleado_ajax(){
@@ -349,9 +350,10 @@ class RubrosController extends Shield {
 
     def rubroVariable(){
         def empleados = Empleado.findAllByEstado("A",[sort:"apellido"])
-        def meses = MesNomina.findAllByCodigoGreaterThanEquals(new Date().format("yyyyMM").toInteger(),[sort: "codigo"])
+        def meses = MesNomina.findAllByCodigoGreaterThanEquals(new Date().format("yyyyMM").toInteger()-3,[sort: "codigo"])
         def tipos = ["-1":"Descuento","1":"Ingreso"]
-        [empleados:empleados,meses: meses,tipos:tipos]
+        def rubros = ["Supermaxi","Fybeca","Seguro dental y de vida","Génesis","Préstamo PyS","Ecuasanitas","Préstamo IESS","Multas","Otros"]
+        [empleados:empleados,meses: meses,tipos:tipos,rubros:rubros]
     }
 
     def guardarRubroVariable_ajax(){
@@ -381,7 +383,7 @@ class RubrosController extends Shield {
                     }
                     det.rol=rol
                     det.descripcion=rubro
-                    det.codigo="VRAB"
+                    det.codigo="OTRO"
                     det.valor=valor
                     det.signo=signo
                     det.usuario=session.usuario

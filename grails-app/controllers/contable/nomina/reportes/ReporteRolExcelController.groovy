@@ -125,12 +125,35 @@ class ReporteRolExcelController {
         ))
         sheet.setColumnWidth(1,8000)
         sheet.setColumnWidth(2,8000)
-        sheet.setColumnWidth(3,5000)
-        sheet.setColumnWidth(4,5000)
-        sheet.setColumnWidth(5,5000)
-        sheet.setColumnWidth(6,5000)
-        sheet.setColumnWidth(7,5000)
-        sheet.setColumnWidth(8,5000)
+        sheet.setColumnWidth(3,3000)
+        sheet.setColumnWidth(4,3000)
+        sheet.setColumnWidth(5,3000)
+        sheet.setColumnWidth(6,3000)
+        sheet.setColumnWidth(7,3000)
+        sheet.setColumnWidth(8,3000)
+        sheet.setColumnWidth(9,3000)
+        sheet.setColumnWidth(10,3000)
+        sheet.setColumnWidth(11,3000)
+        sheet.setColumnWidth(12,3000)
+        sheet.setColumnWidth(13,3000)
+        sheet.setColumnWidth(14,3000)
+        sheet.setColumnWidth(15,3000)
+        sheet.setColumnWidth(16,3000)
+        sheet.setColumnWidth(17,3000)
+        sheet.setColumnWidth(18,3000)
+        sheet.setColumnWidth(19,3000)
+        sheet.setColumnWidth(20,3000)
+        sheet.setColumnWidth(21,3000)
+        sheet.setColumnWidth(22,3000)
+        sheet.setColumnWidth(23,3000)
+        sheet.setColumnWidth(24,3000)
+        sheet.setColumnWidth(25,3000)
+        sheet.setColumnWidth(26,3000)
+        sheet.setColumnWidth(27,3000)
+        sheet.setColumnWidth(28,3000)
+        sheet.setColumnWidth(29,3000)
+        sheet.setColumnWidth(30,3000)
+        sheet.setColumnWidth(31,3000)
 
         row = sheet.createRow((short) curRow)
         celda =  row.createCell((short) 1)
@@ -160,11 +183,13 @@ class ReporteRolExcelController {
             celda.setCellStyle(styleHeader)
             cont++
         }
-
         celda =  row.createCell((short)cont)
+        celda.setCellValue("OTROS")
+        celda.setCellStyle(styleHeader)
+        celda =  row.createCell((short)cont+1)
         celda.setCellValue("TOTAL EGRESOS")
         celda.setCellStyle(styleHeader)
-        celda =  row.createCell((short)cont +1)
+        celda =  row.createCell((short)cont +2)
         celda.setCellValue("A RECIBIR")
         celda.setCellStyle(styleHeader)
 
@@ -211,19 +236,25 @@ class ReporteRolExcelController {
                     celda.setCellValue(0)
                 }
             }
-            def otros = DetalleRol.findByRolAndCodigo(r,'OTRO')
+            def otros = DetalleRol.findAll("from DetalleRol  where rol=${r.id} and (codigo is null or codigo='OTRO') and rubro is null")
             def totalOtros =0
+//            println "------Empleado "+r.empleado.apellido
             otros.each {otro->
-                totalOtros=otro.valor*otro.signo
+//                println "otro "+otro.descripcion+"  "+otro.valor+"  "+otro.signo
+                totalOtros+=otro.valor*otro.signo
             }
+//            println "--------------------------------"
             def recibir = suma - resta
             //println "+" + suma
             //println "-" + resta
             celda =  row.createCell((short) cont)
-            celda.setCellValue(resta)
+            celda.setCellValue(totalOtros)
             celda.setCellStyle(styleFooter)
-            celda =  row.createCell((short) cont +1)
-            celda.setCellValue(recibir)
+            celda =  row.createCell((short) cont+1)
+            celda.setCellValue(resta-totalOtros)
+            celda.setCellStyle(styleFooter)
+            celda =  row.createCell((short) cont +2)
+            celda.setCellValue(recibir+totalOtros)
             celda.setCellStyle(styleFooter)
 
 

@@ -21,7 +21,7 @@
                         <label>Rubro</label>
                     </div>
                     <div class="col-md-3">
-                        <input type="text" name="rubro" id="rubro" class="form-control input-sm">
+                        <g:select name="rubro" id="rubro" from="${rubros}"  class="form-control input-sm"/>
                     </div>
                     <div class="col-md-1">
                         <label>
