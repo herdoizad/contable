@@ -79,11 +79,12 @@
             </div>
         </div>
     </div>
+
     <div class="col-md-3">
         <div class="panel-completo" style="margin-left: 10px">
             <div class="row">
                 <div class="col-md-12 titulo-panel">
-                    Horas extra
+                    Horas Extras
                 </div>
             </div>
             <div class="row fila">
@@ -113,6 +114,7 @@
             </div>
         </div>
     </div>
+    <!--
     <div class="col-md-3">
         <div class="panel-completo" style="margin-left: 10px">
             <div class="row">
@@ -146,7 +148,7 @@
                 </div>
             </div>
         </div>
-    </div>
+    </div>-->
 </div>
 <script>
     $(".generar").click(function(){

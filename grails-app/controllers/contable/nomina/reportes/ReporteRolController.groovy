@@ -194,7 +194,11 @@ class ReporteRolController extends Shield {
         def cell
         p = new Paragraph("\n", titulo);
         document.add(p);
+        def su = 0
         ingresos.each{d->
+
+            def suu = su + d.valor
+
             cell = new PdfPCell(new Paragraph(d.descripcion, contenido));
             cell.setBorder(0)
             table.addCell(cell);
@@ -202,7 +206,11 @@ class ReporteRolController extends Shield {
             cell.setHorizontalAlignment(Element.ALIGN_RIGHT)
             cell.setBorder(0)
             table.addCell(cell);
+
         }
+
+
+
         document.add(table)
         p = new Paragraph("Total ingresos: "+formatNumber(number: rol.totalIngresos,maxFractionDigits: 2,format: "###,##0",minFractionDigits: 2 ), titulo);
         document.add(p);
@@ -221,7 +229,7 @@ class ReporteRolController extends Shield {
         anchos = [70,30];
         table.setWidths(anchos)
 
-        egresos.each{d->
+         egresos.each{d->
             cell = new PdfPCell(new Paragraph(d.descripcion, contenido));
             cell.setBorder(0)
             table.addCell(cell);
@@ -229,7 +237,10 @@ class ReporteRolController extends Shield {
             cell.setHorizontalAlignment(Element.ALIGN_RIGHT)
             cell.setBorder(0)
             table.addCell(cell);
+
         }
+
+        //s = egresos
         document.add(table)
         p = new Paragraph("Total egresos: "+formatNumber(number: rol.totalEgresos,maxFractionDigits: 2,format: "###,##0",minFractionDigits: 2 ), titulo);
         document.add(p);
@@ -247,6 +258,7 @@ class ReporteRolController extends Shield {
         response.setContentLength(b.length)
         response.getOutputStream().write(b)
         println "lLlego"
+
     }
     String getVcard(title) {
         def s = new StringBuilder()
