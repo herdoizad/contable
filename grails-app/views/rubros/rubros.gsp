@@ -39,8 +39,10 @@
                             <th>Nombre</th>
                             <th>Código</th>
                             <th>Tipo</th>
+                            <th>Signo</th>
                             <th>Valor</th>
                             <th>Fórmula</th>
+                            <th>Estado</th>
                         </tr>
                         </thead>
                         <tbody>
@@ -49,9 +51,11 @@
                                 <tr data-id="${r.id}">
                                     <td>${r.nombre}</td>
                                     <td>${r.codigo}</td>
+                                    <td>${r.variable=="V"?"Variable":"Fijo"}</td>
                                     <td style="text-align: center">${r.signo==1?'Ingreso':'Egreso'}</td>
                                     <td style="text-align: right"><g:formatNumber number="${r.valor}" currencySymbol="" type="currency"/></td>
                                     <td>${r.formula}</td>
+                                    <td style="text-align: center">${r.estado!="I"?"Activo":"Inactivo"}</td>
                                 </tr>
                             </g:each>
                         </g:if>

@@ -160,12 +160,12 @@ class PrestamoController extends Shield {
         def puede = true
         def now = new Date()
         def fecha
-        if(prestmos.size()>0){
-            if(prestmos.first().fin.plus(90)>now){
-                puede=false
-                fecha=prestmos.first().fin.plus(90)
-            }
-        }
+//        if(prestmos.size()>0){
+//            if(prestmos.first().fin.plus(90)>now){
+//                puede=false
+//                fecha=prestmos.first().fin.plus(90)
+//            }
+//        }
         [puede:puede,fecha:fecha]
     }
 
@@ -334,6 +334,20 @@ class PrestamoController extends Shield {
         def empleado = Empleado.findByUsuario(session.usuario.login)
         def tipo = TipoPrestamo.get(params.id)
         def interes = Variable.findByCodigo("TINT")
+        def prestmos = Prestamo.findAllByEstado("A",[sort: "fin",order: "desc"])
+        def puede = true
+        def now = new Date()
+        def fecha
+        if(prestmos.size()>0){
+            if(prestmos.first().fin.plus(90)>now){
+                puede=false
+                fecha=prestmos.first().fin.plus(90)
+            }
+        }
+        if(!puede){
+            render   "Usted podrá solicitar un nuevo prestamo el ${fecha.format('dd-MM-yyyy')}"
+            return
+        }
         if(!empleado){
             render "El usuario ${session.usuario} no está registrado como empleado de la institución"
             return

@@ -13,7 +13,8 @@ class Rubro {
     String tipo
     Integer signoContable
     Cuenta cuenta
-
+    String estado ="A"
+    String variable //Variable si o no
 
     static auditable = [ignore: []]
 
@@ -36,6 +37,8 @@ class Rubro {
             codigo column: 'CODIGO'
             tipo column: 'TIPO'
             signoContable column: 'SIGNO_CONTABLE'
+            estado column: 'ESTADO'
+            variable column: 'ES_VARIABLE'
         }
     }
 
@@ -47,6 +50,8 @@ class Rubro {
         cuenta(nullable: true)
         tipo(nullable: true,blank: true,size: 1..1)
         signoContable(nullable: true)
+        estado(nullable: true,size:1..1)
+        variable(nullable: true,size:1..1)
 
     }
 }

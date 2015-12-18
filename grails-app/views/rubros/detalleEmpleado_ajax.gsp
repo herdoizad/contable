@@ -3,7 +3,7 @@
         <label>Rubro:</label>
     </div>
     <div class="col-md-3">
-        <g:select name="rubros" id="rubros" from="${contable.nomina.Rubro.list([sort: 'nombre'])}" optionKey="id" optionValue="nombre" class="form-control input-sm"/>
+        <g:select name="rubros" id="rubros" from="${contable.nomina.Rubro.findAllByVariableNotEqualAndEstadoNotEqual("V","I",[sort: 'nombre'])}" optionKey="id" optionValue="nombre" class="form-control input-sm"/>
     </div>
     <div class="col-md-1">
         <label>Descuenta:</label>

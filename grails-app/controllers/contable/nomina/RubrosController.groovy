@@ -12,14 +12,17 @@ class RubrosController extends Shield {
     def nuevoRubro(){
         def rubro = null
         def tipos = ["I":"Individual","G":"Grupal"]
+        def variables = ["F":"Fijo","V":"Variable"]
+        def estados = ["A":"Activo","I":"Inactivo"]
         if(params.id)
             rubro=Rubro.get(params.id)
-        [rubro:rubro,tipos:tipos]
+        [rubro:rubro,tipos:tipos,variables:variables,estados:estados]
     }
 
     def rubros(){
         def rubros = getList(params, false)
         def count = getList(params, true).size()
+        params.max=20
         return [rubros: rubros, count: count]
     }
 
@@ -80,7 +83,7 @@ class RubrosController extends Shield {
     }
 
     def save_ajax(){
-//        println "params "+params
+        println "params "+params
         def codigoCuenta = params.remove("cuenta")
         def rubro = new Rubro()
         if(params.id)
@@ -94,7 +97,7 @@ class RubrosController extends Shield {
             rubro.cuenta=null
         }
         if(!rubro.save(flush: true)){
-            println "error save rubro "+params
+            println "error save rubro "+rubro.errors
         }
         flash.message="Datos guardados"
         redirect(action: "rubros")
@@ -133,14 +136,15 @@ class RubrosController extends Shield {
 
     def getList(params, all) {
         params = params.clone()
-        params.max = params.max ? Math.min(params.max.toInteger(), 100) : 20
+        params.max =  20
         params.offset = params.offset ?: 0
-        params.sort="codigo"
-        params.order="desc"
+        params.sort="id"
+        params.order="asc"
         if (all) {
             params.remove("max")
             params.remove("offset")
         }
+        println " max" +params.max
         def list
         if (params.search) {
             def c = Rubro.createCriteria()
@@ -349,24 +353,26 @@ class RubrosController extends Shield {
 
 
     def rubroVariable(){
-        def empleados = Empleado.findAllByEstado("A",[sort:"apellido"])
+
         def meses = MesNomina.findAllByCodigoGreaterThanEquals(new Date().format("yyyyMM").toInteger()-3,[sort: "codigo"])
         def tipos = ["-1":"Descuento","1":"Ingreso"]
-        def rubros = ["Supermaxi","Fybeca","Seguro dental y de vida","Génesis","Préstamo PyS","Ecuasanitas","Préstamo IESS","Multas","Otros"]
-        [empleados:empleados,meses: meses,tipos:tipos,rubros:rubros]
+        def rubros = Rubro.findAllByVariableAndEstado("V","A")
+//                ["Supermaxi","Fybeca","Seguro dental y de vida","Génesis","Préstamo PyS","Ecuasanitas","Préstamo IESS","Multas","Otros"]
+        [meses: meses,tipos:tipos,rubros:rubros]
     }
 
     def guardarRubroVariable_ajax(){
         flash.message="Rubro registrado"
-        def signo = params.tipo.toDouble()
+//        println "params "+params
         def mes = MesNomina.get(params.mes)
-        def rubro = params.rubro
+        def rubro = Rubro.get(params.rubro)
+        def signo = rubro.signo
         if(params.data && params.data!=""){
             def data = params.data.split("W")
             data.each {d->
                 if(d!=""){
                     def parts = d.split(";")
-                    println "parts "+parts
+//                    println "parts "+parts
                     def empleado = Empleado.get(parts[0])
                     def valor = parts[1].toDouble()
                     def rol = Rol.findByEmpleadoAndMes(empleado,mes)
@@ -375,15 +381,17 @@ class RubrosController extends Shield {
                         rol.mes=mes
                         rol.empleado=empleado
                         rol.usuario=session.usuario
-                        rol.save(flush: true)
+                        if(!rol.save(flush: true))
+                            println "error save rol "+rol.errors
                     }
-                    def det = DetalleRol.findByRolAndDescripcion(rol,rubro)
+                    def det = DetalleRol.findByRolAndRubro(rol,rubro)
                     if(!det){
                         det = new DetalleRol()
                     }
+                    det.rubro=rubro
                     det.rol=rol
-                    det.descripcion=rubro
-                    det.codigo="OTRO"
+                    det.descripcion=rubro.nombre
+                    det.codigo=rubro.codigo
                     det.valor=valor
                     det.signo=signo
                     det.usuario=session.usuario
@@ -395,6 +403,28 @@ class RubrosController extends Shield {
             }
         }
         redirect(action: 'rubroVariable')
+    }
+
+    def getValoresRubroVariable_ajax(){
+//        println "params "+params
+        def empleados = Empleado.findAllByEstado("A",[sort:"apellido"])
+        def mes = MesNomina.get(params.mes)
+        def rubro = Rubro.get(params.rubro)
+        def datos = [:]
+        empleados.each {e->
+            def valor=0
+            def rol = Rol.findByEmpleadoAndMes(e,mes)
+            if(rol){
+                def detalle = DetalleRol.findByRolAndRubro(rol,rubro)
+                if(detalle){
+                    valor=detalle.valor
+                }
+            }
+            datos.put(e,valor)
+
+        }
+//        println "datos "+datos
+        [empleados:empleados,mes:mes,rubro: rubro,datos:datos]
     }
 
 

@@ -21,6 +21,14 @@
                 </div>
                 <div class="row fila">
                     <div class="col-md-2">
+                        <label>Tipo</label>
+                    </div>
+                    <div class="col-md-3">
+                        <g:select name="variable" id="variable" value="${rubro?.variable}" from="${variables}" class="form-control input-sm" optionKey="key" optionValue="value"/>
+                    </div>
+                </div>
+                <div class="row fila">
+                    <div class="col-md-2">
                         <label>Nombre</label>
                     </div>
                     <div class="col-md-10">
@@ -53,7 +61,7 @@
                 </div>
                 <div class="row fila">
                     <div class="col-md-2">
-                        <label>Tipo</label>
+                        <label>Signo</label>
                     </div>
                     <div class="col-md-3">
                         <input type="checkbox" class="chk" id="signo" name="signo_chk" value="1" checked>
@@ -94,6 +102,14 @@
                     </div>
                     <div class="col-md-3">
                         <g:select name="tipo" value="${rubro?.tipo}" from="${tipos}" class="form-control input-sm" optionKey="key" optionValue="value"/>
+                    </div>
+                </div>
+                <div class="row fila">
+                    <div class="col-md-2">
+                        <label>Estado</label>
+                    </div>
+                    <div class="col-md-3">
+                        <g:select name="estado" value="${rubro?.estado}" from="${estados}" class="form-control input-sm" optionKey="key" optionValue="value"/>
                     </div>
                 </div>
 
@@ -149,12 +165,14 @@
         var nombre = $("#nombre").val()
         var valor = $("#valor").val()
         var formula = $("#formula").val()
+        var tipo = $("#variable").val()
         var msg =""
         if(nombre==""){
             msg="Ingrese un nombre<br/>"
         }
         if(valor == "" && formula==""){
-            msg="Ingrese un vlaor o una fórmula<br/>"
+            if(tipo!="V")
+                msg="Ingrese un valar o una fórmula<br/>"
         }
         if(msg==""){
             if( $("#signo").bootstrapSwitch("state"))

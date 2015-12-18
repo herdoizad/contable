@@ -60,7 +60,7 @@ class ReportesNominaController extends Shield {
         def mes = MesNomina.get(params.mes)
         def emepleados = []
         if(params.empleado=="-1")
-            emepleados=Empleado.findAllByEstado("A")
+            emepleados=Empleado.findAllByEstado("A",[sort: "apellido"])
         else{
             emepleados.add(Empleado.get(params.empleado))
         }
@@ -170,49 +170,10 @@ class ReportesNominaController extends Shield {
         sheet.setColumnWidth(12,5000)
 
 
-//        AFP Génesis	Atrasos	Copagos	Fybeca	Odas	Otros descuentos
-// Pensión Alimenticia	Seguro Vida y Dental	Seguro Médico	Supermaxi
-
-
-
-
-        def headers = [3:"GENESIS",4:"ATRASOS",5:"FYBECA",6:"SUPERMAXI",7:"ODA",
-                       8:"PENSION ALIMENTICIA",9:"SEGURO DENTAL",10:"SEGURO MEDICO",11:"OTROS"]
-        def posiciones = ["GENESIS":3,"ATRASOS":4,"FYBECA":5,"SUPERMAXI":6,"ODA":7,"OTROS":11
-                          ,"PENSION":8,"DENTAL":9,"VIDA":9,"MEDICO":10,"MÉDICO":10]
         curRow++
-        def datos=[:]
-        //def emp = Empleado.listOrderByApellido()
-        emepleados.each {em  ->
-            //roles.each { r ->
-//                row = sheet.createRow((short) curRow)
-//                celda = row.createCell((short) 1)
-//                celda.setCellValue(em.apellido)
-//                curRow++
-//                //row = sheet.createRow((short) curRow)
-//                celda = row.createCell((short) 2)
-//                celda.setCellValue(em.nombre)
-//                println "ema " + em.nombre
-            datos.put(em.cedula,[:])
-            datos[em.cedula].put("nombre",em.nombre)
-            datos[em.cedula].put("apellido",em.apellido)
-            datos[em.cedula].put("descuentos",[])
 
-            def roles = Rol.findByEmpleadoAndMes(em,mes)
-            def detalles = DetalleRol.findAllByRolAndSigno(roles, -1)
-            detalles.each {dt ->
-
-
-
-                def tmp =[:]
-                tmp.put(dt.descripcion.trim().toUpperCase(),dt.valor)
-                datos[em.cedula]["descuentos"].add(tmp)
-
-            }
-
-
-
-        }
+        def rubros = Rubro.findAllBySigno(-1)
+        row = sheet.createRow((short) curRow)
         row = sheet.createRow((short) curRow)
         celda =  row.createCell((short) 1)
         celda.setCellValue("Apellido")
@@ -220,48 +181,77 @@ class ReportesNominaController extends Shield {
         celda =  row.createCell((short) 2)
         celda.setCellValue("Nombre")
         celda.setCellStyle(styleHeader)
-        headers.eachWithIndex {h,i->
-            celda =  row.createCell((short) h.key)
-            celda.setCellValue(h.value)
+        def datos = [:]
+        datos.put("OTROS",0)
+        def cont = 3
+        rubros.each {r->
+            celda =  row.createCell((short) cont)
+            celda.setCellValue(r.nombre)
             celda.setCellStyle(styleHeader)
+            datos.put(r,0)
+            cont++
         }
+        celda =  row.createCell((short) cont)
+        celda.setCellValue("Otros")
+        celda.setCellStyle(styleHeader)
+        cont++
+        celda =  row.createCell((short) cont)
+        celda.setCellValue("Total")
+        celda.setCellStyle(styleHeader)
         curRow++
-        datos.each {d->
+        def totalGeneral = 0
+
+        emepleados.each {em->
+            def totalEmpleado = 0
             row = sheet.createRow((short) curRow)
             celda = row.createCell((short) 1)
-            celda.setCellValue(d.value["apellido"])
-
-            //row = sheet.createRow((short) curRow)
+            celda.setCellValue(em.apellido)
             celda = row.createCell((short) 2)
-            celda.setCellValue(d.value["nombre"])
-            def otros = 0
-            d.value["descuentos"].each {desc->
-//                    println "descuentos "+desc+" "+desc.key+" "+desc.value
-                desc.each {de->
-                    def band = false
-
-                    posiciones.each {p->
-
-                        if(de.key=~p.key){
-                            band=true
-                            celda =  row.createCell((short) p.value)
-                            celda.setCellValue(de.value)
-                            celda.setCellStyle(styleTable)
-                            println "jja " + p.value
-                        }
-                    }
-                    if(!band){
-                        otros+=de.value
-                    }
+            celda.setCellValue(em.nombre)
+            def rol = Rol.findAllByEmpleadoAndMes(em,mes)
+            cont=3
+            rubros.each {r->
+                def detalle = DetalleRol.findByRolAndRubro(rol,r)
+                def valor = 0
+                if(detalle) {
+                    valor = detalle.valor
+                    datos[r]+=valor
                 }
-
-
+                celda = row.createCell((short) cont)
+                celda.setCellValue(valor)
+                totalEmpleado+=valor
+                cont++
             }
-            celda =  row.createCell((short) posiciones["OTROS"])
+            def otros  = 0
+            def detalle = DetalleRol.findAllByRolAndCodigo(rol,"OTROS")
+            detalle.each {d->
+                otros+=d.valor
+            }
+            datos["OTROS"]+=otros
+            celda = row.createCell((short) cont)
             celda.setCellValue(otros)
-            celda.setCellStyle(styleTable)
+            cont++
+            celda = row.createCell((short) cont)
+            celda.setCellValue(totalEmpleado+otros)
+            totalGeneral+=totalEmpleado+otros
             curRow++
+
+
         }
+
+        row = sheet.createRow((short) curRow)
+        cont=3
+        rubros.each { r ->
+            celda = row.createCell((short) cont)
+            celda.setCellValue(datos[r])
+            cont++
+
+        }
+        celda = row.createCell((short) cont)
+        celda.setCellValue(datos["OTROS"])
+        cont++
+        celda = row.createCell((short) cont)
+        celda.setCellValue(totalGeneral)
 //        println "datos "+datos
         // le borro render
         //todos los roles por empleado
@@ -468,7 +458,7 @@ class ReportesNominaController extends Shield {
                 fd=totalIngresos/12
                 fd=dt.toDouble().round(2)
             }
-          
+
             celda = row.createCell((short) 3)
             celda.setCellValue(fd)
             totalEmpleado+=fd
@@ -512,209 +502,209 @@ class ReportesNominaController extends Shield {
         wb.write(output)
         output.flush()
     }
-      /* def cuadre() {
-        println "cuadre"
-        def mes = MesNomina.get(params.mes)
-        def emepleados = []
-        if (params.empleado == "-1")
-            emepleados = Empleado.findAllByEstado("A")
-        else {
-            emepleados.add(Empleado.get(params.empleado))
-        }
-        
-        def iniRow = 0
-        def iniCol = 0
-        //render "aqui hacer reporte"
-        def celda
-        def img = grailsApplication.mainContext.getResource('/images/favicons/apple-touch-icon-57x57.png').getFile()
-        def curRow = iniRow
-        XSSFWorkbook wb = new XSSFWorkbook()
-        XSSFSheet sheet = wb.createSheet("Reporte Descuento Empleado")
-        int pictureIdx = wb.addPicture(img.readBytes(), XSSFWorkbook.PICTURE_TYPE_PNG);
-        CreationHelper helper = wb.getCreationHelper();
-        Drawing drawing = sheet.createDrawingPatriarch();
-        ClientAnchor anchor = helper.createClientAnchor();
-        anchor.setRow1(0);
-        anchor.setCol1(0);
-        anchor.setRow2(1);
-        anchor.setCol2(1);
+    /* def cuadre() {
+      println "cuadre"
+      def mes = MesNomina.get(params.mes)
+      def emepleados = []
+      if (params.empleado == "-1")
+          emepleados = Empleado.findAllByEstado("A")
+      else {
+          emepleados.add(Empleado.get(params.empleado))
+      }
 
-        DataFormat format = wb.createDataFormat();
-        Font fontTitulo = wb.createFont()
-        fontTitulo.setFontHeightInPoints((short) 24)
-        fontTitulo.setColor(new XSSFColor(new java.awt.Color(23, 54, 93)))
-        fontTitulo.setBold(true)
-        Font fontSubtitulo = wb.createFont()
-        fontSubtitulo.setFontHeightInPoints((short) 18)
-        fontSubtitulo.setColor(new XSSFColor(new java.awt.Color(23, 54, 93)))
-        fontSubtitulo.setBold(true)
+      def iniRow = 0
+      def iniCol = 0
+      //render "aqui hacer reporte"
+      def celda
+      def img = grailsApplication.mainContext.getResource('/images/favicons/apple-touch-icon-57x57.png').getFile()
+      def curRow = iniRow
+      XSSFWorkbook wb = new XSSFWorkbook()
+      XSSFSheet sheet = wb.createSheet("Reporte Descuento Empleado")
+      int pictureIdx = wb.addPicture(img.readBytes(), XSSFWorkbook.PICTURE_TYPE_PNG);
+      CreationHelper helper = wb.getCreationHelper();
+      Drawing drawing = sheet.createDrawingPatriarch();
+      ClientAnchor anchor = helper.createClientAnchor();
+      anchor.setRow1(0);
+      anchor.setCol1(0);
+      anchor.setRow2(1);
+      anchor.setCol2(1);
 
-        Font fontHeader = wb.createFont()
-        fontHeader.setFontHeightInPoints((short) 10)
-        fontHeader.setColor(new XSSFColor(new java.awt.Color(255, 255, 255)))
-        fontHeader.setBold(true)
+      DataFormat format = wb.createDataFormat();
+      Font fontTitulo = wb.createFont()
+      fontTitulo.setFontHeightInPoints((short) 24)
+      fontTitulo.setColor(new XSSFColor(new java.awt.Color(23, 54, 93)))
+      fontTitulo.setBold(true)
+      Font fontSubtitulo = wb.createFont()
+      fontSubtitulo.setFontHeightInPoints((short) 18)
+      fontSubtitulo.setColor(new XSSFColor(new java.awt.Color(23, 54, 93)))
+      fontSubtitulo.setBold(true)
 
-        Font fontFooter = wb.createFont()
-        fontFooter.setBold(true)
+      Font fontHeader = wb.createFont()
+      fontHeader.setFontHeightInPoints((short) 10)
+      fontHeader.setColor(new XSSFColor(new java.awt.Color(255, 255, 255)))
+      fontHeader.setBold(true)
 
-        // Create a row and put some cells in it. Rows are 0 based.
-        XSSFRow row = sheet.createRow((short) curRow)
-        curRow++
-        row.setHeightInPoints(30)
-        XSSFRow row2 = sheet.createRow((short) curRow)
-        curRow += 2
-        row2.setHeightInPoints(24)
-        curRow++
+      Font fontFooter = wb.createFont()
+      fontFooter.setBold(true)
 
-        CellStyle styleTitulo = wb.createCellStyle()
-        styleTitulo.setFont(fontTitulo)
-        styleTitulo.setAlignment(CellStyle.ALIGN_CENTER)
-        styleTitulo.setVerticalAlignment(CellStyle.VERTICAL_CENTER)
+      // Create a row and put some cells in it. Rows are 0 based.
+      XSSFRow row = sheet.createRow((short) curRow)
+      curRow++
+      row.setHeightInPoints(30)
+      XSSFRow row2 = sheet.createRow((short) curRow)
+      curRow += 2
+      row2.setHeightInPoints(24)
+      curRow++
 
-        CellStyle styleSubtitulo = wb.createCellStyle()
-        styleSubtitulo.setFont(fontSubtitulo)
-        styleSubtitulo.setAlignment(CellStyle.ALIGN_CENTER)
-        styleSubtitulo.setVerticalAlignment(CellStyle.VERTICAL_CENTER)
+      CellStyle styleTitulo = wb.createCellStyle()
+      styleTitulo.setFont(fontTitulo)
+      styleTitulo.setAlignment(CellStyle.ALIGN_CENTER)
+      styleTitulo.setVerticalAlignment(CellStyle.VERTICAL_CENTER)
 
-        CellStyle styleHeader = wb.createCellStyle()
-        styleHeader.setFont(fontHeader)
-        styleHeader.setAlignment(CellStyle.ALIGN_CENTER)
-        styleHeader.setVerticalAlignment(CellStyle.VERTICAL_CENTER)
-        styleHeader.setFillForegroundColor(new XSSFColor(new java.awt.Color(0, 110, 183)));
-        styleHeader.setFillPattern(CellStyle.SOLID_FOREGROUND)
-        styleHeader.setBorderRight((short) 1)
-        styleHeader.setBorderLeft((short) 1)
-        styleHeader.setBorderTop((short) 1)
-        styleHeader.setBorderBottom((short) 1)
-        styleHeader.setWrapText(true);
+      CellStyle styleSubtitulo = wb.createCellStyle()
+      styleSubtitulo.setFont(fontSubtitulo)
+      styleSubtitulo.setAlignment(CellStyle.ALIGN_CENTER)
+      styleSubtitulo.setVerticalAlignment(CellStyle.VERTICAL_CENTER)
 
-        CellStyle styleFooter = wb.createCellStyle()
-        styleFooter.setFont(fontFooter)
-        styleFooter.setDataFormat(format.getFormat("0.00"));
+      CellStyle styleHeader = wb.createCellStyle()
+      styleHeader.setFont(fontHeader)
+      styleHeader.setAlignment(CellStyle.ALIGN_CENTER)
+      styleHeader.setVerticalAlignment(CellStyle.VERTICAL_CENTER)
+      styleHeader.setFillForegroundColor(new XSSFColor(new java.awt.Color(0, 110, 183)));
+      styleHeader.setFillPattern(CellStyle.SOLID_FOREGROUND)
+      styleHeader.setBorderRight((short) 1)
+      styleHeader.setBorderLeft((short) 1)
+      styleHeader.setBorderTop((short) 1)
+      styleHeader.setBorderBottom((short) 1)
+      styleHeader.setWrapText(true);
 
-        CellStyle styleNegrilla = wb.createCellStyle()
-        styleNegrilla.setFont(fontFooter)
+      CellStyle styleFooter = wb.createCellStyle()
+      styleFooter.setFont(fontFooter)
+      styleFooter.setDataFormat(format.getFormat("0.00"));
 
-        CellStyle styleTable = wb.createCellStyle()
-        styleTable.setDataFormat(format.getFormat("0.00"));
+      CellStyle styleNegrilla = wb.createCellStyle()
+      styleNegrilla.setFont(fontFooter)
 
-        XSSFCell cellTitulo = row.createCell((short) iniCol)
-        cellTitulo.setCellValue("Petróleos y Servicios")
-        cellTitulo.setCellStyle(styleTitulo)
-        XSSFCell cellSubtitulo = row2.createCell((short) iniCol)
-        cellSubtitulo.setCellValue("Reporte especial del mes de" + mes.descripcion.toUpperCase());
+      CellStyle styleTable = wb.createCellStyle()
+      styleTable.setDataFormat(format.getFormat("0.00"));
 
-        cellSubtitulo.setCellStyle(styleSubtitulo)
-        sheet.addMergedRegion(new CellRangeAddress(
-                iniRow, //first row (0-based)
-                iniRow, //last row  (0-based)
-                iniCol, //first column (0-based)
-                8  //last column  (0-based)
-        ))
-        sheet.addMergedRegion(new CellRangeAddress(
-                1, //first row (0-based)
-                1, //last row  (0-based)
-                0, //first column (0-based)
-                8  //last column  (0-based)
-        ))
-        sheet.setColumnWidth(1, 8000)
-        sheet.setColumnWidth(2, 8000)
-        sheet.setColumnWidth(3, 5000)
-        sheet.setColumnWidth(4, 5000)
-        sheet.setColumnWidth(5, 5000)
-        sheet.setColumnWidth(6, 5000)
-        sheet.setColumnWidth(7, 5000)
-        sheet.setColumnWidth(8, 5000)
+      XSSFCell cellTitulo = row.createCell((short) iniCol)
+      cellTitulo.setCellValue("Petróleos y Servicios")
+      cellTitulo.setCellStyle(styleTitulo)
+      XSSFCell cellSubtitulo = row2.createCell((short) iniCol)
+      cellSubtitulo.setCellValue("Reporte especial del mes de" + mes.descripcion.toUpperCase());
 
-
-        row = sheet.createRow((short) curRow)
-        celda = row.createCell((short) 1)
-        celda.setCellValue("Apellido")
-        celda.setCellStyle(styleHeader)
-        celda = row.createCell((short) 2)
-        celda.setCellValue("Nombre")
-        celda.setCellStyle(styleHeader)
-        celda = row.createCell((short) 3)
-        celda.setCellValue("RMU")
-        celda.setCellStyle(styleHeader)
-        celda = row.createCell((short) 4)
-        celda.setCellValue("Otros Ingresos")
-        celda.setCellStyle(styleHeader)
-        celda = row.createCell((short) 5)
-        celda.setCellValue("Fondos de Reserva")
-        celda.setCellStyle(styleHeader)
-        celda = row.createCell((short) 6)
-        celda.setCellValue("Aporte IEES")
-        celda.setCellStyle(styleHeader)
-        celda = row.createCell((short) 7)
-        celda.setCellValue("Impuesto Rentas")
-        celda.setCellStyle(styleHeader)
-
-        //siempreponercurRow++
-        curRow++
-        def totalVerticalUno = 0
-        def totalVerticalDos = 0
-        def totalVerticalTres = 0
-        def totalTodo = 0
-
-        //def emp = Empleado.listOrderByApellido()
-        emepleados.each { em ->
-            def totalEmpleado = 0
-            row = sheet.createRow((short) curRow)
-            celda = row.createCell((short) 1)
-            celda.setCellValue(em.apellido)
-            curRow++
-            //row = sheet.createRow((short) curRow)
-            celda = row.createCell((short) 2)
-            celda.setCellValue(em.nombre)
-            def rol = Rol.findByEmpleadoAndMes(em, mes)
-            def detallermu = DetalleRol.findAllByRol(rol)
-            def pq = 0
-            def sq = 0
-            def rmu = 0
-            def fd = 0
-            def ai = 0
-            def ir = 0
-            detallermu.each{d ->
-                if (d.descripcion == 'Primera quincena' ){
-                    pq =  d.valor
-
-                }
-                if (d.descripcion == 'Segunda quincena' ){
-                    sq =  d.valor
-                }
-                rmu = pq + sq
-
-                if (d.descripcion == 'Fondos de reserva' ){
-                    fd =  d.valor
-                }
-                if (d.descripcion == 'Aporte al IESS' ){
-                    ai =  d.valor
-                }
-                if (d.codigo == 'IRNTA' ){
-                    ir =  d.valor
-                }
+      cellSubtitulo.setCellStyle(styleSubtitulo)
+      sheet.addMergedRegion(new CellRangeAddress(
+              iniRow, //first row (0-based)
+              iniRow, //last row  (0-based)
+              iniCol, //first column (0-based)
+              8  //last column  (0-based)
+      ))
+      sheet.addMergedRegion(new CellRangeAddress(
+              1, //first row (0-based)
+              1, //last row  (0-based)
+              0, //first column (0-based)
+              8  //last column  (0-based)
+      ))
+      sheet.setColumnWidth(1, 8000)
+      sheet.setColumnWidth(2, 8000)
+      sheet.setColumnWidth(3, 5000)
+      sheet.setColumnWidth(4, 5000)
+      sheet.setColumnWidth(5, 5000)
+      sheet.setColumnWidth(6, 5000)
+      sheet.setColumnWidth(7, 5000)
+      sheet.setColumnWidth(8, 5000)
 
 
-            }
+      row = sheet.createRow((short) curRow)
+      celda = row.createCell((short) 1)
+      celda.setCellValue("Apellido")
+      celda.setCellStyle(styleHeader)
+      celda = row.createCell((short) 2)
+      celda.setCellValue("Nombre")
+      celda.setCellStyle(styleHeader)
+      celda = row.createCell((short) 3)
+      celda.setCellValue("RMU")
+      celda.setCellStyle(styleHeader)
+      celda = row.createCell((short) 4)
+      celda.setCellValue("Otros Ingresos")
+      celda.setCellStyle(styleHeader)
+      celda = row.createCell((short) 5)
+      celda.setCellValue("Fondos de Reserva")
+      celda.setCellStyle(styleHeader)
+      celda = row.createCell((short) 6)
+      celda.setCellValue("Aporte IEES")
+      celda.setCellStyle(styleHeader)
+      celda = row.createCell((short) 7)
+      celda.setCellValue("Impuesto Rentas")
+      celda.setCellStyle(styleHeader)
+
+      //siempreponercurRow++
+      curRow++
+      def totalVerticalUno = 0
+      def totalVerticalDos = 0
+      def totalVerticalTres = 0
+      def totalTodo = 0
+
+      //def emp = Empleado.listOrderByApellido()
+      emepleados.each { em ->
+          def totalEmpleado = 0
+          row = sheet.createRow((short) curRow)
+          celda = row.createCell((short) 1)
+          celda.setCellValue(em.apellido)
+          curRow++
+          //row = sheet.createRow((short) curRow)
+          celda = row.createCell((short) 2)
+          celda.setCellValue(em.nombre)
+          def rol = Rol.findByEmpleadoAndMes(em, mes)
+          def detallermu = DetalleRol.findAllByRol(rol)
+          def pq = 0
+          def sq = 0
+          def rmu = 0
+          def fd = 0
+          def ai = 0
+          def ir = 0
+          detallermu.each{d ->
+              if (d.descripcion == 'Primera quincena' ){
+                  pq =  d.valor
+
+              }
+              if (d.descripcion == 'Segunda quincena' ){
+                  sq =  d.valor
+              }
+              rmu = pq + sq
+
+              if (d.descripcion == 'Fondos de reserva' ){
+                  fd =  d.valor
+              }
+              if (d.descripcion == 'Aporte al IESS' ){
+                  ai =  d.valor
+              }
+              if (d.codigo == 'IRNTA' ){
+                  ir =  d.valor
+              }
 
 
-            celda = row.createCell((short) 3)
-            celda.setCellValue(rmu)
-            celda = row.createCell((short) 5)
-            celda.setCellValue(fd)
-            celda = row.createCell((short) 6)
-            celda.setCellValue(ai)
-            celda = row.createCell((short) 7)
-            celda.setCellValue(ir)
-                    }
-        def output = response.getOutputStream()
-        def header = "attachment; filename=" + "reporteespecial.xlsx"
-        response.setContentType("application/application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
-        response.setHeader("Content-Disposition", header)
-        wb.write(output)
-        output.flush()
-    }*/
+          }
+
+
+          celda = row.createCell((short) 3)
+          celda.setCellValue(rmu)
+          celda = row.createCell((short) 5)
+          celda.setCellValue(fd)
+          celda = row.createCell((short) 6)
+          celda.setCellValue(ai)
+          celda = row.createCell((short) 7)
+          celda.setCellValue(ir)
+                  }
+      def output = response.getOutputStream()
+      def header = "attachment; filename=" + "reporteespecial.xlsx"
+      response.setContentType("application/application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+      response.setHeader("Content-Disposition", header)
+      wb.write(output)
+      output.flush()
+  }*/
 
     def horasExtra(){
         println "horasExtrados"
@@ -923,7 +913,7 @@ class ReportesNominaController extends Shield {
                 celda.setCellValue(hr.horas2x)
 
 
-                }
+            }
             def horasf = HorasExtraFacturacion.findAllByEmpleadoAndMes(em, mes)
             horasf.each{ hrsf ->
                 celda = row.createCell((short) 6)
@@ -969,7 +959,7 @@ class ReportesNominaController extends Shield {
                 if (deta.descripcion == 'Horas extra SF 25' ){
                     fd =  deta.valor
                 }
-               if (deta.descripcion == 'Horas extra SF 50' ){
+                if (deta.descripcion == 'Horas extra SF 50' ){
                     dt= deta.valor
                 }
                 if (deta.descripcion == 'Horas extra SF 100'  ){

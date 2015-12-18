@@ -174,7 +174,8 @@ class RolController extends Shield {
                         def det = DetalleRol.findAllByRol(rol)
                         det.each {
                             if(it.rubro!=null)
-                                it.delete(flush: true)
+                                if(it.rubro.variable!="V")
+                                    it.delete(flush: true)
                         }
 //                        rol.delete(flush: true)
 
@@ -203,35 +204,41 @@ class RolController extends Shield {
                         isNull("fin")
                     }
                 }
-                def fijos = RubroFijoEmpleado.withCriteria {
+                def prestamo = Prestamo.withCriteria {
                     eq("empleado",e)
+                    ge("inicio",inicio)
                     le("inicio",fin)
-                    or{
-                        ge("fin",fin)
-                        isNull("fin")
-                    }
+                    ge("fin",fin)
                 }
-                fijos.each {r->
-                    if(r.mes==0 || r.mes==mesNum){
-                        def dt = DetalleRol.findByDescripcionAndRol(r.descripcion,rol)
-                        if(!dt)
-                            dt = new DetalleRol()
-                        dt.rol=rol
-                        dt.usuario=session.usuario.login
-                        dt.descripcion=r.descripcion
-                        dt.rubro=null
-                        dt.codigo="OTRO"
-                        dt.valor=r.valor
-                        dt.valor=dt.valor.round(2)
-                        dt.signo=r.signo
-                        if(dt.signo>0)
-                            totalIngresos+=dt.valor
-                        else
-                            totalEgresos+=dt.valor
-                        if(!dt.save(flush: true))
-                            println "error save dt "+dt.errors
-                    }
-                }
+//                def fijos = RubroFijoEmpleado.withCriteria {
+//                    eq("empleado",e)
+//                    le("inicio",fin)
+//                    or{
+//                        ge("fin",fin)
+//                        isNull("fin")
+//                    }
+//                }
+//                fijos.each {r->
+//                    if(r.mes==0 || r.mes==mesNum){
+//                        def dt = DetalleRol.findByDescripcionAndRol(r.descripcion,rol)
+//                        if(!dt)
+//                            dt = new DetalleRol()
+//                        dt.rol=rol
+//                        dt.usuario=session.usuario.login
+//                        dt.descripcion=r.descripcion
+//                        dt.rubro=null
+//                        dt.codigo="OTRO"
+//                        dt.valor=r.valor
+//                        dt.valor=dt.valor.round(2)
+//                        dt.signo=r.signo
+//                        if(dt.signo>0)
+//                            totalIngresos+=dt.valor
+//                        else
+//                            totalEgresos+=dt.valor
+//                        if(!dt.save(flush: true))
+//                            println "error save dt "+dt.errors
+//                    }
+//                }
                 rubros = rubros.sort{it.rubro.signo*-1}
                 def finales = []
                 rubros.each {r->
@@ -266,7 +273,7 @@ class RolController extends Shield {
                         /*Impuesto a la renta*/
                         println "------------------------impuesto a la renta----------------------"
                         def v = procesaFormula_ajax(r.rubro.formula,e,mes,inicio,fin,variables,resultados)
-                       // println "v "+v
+                        // println "v "+v
                         if(v>0 && v !=null) {
                             v -= v * 9.45 / 100
                         }
@@ -322,13 +329,8 @@ class RolController extends Shield {
                     }
                 }
 
-                def prestamo = Prestamo.withCriteria {
-                    eq("empleado",e)
-                    ge("inicio",inicio)
-                    le("inicio",fin)
-                    ge("fin",fin)
-                }
-                println "prestamo "+prestamo
+
+//                println "prestamo "+prestamo
 
                 prestamo.each {pre->
                     def detalle = DetallePrestamo.findByMesAndPrestamo(mes,pre)
