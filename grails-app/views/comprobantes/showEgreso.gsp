@@ -104,35 +104,35 @@
         <div class="panel-completo" style="margin-left: 10px;min-height: 60px">
             <div class="row">
                 <div class="col-md-12 titulo-panel">
-                    Cheque Número: ${cheque.numero}
+                    Cheque Número: ${cheque?.numero}
                 </div>
             </div>
             <div class="row fila">
                 <div class="col-md-3">
                     <label>Banco: </label>
-                    ${cheque.banco.descripcion}
+                    ${cheque?.banco?.descripcion}
                 </div>
                 <div class="col-md-2">
                     <label>Cuenta: </label>
-                    ${cheque.cuenta}
+                    ${cheque?.cuenta}
                 </div>
                 <div class="col-md-2">
                     <label>Número: </label>
-                    ${cheque.numero}
+                    ${cheque?.numero}
                 </div>
                 <div class="col-md-2">
                     <label>Fecha: </label>
-                    ${cheque.emision.format("dd-MM-yyyy")}
+                    ${cheque?.emision?.format("dd-MM-yyyy")}
                 </div>
             </div>
             <div class="row fila">
                 <div class="col-md-3">
                     <label>Valor: </label>
-                    <g:formatNumber number="${cheque.valor}" type="currency" currencySymbol="\$"/>
+                    <g:formatNumber number="${cheque?.valor}" type="currency" currencySymbol="\$"/>
                 </div>
                 <div class="col-md-5">
                     <label>Beneficiario: </label>
-                    ${cheque.beneficiario}
+                    ${cheque?.beneficiario}
                 </div>
             </div>
         </div>

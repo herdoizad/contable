@@ -675,10 +675,10 @@ class ComprobantesController extends Shield {
             comp = comp.pop()
             numero = comp.numero
             DetalleComprobante.findAll("from DetalleComprobante where empresa='${comp.empresa.codigo}' and numero=${numero} and tipo=${params.tipo} and mes=${mes}").each {d->
-                d.delete(flush: true)
+                // d.delete(flush: true)
             }
             DetalleFacturaEgresos.findAll("from DetalleFacturaEgresos where empresa='${comp.empresa.codigo}' and comprobante=${params.numero} and tipo=${params.tipo} and mes=${mes}").each {
-                it.delete(flush: true)
+                //it.delete(flush: true)
             }
         }else{
             comp = new Comprobante()
@@ -712,18 +712,9 @@ class ComprobantesController extends Shield {
                 cliente.save(flush: true)
             }
             def cheque
-            cheque = Cheque.findAll("from Cheque where empresa='${comp.empresa.codigo}' and comprobante=${params.numero} and tipo=${params.tipo} and mes=${mes}")
-            if(cheque.size()>0)
-                cheque=cheque.pop()
-            else {
-                cheque = new Cheque()
-                banco.ultimoCheque=banco.ultimoCheque+1
-                cheque.numero=banco.ultimoCheque.toInteger()
-
-                if(!banco.save(flush: true))
-                    println "error update banco "+banco.errors
-
-            }
+            cheque = new Cheque()
+            banco.ultimoCheque=banco.ultimoCheque+1
+            cheque.numero=banco.ultimoCheque.toInteger()
             println "cheque "+cheque
             cheque.empresa=comp.empresa
             cheque.tipo=comp.tipo
@@ -735,10 +726,24 @@ class ComprobantesController extends Shield {
             cheque.emision=new Date().parse("dd-MM-yyyy",params.chequefecha_input)
             cheque.usuario=comp.usuario
             cheque.codigoBeneficiario=cliente.codigo
-            session.cheque=cheque
+
             cheque.valor=params.cheque.valor.toDouble()
+            cheque.comprobante=null
             if(!cheque.save(flush: true)){
-                println "error save cliente "+cheque.errors
+                println "error save cheque!!!!!!!! "+cheque.errors
+                mailService.sendMail {
+                    multipart true
+                    to "valentinsvt@hotmail.com"
+//                    to "pys@petroleosyservicios.com"
+                    subject "[CONTABLE]Error al guardar el cheque"
+                    body ""+cheque.errors
+                    inline 'logo','image/png',grailsApplication.mainContext.getResource('/images/logo-login.png').getFile().readBytes()
+//            inline 'logo','image/png', new File('./web-app///images/logo-login.png').readBytes()
+                }
+            }else{
+                if(!banco.save(flush: true))
+                    println "error update banco "+banco.errors
+                session.cheque=cheque
             }
             def data = params.data2.split("W")
             def cont = 1
@@ -848,8 +853,11 @@ class ComprobantesController extends Shield {
                 return
             }
             cheque = Cheque.findAll("from Cheque where mes=${comp.mes} and comprobante=${comp.numero} and tipo=${comp.tipo} and empresa='${session.empresa.codigo}'")
+            println "cheque "+cheque
             if(cheque.size()>0)
                 cheque=cheque.pop()
+            else
+                cheque=null
         }
         def detComp = DetalleComprobante.findAll("from DetalleComprobante  where mes=${comp.mes} and numero=${comp.numero} and tipo=${comp.tipo} and empresa='${session.empresa.codigo}'")
         def detFac = DetalleFacturaEgresos.findAll("from DetalleFacturaEgresos  where mes=${comp.mes} and comprobante=${comp.numero} and tipo=${comp.tipo} and empresa='${session.empresa.codigo}'")
