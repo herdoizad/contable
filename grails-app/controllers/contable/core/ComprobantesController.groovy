@@ -693,6 +693,7 @@ class ComprobantesController extends Shield {
         comp.ipMod=session.ip
         comp.control=9
         comp.numeroCheque=0
+        comp.revisaAuditoria=0
         comp.bancoCliente=BancoOcp.findByCodigo(params.bancoCliente)
         comp.cuentaTransferencia=params.cuentaTransferencia
         comp.tipoCuenta=params.tipoCuenta

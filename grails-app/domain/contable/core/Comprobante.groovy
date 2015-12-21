@@ -24,7 +24,7 @@ class Comprobante  implements Serializable{
 
     String usuario
     String ipMod
-    String origen="W"
+    String origen=null
     static auditable = [ignore: []]
 
     /**
