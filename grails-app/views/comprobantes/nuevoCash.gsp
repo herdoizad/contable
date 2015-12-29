@@ -95,10 +95,10 @@
             Transferencia
         </div>
         <div class="col-md-1">
-            <label>Fecha:</label>
+            <label>Fecha: </label>
         </div>
         <div class="col-md-2">
-            <elm:datepicker name="fecha" class="form-control input-sm" minDate="${inicio}" maxDate="${fin}" value="${comp?.fecha?:fecha}"></elm:datepicker>
+            <elm:datepicker name="fecha" class="form-control input-sm" minDate="${inicio}" maxDate="${fin}" value="${fecha}"></elm:datepicker>
         </div>
         <div class="col-md-1">
             <label>Usar prototipo:</label>

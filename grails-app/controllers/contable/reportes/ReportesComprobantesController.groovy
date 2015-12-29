@@ -326,7 +326,7 @@ class ReportesComprobantesController extends Shield {
                     cell = new PdfPCell(new Paragraph("Contribuyente:", titulo));
                     cell.setBorder(0)
                     table.addCell(cell);
-                    cell = new PdfPCell(new Paragraph(cheque.beneficiario, contenido));
+                    cell = new PdfPCell(new Paragraph(cheque?cheque.beneficiario:'', contenido));
                     cell.setBorder(0)
                     cell.setColspan(2)
                     table.addCell(cell);

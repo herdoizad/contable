@@ -142,10 +142,13 @@ class ComprobantesController extends Shield {
         def tipoComp = TipoDocumento.findAllByDescripcionNotEqual("----------")
         def cuentas = Cuenta.findAllByAgrupa(1)
         def clientes = Cliente.list([sort: 'cp'])
+        cal = Calendar.getInstance();
         cal.set(Calendar.DAY_OF_MONTH, new Date().format("dd").toInteger());
+        cal.set(Calendar.YEAR,new Date().format("yyyy").toInteger())
         def fecha = cal.getTime()
         if(fecha>fin)
             fecha=fin
+//        println "fecha2 "+fecha+"  fin "+fin+"  inicio "+inicio
         [mes:mes,mesSolo:mesSolo,tipo:params.tipo,tipoString:tipoString,siguiente:siguiente,inicio: inicio,fin:fin,tipos:tipos,tiposRet:tiposRet,tipoIva:tipoIva,tipoComp:tipoComp,cuentas:cuentas,clientes:clientes,comp:comp,cheque:cheque,detalles:detalles,rets:rets,cliente:cliente,fecha:fecha]
     }
 
@@ -699,11 +702,9 @@ class ComprobantesController extends Shield {
         comp.tipoCuenta=params.tipoCuenta
         comp.tipoProcesamiento=4
 
-        if(!comp.save(flush: true))
-            println "error save comp "+comp.errors
-        else{
-
-
+        if(!comp.save(flush: true)) {
+            println "error save comp " + comp.errors
+        }else{
             def banco =  Banco.findByCodigoAndEmpresa(params.cheque.banco,session.empresa)
             def cliente = Cliente.findByCodigoAndEmpresa(params.cheque.cliente,session.empresa)
             if(!cliente.numeroCuenta || cliente.numeroCuenta==""){
@@ -716,7 +717,7 @@ class ComprobantesController extends Shield {
             cheque = new Cheque()
             banco.ultimoCheque=banco.ultimoCheque+1
             cheque.numero=banco.ultimoCheque.toInteger()
-            println "cheque "+cheque
+            println "cheque "+cheque.numero
             cheque.empresa=comp.empresa
             cheque.tipo=comp.tipo
             cheque.mes=comp.mes
@@ -727,9 +728,7 @@ class ComprobantesController extends Shield {
             cheque.emision=new Date().parse("dd-MM-yyyy",params.chequefecha_input)
             cheque.usuario=comp.usuario
             cheque.codigoBeneficiario=cliente.codigo
-
             cheque.valor=params.cheque.valor.toDouble()
-            cheque.comprobante=null
             if(!cheque.save(flush: true)){
                 println "error save cheque!!!!!!!! "+cheque.errors
                 mailService.sendMail {
