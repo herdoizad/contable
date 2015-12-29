@@ -502,9 +502,7 @@
             msg+="<br/>Por favor, seleccione una cuenta"
         }else{
 
-            if($("."+cuenta).length>0){
-                msg+="<br/>La cuenta "+cuenta+" ya esta presente en la tabla de detalle, seleccione otra o primero elimine la cuenta de la tabla."
-            }
+
             if(desc.length>35){
                 desc =desc.substr(0,30)
             }

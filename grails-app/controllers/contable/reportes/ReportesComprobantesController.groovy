@@ -65,7 +65,7 @@ class ReportesComprobantesController extends Shield {
             cell = new PdfPCell(new Paragraph("", titulo));
             cell.setBorder(0)
             tabla.addCell(cell);
-            cell = new PdfPCell(new Paragraph("No: PS-${comp.mes}-${comp.tipo}-${g.formatNumber(number: comp.numero,maxFractionDigits: 0)}", titulo));
+            cell = new PdfPCell(new Paragraph("No: PS-${comp.mes}-${comp.tipo}-${g.formatNumber(number: comp.numero,maxFractionDigits: 0)}", header));
             cell.setBorder(0)
             tabla.addCell(cell);
             writer.setPageEvent(new contable.HeaderFooter(img.readBytes(),bs, fecha, session.usuario.login,"",tabla));

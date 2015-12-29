@@ -733,7 +733,7 @@ class ComprobantesController extends Shield {
                 println "error save cheque!!!!!!!! "+cheque.errors
                 mailService.sendMail {
                     multipart true
-                    to "valentinsvt@hotmail.com"
+                    to "david.herdoiza@petroleosyservicios.com"
 //                    to "pys@petroleosyservicios.com"
                     subject "[CONTABLE]Error al guardar el cheque"
                     body ""+cheque.errors

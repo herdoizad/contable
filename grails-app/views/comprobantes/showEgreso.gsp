@@ -26,6 +26,9 @@
                     <a href="#" id="imprimir" class="btn btn-verde">
                         <i class="fa fa-print"></i> Imprimir
                     </a>
+                    <a href="${g.createLink(action: 'nuevoCash',params: [mes:comp.mes,tipo:comp.tipo])}" id="nuevo" class="btn btn-verde">
+                        <i class="fa fa-file"></i> Nuevo
+                    </a>
                 </div>
             </div>
             <div class="row fila">
