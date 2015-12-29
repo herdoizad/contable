@@ -330,13 +330,9 @@ class ElementosTagLib {
         def showDate = attrs.showDate ?: true
         def showTime = attrs.showTime ?: false
 
-        def defaultFormat = "dd-MM-yyyy"
-        if (showTime) {
-            defaultFormat += " hh:mm"
-        }
 
-        def format = attrs.format ?: defaultFormat
-        def formatJS = attrs.formatJS ?: format.replaceAll("d", "D")
+
+
 
         def startDate = attrs.minDate ?: false
         def endDate = attrs.maxDate ?: false
@@ -354,6 +350,12 @@ class ElementosTagLib {
 
         def daysOfWeekDisabled = attrs.daysOfWeekDisabled ?: false
 
+        def defaultFormat = "dd-MM-yyyy"
+        def format = attrs.format ?: defaultFormat
+        def formatJS = attrs.formatJS ?: 'DD-MM-YYYY'
+        if (showTime) {
+            defaultFormat += " hh:mm"
+        }
         def img = attrs.img ?: "fa fa-calendar"
 //        println "value tag "+value
         if (value instanceof Date) {
