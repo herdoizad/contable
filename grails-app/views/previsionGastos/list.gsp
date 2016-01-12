@@ -36,13 +36,15 @@
                     
                     <th>Empleado</th>
                     
-                    <g:sortableColumn property="totalAlimentacion" title="Total Alimentacion" />
+                    <g:sortableColumn property="totalAlimentacion" title="Total Vivienda" />
                     
                     <g:sortableColumn property="totalEducacion" title="Total Educacion" />
                     
                     <g:sortableColumn property="totalSalud" title="Total Salud" />
                     
                     <g:sortableColumn property="totalVestimenta" title="Total Vestimenta" />
+
+                    <g:sortableColumn property="totalAlimentacion" title="Total Alimentacion" />
                     
                 </tr>
             </thead>
@@ -56,7 +58,7 @@
                             <td><elm:textoBusqueda busca="${params.search}"><g:fieldValue bean="${previsionGastosInstance}" field="empleado"/></elm:textoBusqueda></td>
                             
                             <td style="text-align: right">
-                                <g:formatNumber number="${previsionGastosInstance.totalAlimentacion}" type="currency" currencySymbol=""/>
+                                <g:formatNumber number="${previsionGastosInstance.totalVivienda}" type="currency" currencySymbol=""/>
                             </td>
                             
                             <td style="text-align: right">
@@ -69,6 +71,10 @@
                             
                             <td style="text-align: right">
                                 <g:formatNumber number="${previsionGastosInstance.totalVestimenta}" type="currency" currencySymbol=""/>
+                            </td>
+
+                            <td style="text-align: right">
+                                <g:formatNumber number="${previsionGastosInstance.totalAlimentacion}" type="currency" currencySymbol=""/>
                             </td>
                             
                         </tr>

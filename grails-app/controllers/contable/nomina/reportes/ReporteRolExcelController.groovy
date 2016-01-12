@@ -154,6 +154,7 @@ class ReporteRolExcelController {
         sheet.setColumnWidth(29,3000)
         sheet.setColumnWidth(30,3000)
         sheet.setColumnWidth(31,3000)
+        curRow++
 
         row = sheet.createRow((short) curRow)
         celda =  row.createCell((short) 1)
@@ -162,104 +163,313 @@ class ReporteRolExcelController {
         celda =  row.createCell((short) 2)
         celda.setCellValue("Nombre")
         celda.setCellStyle(styleHeader)
-
-        def rubros =  Rubro.list([sort: "signo",order: "desc"])
-        def signo = null
-        def num =3
-        def cont = 3
-
-        rubros.eachWithIndex{ r, i ->
-
-            if (signo!=r.signo && signo ){
-                celda =  row.createCell((short)i+num)
-                celda.setCellValue("TOTAL INGRESOS")
-                celda.setCellStyle(styleHeader)
-                num++
-                cont++
-            }
-            signo=r.signo
-            celda =  row.createCell((short)i+num)
-            celda.setCellValue(r.nombre)
-            celda.setCellStyle(styleHeader)
-            cont++
-        }
-        celda =  row.createCell((short)cont)
-        celda.setCellValue("OTROS")
+        celda =  row.createCell((short) 3)
+        celda.setCellValue("RBU")
         celda.setCellStyle(styleHeader)
-        celda =  row.createCell((short)cont+1)
-        celda.setCellValue("TOTAL EGRESOS")
+        celda =  row.createCell((short) 4)
+        celda.setCellValue("Bono Alimentacion")
         celda.setCellStyle(styleHeader)
-        celda =  row.createCell((short)cont +2)
-        celda.setCellValue("A RECIBIR")
+        celda =  row.createCell((short) 5)
+        celda.setCellValue("Decimo Tercero")
+        celda.setCellStyle(styleHeader)
+        celda =  row.createCell((short) 6)
+        celda.setCellValue("Decimo Cuarto")
+        celda.setCellStyle(styleHeader)
+        celda =  row.createCell((short) 7)
+        celda.setCellValue("Horas Extras")
+        celda.setCellStyle(styleHeader)
+        celda =  row.createCell((short) 8)
+        celda.setCellValue("Fondos de Reserva")
+        celda.setCellStyle(styleHeader)
+        celda =  row.createCell((short) 9)
+        celda.setCellValue("Bono Antiguedad")
+        celda.setCellStyle(styleHeader)
+        celda =  row.createCell((short) 10)
+        celda.setCellValue("Bono Sistema Facturacion")
+        celda.setCellStyle(styleHeader)
+        celda =  row.createCell((short) 11)
+        celda.setCellValue("Bonificacion")
+        celda.setCellStyle(styleHeader)
+        celda =  row.createCell((short) 12)
+        celda.setCellValue("Devolucion Descuentos")
+        celda.setCellStyle(styleHeader)
+        celda =  row.createCell((short) 13)
+        celda.setCellValue("Horas Extras Sistema Facturacion")
+        celda.setCellStyle(styleHeader)
+        celda =  row.createCell((short) 14)
+        celda.setCellValue("Reemplazo")
+        celda.setCellStyle(styleHeader)
+        celda =  row.createCell((short) 15)
+        celda.setCellValue("Total Ingresos")
+        celda.setCellStyle(styleHeader)
+        celda =  row.createCell((short) 16)
+        celda.setCellValue("IESS")
+        celda.setCellStyle(styleHeader)
+        celda =  row.createCell((short) 17)
+        celda.setCellValue("Anticipo")
+        celda.setCellStyle(styleHeader)
+        celda =  row.createCell((short) 18)
+        celda.setCellValue("Impuesto Renta")
+        celda.setCellStyle(styleHeader)
+        celda =  row.createCell((short) 19)
+        celda.setCellValue("Primera Quincena")
+        celda.setCellStyle(styleHeader)
+        celda =  row.createCell((short) 20)
+        celda.setCellValue("Otros Descuentos")
+        celda.setCellStyle(styleHeader)
+        celda =  row.createCell((short) 21)
+        celda.setCellValue("Total Egresos")
+        celda.setCellStyle(styleHeader)
+        celda =  row.createCell((short) 22)
+        celda.setCellValue("A Recibir")
         celda.setCellStyle(styleHeader)
 
         curRow++
-        println "pat4"
-        curRow++
-
-        def roles = Rol.findAllByMes(mes)
-
-        roles.each{r->
+        //def em =  Empleado.list([sort: "Apellido",order: "desc"])
+        //Empleado.listOrderByApellido().eac
+        def emp =Empleado.findAllByEstado("A",[sort: "apellido"])
+        def rubros = Rubro.findAllBySigno(-1)
+        def rubro = Rubro.findAllBySigno(1)
+        emp.each {em ->
+            def totalEmpleadou = 0
+            def totalEmpleadod = 0
+            def totalEmpleadot = 0
+            def totalEmpleadoc = 0
+            def totalEmpleadoci = 0
+            def totalEmpleadose = 0
+            def totalEmpleadosi = 0
+            def totalEmpleadooch = 0
+            def totalEmpleadonu = 0
             row = sheet.createRow((short) curRow)
-            celda =  row.createCell((short) 1)
-            celda.setCellValue(r.empleado.apellido)
+            celda = row.createCell((short) 1)
+            celda.setCellValue(em.apellido)
+            celda = row.createCell((short) 2)
+            celda.setCellValue(em.nombre)
+            //curRow++
+            def rol = Rol.findByEmpleadoAndMes(em, mes)
+            def pq = DetalleRol.findByRolAndCodigo(rol,'Q1')
+
+            def iees = DetalleRol.findByRolAndCodigo(rol,'IESS')
+            def  iessr = 0
+            if(iees){
+                iessr  = iees?.valor
+            }
+
+            def reem= DetalleRol.findByRolAndCodigo(rol,'REEMP')
+            def  ree = 0
+            if(reem){
+                ree = reem?.valor
+            }
+
+            def devo= DetalleRol.findByRolAndCodigo(rol,'DVLDC')
+            def  dev = 0
+            if(devo){
+                dev = devo?.valor
+            }
+
+            def boni = DetalleRol.findByRolAndCodigo(rol,'BNFC')
+            def  bon = 0
+            if(boni){
+                bon = boni?.valor
+            }
+
+            def ba = DetalleRol.findByRolAndCodigo(rol,'BANT')
+            def  ban = 0
+            if(ba){
+                ban = ba?.valor
+            }
+
+            def fr = DetalleRol.findByRolAndCodigo(rol,'FDRE')
+            def  fre = 0
+            if(fr){
+                fre = fr?.valor
+            }
+
+            def rubro1 = Rubro.findAllByCodigo('H200')
+            def h1 = DetalleRol.findAllByRubroAndRol(rubro1,rol)
+            h1.each {huno ->
+                totalEmpleadou += huno.valor
+            }
+            def rubro2 = Rubro.findAllByCodigo('H150')
+            def h2 = DetalleRol.findAllByRubroAndRol(rubro2,rol)
+            h2.each {hdos ->
+                totalEmpleadod += hdos.valor
+            }
+            def rubro3 = Rubro.findAllByCodigo('H100')
+            def h3 = DetalleRol.findAllByRubroAndRol(rubro3,rol)
+            h3.each {htres ->
+                totalEmpleadot += htres.valor
+            }
+            def tt1 = totalEmpleadou + totalEmpleadod + totalEmpleadot
+
+            def rubro4 = Rubro.findAllByCodigo('BSF7')
+            def h4 = DetalleRol.findAllByRubroAndRol(rubro4,rol)
+            h4.each {hcuatro ->
+               totalEmpleadoc += hcuatro.valor
+            }
+            def rubro5 = Rubro.findAllByCodigo('BSF1')
+            def h5 = DetalleRol.findAllByRubroAndRol(rubro5,rol)
+            h5.each {hcinco ->
+                totalEmpleadoci += hcinco.valor
+            }
+            def rubro6 = Rubro.findAllByCodigo('BSF3')
+            def h6 = DetalleRol.findAllByRubroAndRol(rubro6,rol)
+            h6.each {hseis ->
+                totalEmpleadose += hseis.valor
+            }
+            def tt2 = totalEmpleadoc + totalEmpleadoci + totalEmpleadose
+
+            def fdu = 0
+            def dtd = 0
+            def dct =0
+            def detalled = DetalleRol.findAllByRolAndSigno(rol, 1)
+            detalled.each {deta ->
+
+                if (deta.descripcion == 'Horas extra SF 25' ){
+                    fdu =  deta.valor
+                }
+                if (deta.descripcion == 'Horas extra SF 50' ){
+                    dtd= deta.valor
+                }
+                if (deta.descripcion == 'Horas extra SF 100'  ){
+                    dct =   deta.valor
+                }
+
+            }
+            totalEmpleadosi += fdu
+            totalEmpleadooch += dtd
+            totalEmpleadonu += dct
+            def tt3 = totalEmpleadosi + totalEmpleadooch + totalEmpleadonu
+
+            def al = DetalleRol.findByRolAndCodigo(rol,'ALMT')
+            def  alim
+            if(al){
+                alim = al?.valor
+            }
+            else{
+               alim = 0
+            }
+
+            def dc = DetalleRol.findByRolAndCodigo(rol,'S14')
+            def  decimoc = 0
+            if(dc){
+                decimoc = dc?.valor
+            }
+
+            def dt = DetalleRol.findByRolAndCodigo(rol,'S13')
+            def  decimot
+            if(dt){
+                decimot = dt?.valor
+            }else{
+                decimot = 0
+            }
+
+            //def sc = DetalleRol.findByRolAndCodigo(rol,'SLDO')
+            def sc = Sueldo.findAllByEmpleado(em)
+            def  sueldo
+            sc.each{ s ->
+            if(s){
+                sueldo = s?.sueldo
+            }else{
+                sueldo = 0
+            }
+
+            }
+
+            def anticipo= DetalleRol.findByRolAndCodigo(rol,'ANTSU')
+            def  a
+            if(anticipo){
+                a = anticipo?.valor
+            }else{
+                a = 0
+            }
+
+            def impr= DetalleRol.findByRolAndCodigo(rol,'IRNTA')
+            def  i
+            if(impr){
+                i = impr?.valor
+            }else{
+                i = 0
+            }
+            celda = row.createCell((short) 3)
+            celda.setCellValue(sueldo)
+            celda = row.createCell((short) 4)
+            celda.setCellValue(alim)
+            celda = row.createCell((short) 5)
+            celda.setCellValue(decimot)
+            celda = row.createCell((short) 6)
+            celda.setCellValue(decimoc)
+            celda = row.createCell((short) 7)
+            celda.setCellValue(tt1)
+            celda = row.createCell((short) 8)
+            celda.setCellValue(fre)
+            celda = row.createCell((short) 9)
+            celda.setCellValue(ban)
+            celda = row.createCell((short) 10)
+            celda.setCellValue(tt2)
+            celda = row.createCell((short) 11)
+            celda.setCellValue(bon)
+            celda = row.createCell((short) 12)
+            celda.setCellValue(dev)
+            celda = row.createCell((short) 13)
+            celda.setCellValue(tt3)
+            celda = row.createCell((short) 14)
+            celda.setCellValue(ree)
+            celda = row.createCell((short) 16)
+            celda.setCellValue(iessr)
+            celda = row.createCell((short) 17)
+            celda.setCellValue(a)
+            celda = row.createCell((short) 18)
+            celda.setCellValue(i)
+            celda = row.createCell((short) 19)
+            celda.setCellValue(pq.valor)
+            def datos = 0
+             def datoso = 0
+            // def valoreo = 0
+            rubros.each {r ->
+                def detalle = DetalleRol.findByRolAndRubro(rol,r)
+                def valore
+
+                if(detalle) {
+                    valore = detalle.valor
+                  datos +=valore
+                }
+                datoso = datos - iees.valor - a - i
+                celda = row.createCell((short) 20)
+                celda.setCellValue(datoso)
+                celda = row.createCell((short) 21)
+                celda.setCellValue(datos + pq.valor)
+            }
+
+            def datosi = 0
+            rubro.each {ri ->
+                def detalle = DetalleRol.findByRolAndRubro(rol,ri)
+                def valorei
+
+                if(detalle) {
+                    valorei = detalle.valor
+                    datosi +=valorei
+                }
+                celda = row.createCell((short) 15)
+                celda.setCellValue(datosi)
+            }
+
+            def rec = 0
+            rec = datosi - datos - pq.valor
+            celda = row.createCell((short) 22)
+            celda.setCellValue(rec)
+
             curRow++
-            celda =  row.createCell((short) 2)
-            celda.setCellValue(r.empleado.nombre)
-            def suma = 0
-            def resta = 0
-            num=3
-            signo = null
-            rubros.eachWithIndex{ ru, i ->
-                if (signo!=ru.signo && signo ){
-                    celda =  row.createCell((short)i+num)
-                    celda.setCellValue(suma)
-                    celda.setCellStyle(styleFooter)
-                    num++
-                }
-                signo=ru.signo
-
-                def dr = DetalleRol.findByRolAndRubro(r, ru)
-                if (dr){
-                    celda =  row.createCell((short) i+num)
-                    celda.setCellValue(dr.valor * dr.signo)
-                    celda.setCellStyle(styleTable)
-                    if(dr.signo > 0){
-                        suma = dr.valor + suma
-                    }
-                    else {
-                        resta = dr.valor + resta
-                    }
-                }
-                else{
-                    celda =  row.createCell((short) i+num)
-                    celda.setCellValue(0)
-                }
-            }
-            def otros = DetalleRol.findAll("from DetalleRol  where rol=${r.id} and (codigo is null or codigo='OTRO') and rubro is null")
-            def totalOtros =0
-//            println "------Empleado "+r.empleado.apellido
-            otros.each {otro->
-//                println "otro "+otro.descripcion+"  "+otro.valor+"  "+otro.signo
-                totalOtros+=otro.valor*otro.signo
-            }
-//            println "--------------------------------"
-            def recibir = suma - resta
-            //println "+" + suma
-            //println "-" + resta
-            celda =  row.createCell((short) cont)
-            celda.setCellValue(totalOtros)
-            celda.setCellStyle(styleFooter)
-            celda =  row.createCell((short) cont+1)
-            celda.setCellValue(resta-totalOtros)
-            celda.setCellStyle(styleFooter)
-            celda =  row.createCell((short) cont +2)
-            celda.setCellValue(recibir+totalOtros)
-            celda.setCellStyle(styleFooter)
 
 
-        }
-        def output = response.getOutputStream()
+            //println " * " + impr.valor
+
+          }
+
+
+
+
+def output = response.getOutputStream()
         def header = "attachment; filename=" + "reporteRolEmpleados.xlsx"
         response.setContentType("application/application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
         response.setHeader("Content-Disposition", header)
