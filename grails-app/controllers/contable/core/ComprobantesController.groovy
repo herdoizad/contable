@@ -5,22 +5,25 @@ import contable.seguridad.Shield
 class ComprobantesController extends Shield {
     def mailService
     def diarios(){
+        def empresa = Empresa.findAllByPrincipal("S")
         def meses = ["Enero":"01","Febrero":"02","Marzo":"03","Abril":"04","Mayo":"05","Junio":"06","Juilo":"07","Agosto":"08","Septiembre":"09","Octubre":"10","Noviembre":"11","Diciembre":"12"]
-        def anio = new Date().format("yyyy")
+        def anio = empresa.anio.find() //new Date().format("yyyy")
         def inicio = Comprobante.findAllByMesAndEmpresa((anio+"00").toInteger(),session.empresa)
         [anio:anio,meses:meses,inicio:inicio,mes:params.mes,numero:params.numero]
     }
 
 
     def ingresos(){
+        def empresa = Empresa.findAllByPrincipal("S")
         def meses = ["Enero":"01","Febrero":"02","Marzo":"03","Abril":"04","Mayo":"05","Junio":"06","Juilo":"07","Agosto":"08","Septiembre":"09","Octubre":"10","Noviembre":"11","Diciembre":"12"]
-        def anio = new Date().format("yyyy")
+        def anio = empresa.anio.find() //new Date().format("yyyy")
         [anio:anio,meses:meses,mes:params.mes,numero:params.numero]
     }
 
     def egresos(){
+        def empresa = Empresa.findAllByPrincipal("S")
         def meses = ["Enero":"01","Febrero":"02","Marzo":"03","Abril":"04","Mayo":"05","Junio":"06","Juilo":"07","Agosto":"08","Septiembre":"09","Octubre":"10","Noviembre":"11","Diciembre":"12"]
-        def anio = new Date().format("yyyy")
+        def anio = empresa.anio.find() //new Date().format("yyyy")
         [anio:anio,meses:meses,mes:params.mes,numero:params.numero]
     }
 
