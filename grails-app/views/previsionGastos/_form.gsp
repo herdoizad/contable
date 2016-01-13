@@ -18,12 +18,12 @@
 	<g:select id="empleado" name="empleado.id" from="${contable.nomina.Empleado.list()}" optionKey="id" required="" value="${previsionGastosInstance?.empleado?.id}" class="many-to-one form-control "/>
 </div>
 
-<div class="fieldcontain ${hasErrors(bean: previsionGastosInstance, field: 'totalAlimentacion', 'error')} required">
-	<label for="totalAlimentacion">
-		<g:message code="previsionGastos.totalAlimentacion.label" default="Total Alimentacion" />
+<div class="fieldcontain ${hasErrors(bean: previsionGastosInstance, field: 'totalVivienda', 'error')} required">
+	<label for="totalVivienda">
+		<g:message code="previsionGastos.totalVivienda.label" default="Total Vivienda" />
 		<span class="required-indicator">*</span>
 	</label>
-	<g:textField name="totalAlimentacion" value="${fieldValue(bean: previsionGastosInstance, field: 'totalAlimentacion')}" class="number form-control   required" required=""/>
+	<g:textField name="totalVivienda" value="${fieldValue(bean: previsionGastosInstance, field: 'totalVivienda')}" class="number form-control   required" required=""/>
 </div>
 
 <div class="fieldcontain ${hasErrors(bean: previsionGastosInstance, field: 'totalEducacion', 'error')} required">
@@ -50,11 +50,11 @@
 	<g:textField name="totalVestimenta" value="${fieldValue(bean: previsionGastosInstance, field: 'totalVestimenta')}" class="number form-control   required" required=""/>
 </div>
 
-<div class="fieldcontain ${hasErrors(bean: previsionGastosInstance, field: 'totalVivienda', 'error')} required">
-	<label for="totalVivienda">
-		<g:message code="previsionGastos.totalVivienda.label" default="Total Vivienda" />
+<div class="fieldcontain ${hasErrors(bean: previsionGastosInstance, field: 'totalAlimentacion', 'error')} required">
+	<label for="totalAlimentacion">
+		<g:message code="previsionGastos.totalAlimentacion.label" default="Total Alimentacion" />
 		<span class="required-indicator">*</span>
 	</label>
-	<g:textField name="totalVivienda" value="${fieldValue(bean: previsionGastosInstance, field: 'totalVivienda')}" class="number form-control   required" required=""/>
+	<g:textField name="totalAlimentacion" value="${fieldValue(bean: previsionGastosInstance, field: 'totalAlimentacion')}" class="number form-control   required" required=""/>
 </div>
 

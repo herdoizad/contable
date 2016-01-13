@@ -33,14 +33,14 @@
             </div>
         </g:if>
     
-        <g:if test="${previsionGastosInstance?.totalAlimentacion}">
+        <g:if test="${previsionGastosInstance?.totalVivienda}">
             <div class="row">
                 <div class="col-sm-3 show-label">
-                    Total Alimentacion
+                    Total Vivienda
                 </div>
                 
                 <div class="col-sm-4">
-                    <g:fieldValue bean="${previsionGastosInstance}" field="totalAlimentacion"/>
+                    <g:fieldValue bean="${previsionGastosInstance}" field="totalVivienda"/>
                 </div>
                 
             </div>
@@ -85,14 +85,14 @@
             </div>
         </g:if>
     
-        <g:if test="${previsionGastosInstance?.totalVivienda}">
+        <g:if test="${previsionGastosInstance?.totalAlimentacion}">
             <div class="row">
                 <div class="col-sm-3 show-label">
-                    Total Vivienda
+                    Total Alimentacion
                 </div>
                 
                 <div class="col-sm-4">
-                    <g:fieldValue bean="${previsionGastosInstance}" field="totalVivienda"/>
+                    <g:fieldValue bean="${previsionGastosInstance}" field="totalAlimentacion"/>
                 </div>
                 
             </div>

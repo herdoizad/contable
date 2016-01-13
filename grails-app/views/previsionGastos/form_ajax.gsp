@@ -11,10 +11,10 @@
                 role="form" controller="previsionGastos" action="save_ajax" method="POST">
 
 
-            <elm:fieldRapido claseLabel="col-sm-2" label="Anio" claseField="col-sm-2">
+           %{--<elm:fieldRapido claseLabel="col-sm-2" label="Anio" claseField="col-sm-2">
                 <g:textField name="anio" value="${previsionGastosInstance.anio?prestamoInstance.anio:new Date().format('yyyy')}" class="digits form-control  required" required=""/>
             </elm:fieldRapido>
-
+--}%
             <elm:fieldRapido claseLabel="col-sm-2" label="Empleado" claseField="col-sm-6">
                 <g:if test="${empleado}">
                     <input type="hidden" name="empleado.id" value="${empleado.id}">
@@ -25,8 +25,8 @@
                 </g:else>
             </elm:fieldRapido>
 
-            <elm:fieldRapido claseLabel="col-sm-2" label="Total Alimentacion" claseField="col-sm-3">
-                <g:textField name="totalAlimentacion" style="text-align:right"  value="${fieldValue(bean: previsionGastosInstance, field: 'totalAlimentacion')}" class="number form-control   required" required=""/>
+            <elm:fieldRapido claseLabel="col-sm-2" label="Total Vivienda" claseField="col-sm-3">
+                <g:textField name="totalVivienda" style="text-align:right"  value="${fieldValue(bean: previsionGastosInstance, field: 'totalVivienda')}" class="number form-control   required" required=""/>
             </elm:fieldRapido>
 
             <elm:fieldRapido claseLabel="col-sm-2" label="Total Educacion" claseField="col-sm-3">
@@ -41,8 +41,8 @@
                 <g:textField name="totalVestimenta"  style="text-align:right" value="${fieldValue(bean: previsionGastosInstance, field: 'totalVestimenta')}" class="number form-control   required" required=""/>
             </elm:fieldRapido>
 
-            <elm:fieldRapido claseLabel="col-sm-2" label="Total Vivienda" claseField="col-sm-3">
-                <g:textField name="totalVivienda" style="text-align:right" value="${fieldValue(bean: previsionGastosInstance, field: 'totalVivienda')}" class="number form-control   required" required=""/>
+            <elm:fieldRapido claseLabel="col-sm-2" label="Total Alimentacion" claseField="col-sm-3">
+                <g:textField name="totalAlimentacion" style="text-align:right" value="${fieldValue(bean: previsionGastosInstance, field: 'totalAlimentacion')}" class="number form-control   required" required=""/>
             </elm:fieldRapido>
 
         </g:form>

@@ -41,11 +41,11 @@
 				</li>
 				</g:if>
 			
-				<g:if test="${previsionGastosInstance?.totalAlimentacion}">
+				<g:if test="${previsionGastosInstance?.totalVivienda}">
 				<li class="fieldcontain">
-					<span id="totalAlimentacion-label" class="property-label"><g:message code="previsionGastos.totalAlimentacion.label" default="Total Alimentacion" /></span>
+					<span id="totalVivienda-label" class="property-label"><g:message code="previsionGastos.totalVivienda.label" default="Total Vivienda" /></span>
 					
-						<span class="property-value" aria-labelledby="totalAlimentacion-label"><g:fieldValue bean="${previsionGastosInstance}" field="totalAlimentacion"/></span>
+						<span class="property-value" aria-labelledby="totalVivienda-label"><g:fieldValue bean="${previsionGastosInstance}" field="totalVivienda"/></span>
 					
 				</li>
 				</g:if>
@@ -77,11 +77,11 @@
 				</li>
 				</g:if>
 			
-				<g:if test="${previsionGastosInstance?.totalVivienda}">
+				<g:if test="${previsionGastosInstance?.totalAlimentacion}">
 				<li class="fieldcontain">
-					<span id="totalVivienda-label" class="property-label"><g:message code="previsionGastos.totalVivienda.label" default="Total Vivienda" /></span>
+					<span id="totalAlimentacion" class="property-label"><g:message code="previsionGastos.totalAlimentacion.label" default="Total Alimentacion" /></span>
 					
-						<span class="property-value" aria-labelledby="totalVivienda-label"><g:fieldValue bean="${previsionGastosInstance}" field="totalVivienda"/></span>
+						<span class="property-value" aria-labelledby="totalAlimentacion-label"><g:fieldValue bean="${previsionGastosInstance}" field="totalAlimentacion"/></span>
 					
 				</li>
 				</g:if>

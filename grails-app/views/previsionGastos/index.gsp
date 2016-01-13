@@ -28,14 +28,16 @@
 					
 						<th><g:message code="previsionGastos.empleado.label" default="Empleado" /></th>
 					
-						<g:sortableColumn property="totalAlimentacion" title="${message(code: 'previsionGastos.totalAlimentacion.label', default: 'Total Alimentacion')}" />
+						<g:sortableColumn property="totalVivienda" title="${message(code: 'previsionGastos.totalVivienda.label', default: 'Total Vivienda')}" />
 					
 						<g:sortableColumn property="totalEducacion" title="${message(code: 'previsionGastos.totalEducacion.label', default: 'Total Educacion')}" />
 					
 						<g:sortableColumn property="totalSalud" title="${message(code: 'previsionGastos.totalSalud.label', default: 'Total Salud')}" />
 					
 						<g:sortableColumn property="totalVestimenta" title="${message(code: 'previsionGastos.totalVestimenta.label', default: 'Total Vestimenta')}" />
-					
+
+						<g:sortableColumn property="totalAlimentacion" title="${message(code: 'previsionGastos.totalAlimentacion.label', default: 'Total Alimentacion')}" />
+
 					</tr>
 				</thead>
 				<tbody>
@@ -46,13 +48,15 @@
 					
 						<td>${fieldValue(bean: previsionGastosInstance, field: "empleado")}</td>
 					
-						<td>${fieldValue(bean: previsionGastosInstance, field: "totalAlimentacion")}</td>
+						<td>${fieldValue(bean: previsionGastosInstance, field: "totalVivienda")}</td>
 					
 						<td>${fieldValue(bean: previsionGastosInstance, field: "totalEducacion")}</td>
 					
 						<td>${fieldValue(bean: previsionGastosInstance, field: "totalSalud")}</td>
 					
 						<td>${fieldValue(bean: previsionGastosInstance, field: "totalVestimenta")}</td>
+
+						<td>${fieldValue(bean: previsionGastosInstance, field: "totalAlimentacion")}</td>
 					
 					</tr>
 				</g:each>
