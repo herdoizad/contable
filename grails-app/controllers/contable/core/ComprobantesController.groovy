@@ -27,11 +27,8 @@ class ComprobantesController extends Shield {
     }
 
     def getComprobantesMes_ajax(){
-        def empresa = Empresa.findAllByCodigo(session.empresa.codigo)
         def anio = session.empresa.anio //new Date().format("yyyy")
         def comps = Comprobante.findAll("from Comprobante where mes=${(anio+params.mes).toInteger()} and empresa='${session.empresa.codigo}' and tipo=${params.tipo} order by fecha desc ,numero asc")
-        println "from Comprobante where mes=${(anio+params.mes).toInteger()} and empresa='${session.empresa.codigo}' and tipo=${params.tipo} order by fecha desc ,numero asc"
-
         def mes = Mes.findByCodigo((anio+params.mes).toInteger())
         def editable = Empresa.findByCodigo(session.empresa.codigo)?.editable
         [anio:anio,comps:comps,numero: params.numero,mes:params.mes,mesObj:mes,editable:editable]
