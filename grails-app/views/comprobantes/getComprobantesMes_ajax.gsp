@@ -26,6 +26,7 @@
                 </a>
             </td>
             <td style="text-align: center">
+                <!--Controla NULL en estado-->
                 <g:if test="${mesObj?.estado!='C' && editable!='N'}">
                     <g:if test="${c.tipo==3}">
                         <g:if test="${c.tipoProcesamiento!=4}">
