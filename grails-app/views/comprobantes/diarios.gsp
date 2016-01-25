@@ -23,7 +23,7 @@
         <div class="panel-completo" style="margin-left: 10px">
             <div class="row">
                 <div class="col-md-3 titulo-panel">
-                    Comprobantes de diario para empresa en el año ${anio}
+                    Comprobantes de diario del ${anio}
                 </div>
                 <div class="col-md-5 titulo-panel" style="margin-top: -11px;text-align: right">
                     Imprimir del

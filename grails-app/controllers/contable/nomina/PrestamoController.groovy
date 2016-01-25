@@ -334,7 +334,7 @@ class PrestamoController extends Shield {
         def empleado = Empleado.findByUsuario(session.usuario.login)
         def tipo = TipoPrestamo.get(params.id)
         def interes = Variable.findByCodigo("TINT")
-        def prestmos = Prestamo.findAllByEstado("A",[sort: "fin",order: "desc"])
+        def prestmos = Prestamo.findAllByEstadoAndEmpleado("A", empleado, [sort: "fin",order: "desc"])
         def puede = true
         def now = new Date()
         def fecha
@@ -344,6 +344,7 @@ class PrestamoController extends Shield {
                 fecha=prestmos.first().fin.plus(90)
             }
         }
+
         if(!puede){
             render   "Usted podrá solicitar un nuevo prestamo el ${fecha.format('dd-MM-yyyy')}"
             return

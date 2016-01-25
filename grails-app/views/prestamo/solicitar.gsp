@@ -1,7 +1,7 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
 <html>
 <head>
-    <title>Solcitar prestamo o anticipo</title>
+    <title>Solicitar préstamo o anticipo</title>
     <meta name="layout" content="main">
 </head>
 <body>
@@ -30,7 +30,7 @@
             <g:else>
                 <div class="row fila">
                     <div class="col-md-12">
-                        Usted podrá solicitar un nuevo prestamo el ${fecha.format("dd-MM-yyyy")}
+                        Usted podrá solicitar un nnnnnuevo prestamo el ${fecha.format("dd-MM-yyyy")}
                     </div>
                 </div>
             </g:else>
