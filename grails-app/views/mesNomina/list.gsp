@@ -48,6 +48,8 @@
                     <g:sortableColumn property="codigo" title="Codigo" />
                     
                     <g:sortableColumn property="diasLaborables" title="Dias Laborables" />
+
+                    <g:sortableColumn property="estado" title="Estado" />
                     
                 </tr>
             </thead>
@@ -61,6 +63,8 @@
                             <td>${mesNominaInstance.codigo}</td>
                             
                             <td><g:fieldValue bean="${mesNominaInstance}" field="diasLaborables"/></td>
+
+                            <td>${mesNominaInstance.estado}</td>
                             
                         </tr>
                     </g:each>

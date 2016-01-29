@@ -5,6 +5,7 @@ class MesNomina {
     Integer codigo
     Integer diasLaborables = 30
     String descripcion
+    String estado = "A"
 
     static auditable = [ignore: []]
 
@@ -22,10 +23,12 @@ class MesNomina {
             codigo column: 'CODIGO'
             diasLaborables column: 'DIAS_LABORABLES'
             descripcion column: 'DESCRIPCION'
+            estado column: 'ESTADO'
         }
     }
 
     static constraints = {
         descripcion(size: 1..40)
+        estado(nullable: true,size:1..1)
     }
 }
