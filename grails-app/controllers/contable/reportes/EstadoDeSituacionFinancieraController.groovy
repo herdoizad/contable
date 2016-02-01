@@ -10,6 +10,7 @@ import com.itextpdf.text.Paragraph
 import com.itextpdf.text.pdf.PdfPCell
 import com.itextpdf.text.pdf.PdfPTable
 import com.itextpdf.text.pdf.PdfWriter
+import groovy.time.TimeCategory
 
 class EstadoDeSituacionFinancieraController extends Shield {
 
@@ -17,16 +18,20 @@ class EstadoDeSituacionFinancieraController extends Shield {
     def qrCodeService
     def reportesService
     def estado(){
-//        println "esf "+params
+        //println "esf "+params
         def inicio = new Date().parse("dd-MM-yyyy",params.inicio)
-        def fin = new Date().parse("dd-MM-yyyy",params.fin)
+        def fin
         def nivel = params.nivel.toInteger()
         def cierre = "01/01/2015"
         def cn = new Sql(dataSource)
         Document document = new Document();
         /*Cierre  - fin - inicio*/
-        def sql = "CONTABLE..up_saldos_contables 'PS' ,'${cierre}' , '${fin.format('MM/dd/yyyy')}', '${inicio.format('MM/dd/yyyy')}'"
-       // println "sql "+sql
+        use ( TimeCategory ) {
+            fin = new Date().parse("dd-MM-yyyy",params.fin) + 23.hours + 59.minutes + 59.seconds
+        }
+        println "fecha fin nueva "+ fin
+        def sql = "CONTABLE..up_saldos_contables 'PS' ,'${cierre}' , '${fin.format('MM/dd/yyyy HH:mm:ss')}', '${inicio.format('MM/dd/yyyy')}'"
+        println "sql up_saldos_contables "+sql
         cn.call(sql)
         sql = "select * from CONTABLE..PLAN_CUENTA_TMP where CTA_NIVEL<=${nivel} order by CTA_CUENTA "
         //println "sql "+sql
@@ -71,7 +76,7 @@ class EstadoDeSituacionFinancieraController extends Shield {
         p = new Paragraph("ESTADO SITUACIÓN FINANCIERA",titulo)
         p.setAlignment(Element.ALIGN_CENTER)
         document.add(p);
-        p = new Paragraph("Desde: ${inicio.format("dd-mm-yyyy")} Hasta: "+fin.format("dd-mm-yyyy"),contenido)
+        p = new Paragraph("Desde: ${inicio.format("dd-MM-yyyy")} Hasta: "+fin.format("dd-MM-yyyy"),contenido)
         p.setAlignment(Element.ALIGN_CENTER)
         document.add(p);
         document.add(new Paragraph("\n"));

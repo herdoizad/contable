@@ -10,6 +10,7 @@ import com.itextpdf.text.Paragraph
 import com.itextpdf.text.pdf.PdfPCell
 import com.itextpdf.text.pdf.PdfPTable
 import com.itextpdf.text.pdf.PdfWriter
+import groovy.time.TimeCategory
 
 
 class ResultadoIntegralController extends Shield {
@@ -18,9 +19,12 @@ class ResultadoIntegralController extends Shield {
     def reportesService
     def reporte(){
         def inicio = new Date().parse("dd-MM-yyyy",params.inicio)
-        def fin = new Date().parse("dd-MM-yyyy",params.fin)
+        def fin
         def nivel = params.nivel.toInteger()
         def cierre = "01/01/${inicio.format('yyyy')}"
+        use ( TimeCategory ) {
+            fin = new Date().parse("dd-MM-yyyy",params.fin) + 23.hours + 59.minutes + 59.seconds
+        }
         def cn = new Sql(dataSource)
         Document document = new Document();
         def fecha = new Date()
@@ -65,7 +69,7 @@ class ResultadoIntegralController extends Shield {
         document.add(p);
         document.add(new Paragraph("\n"));
         document.add(new Paragraph("\n"));
-        def sql = "CONTABLE..up_bce_resultados_mes 'PS' ,'${inicio.format('MM/dd/yyyy')}' , '${fin.format('MM/dd/yyyy')}', '${cierre}'"
+        def sql = "CONTABLE..up_bce_resultados_mes 'PS' ,'${inicio.format('MM/dd/yyyy')}' , '${fin.format('MM/dd/yyyy HH:mm:ss')}', '${cierre}'"
 //        println "sql "+sql
         cn.call(sql.toString())
         sql = "select * from CONTABLE..PLAN_CUENTA_TMP where CTA_NIVEL<=${nivel} order by CTA_CUENTA "
