@@ -240,6 +240,8 @@ class ReporteRolExcelController {
             def totalEmpleadosi = 0
             def totalEmpleadooch = 0
             def totalEmpleadonu = 0
+            def totalEmpleadofac = 0
+
             row = sheet.createRow((short) curRow)
             celda = row.createCell((short) 1)
             celda.setCellValue(em.apellido)
@@ -317,7 +319,12 @@ class ReporteRolExcelController {
             h6.each {hseis ->
                 totalEmpleadose += hseis.valor
             }
-            def tt2 = totalEmpleadoc + totalEmpleadoci + totalEmpleadose
+            def rubrofac = Rubro.findAllByCodigo('BSF')
+            def rfac = DetalleRol.findAllByRubroAndRol(rubrofac,rol)
+            rfac.each {fac ->
+                totalEmpleadofac += fac.valor
+            }
+            def tt2 = totalEmpleadoc + totalEmpleadoci + totalEmpleadose + totalEmpleadofac
 
             def fdu = 0
             def dtd = 0
@@ -370,6 +377,8 @@ class ReporteRolExcelController {
             sc.each{ s ->
             if(s){
                 sueldo = s?.sueldo
+                 // println  "sueldo " + s.sueldo
+
             }else{
                 sueldo = 0
             }
