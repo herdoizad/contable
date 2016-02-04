@@ -354,7 +354,11 @@ class RubrosController extends Shield {
 
     def rubroVariable(){
 
-        def meses = MesNomina.findAllByCodigoGreaterThanEquals(new Date().format("yyyyMM").toInteger()-3,[sort: "codigo"])
+        def mesito = new Date().format("yyyyMM").toInteger()-3
+        println "Mesito-3 " + mesito
+
+       //def meses = MesNomina.findAllByCodigoGreaterThanEquals(new Date().format("yyyyMM").toInteger()-3,[sort: "codigo"])
+        def meses = MesNomina.findAllByEstado("A",[sort: "codigo"])
         def tipos = ["-1":"Descuento","1":"Ingreso"]
         def rubros = Rubro.findAllByVariableAndEstado("V","A")
 //                ["Supermaxi","Fybeca","Seguro dental y de vida","Génesis","Préstamo PyS","Ecuasanitas","Préstamo IESS","Multas","Otros"]

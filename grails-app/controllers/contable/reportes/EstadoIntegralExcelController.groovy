@@ -2,6 +2,7 @@ package contable.reportes
 
 import contable.seguridad.Shield
 import groovy.sql.Sql
+import groovy.time.TimeCategory
 import org.apache.poi.ss.usermodel.CellStyle
 import org.apache.poi.ss.usermodel.ClientAnchor
 import org.apache.poi.ss.usermodel.CreationHelper
@@ -20,12 +21,17 @@ class EstadoIntegralExcelController extends Shield {
     def dataSource
     def index() {
         def inicio = new Date().parse("dd-MM-yyyy",params.inicio)
-        def fin = new Date().parse("dd-MM-yyyy",params.fin)
+        def fin
         def nivel = params.nivel.toInteger()
         def cierre = "01/01/${inicio.format('yyyy')}"
         def cn = new Sql(dataSource)
         def fecha = new Date()
-        def sql = "CONTABLE..up_bce_resultados_mes 'PS' ,'${inicio.format('MM/dd/yyyy')}' , '${fin.format('MM/dd/yyyy')}', '${cierre}'"
+
+        use ( TimeCategory ) {
+            fin = new Date().parse("dd-MM-yyyy",params.fin) + 23.hours + 59.minutes + 59.seconds
+        }
+
+        def sql = "CONTABLE..up_bce_resultados_mes 'PS' ,'${inicio.format('MM/dd/yyyy')}' , '${fin.format('MM/dd/yyyy HH:mm:ss')}', '${cierre}'"
         cn.call(sql.toString())
         sql = "select * from CONTABLE..PLAN_CUENTA_TMP where CTA_NIVEL<=${nivel} order by CTA_CUENTA "
         def result = [:]

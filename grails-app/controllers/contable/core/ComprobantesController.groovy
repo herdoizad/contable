@@ -6,27 +6,31 @@ class ComprobantesController extends Shield {
     def mailService
     def diarios(){
         def meses = ["Enero":"01","Febrero":"02","Marzo":"03","Abril":"04","Mayo":"05","Junio":"06","Juilo":"07","Agosto":"08","Septiembre":"09","Octubre":"10","Noviembre":"11","Diciembre":"12"]
-        def anio = new Date().format("yyyy")
+        def anio = session.empresa.anio //new Date().format("yyyy")
         def inicio = Comprobante.findAllByMesAndEmpresa((anio+"00").toInteger(),session.empresa)
         [anio:anio,meses:meses,inicio:inicio,mes:params.mes,numero:params.numero]
     }
 
 
     def ingresos(){
+        //def empresa = Empresa.findAllByCodigo(session.empresa.codigo)
         def meses = ["Enero":"01","Febrero":"02","Marzo":"03","Abril":"04","Mayo":"05","Junio":"06","Juilo":"07","Agosto":"08","Septiembre":"09","Octubre":"10","Noviembre":"11","Diciembre":"12"]
-        def anio = new Date().format("yyyy")
+        def anio = session.empresa.anio //new Date().format("yyyy")
         [anio:anio,meses:meses,mes:params.mes,numero:params.numero]
     }
 
     def egresos(){
+        //def empresa = Empresa.findAllByCodigo(session.empresa.codigo)
         def meses = ["Enero":"01","Febrero":"02","Marzo":"03","Abril":"04","Mayo":"05","Junio":"06","Juilo":"07","Agosto":"08","Septiembre":"09","Octubre":"10","Noviembre":"11","Diciembre":"12"]
-        def anio = new Date().format("yyyy")
+        def anio = session.empresa.anio //new Date().format("yyyy")
         [anio:anio,meses:meses,mes:params.mes,numero:params.numero]
     }
 
     def getComprobantesMes_ajax(){
-        def anio = new Date().format("yyyy")
+        def anio = session.empresa.anio //new Date().format("yyyy")
+        println "anio " + anio
         def comps = Comprobante.findAll("from Comprobante where mes=${(anio+params.mes).toInteger()} and empresa='${session.empresa.codigo}' and tipo=${params.tipo} order by fecha desc ,numero asc")
+        println "from Comprobante where mes=${(anio+params.mes).toInteger()} and empresa='${session.empresa.codigo}' and tipo=${params.tipo} order by fecha desc ,numero asc"
         def mes = Mes.findByCodigo((anio+params.mes).toInteger())
         def editable = Empresa.findByCodigo(session.empresa.codigo)?.editable
         [anio:anio,comps:comps,numero: params.numero,mes:params.mes,mesObj:mes,editable:editable]

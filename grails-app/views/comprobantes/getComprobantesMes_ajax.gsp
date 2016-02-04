@@ -26,7 +26,7 @@
                 </a>
             </td>
             <td style="text-align: center">
-                <g:if test="${mesObj.estado!='C' && editable!='N'}">
+                <g:if test="${mesObj?.estado!='C' && editable!='N'}">
                     <g:if test="${c.tipo==3}">
                         <g:if test="${c.tipoProcesamiento!=4}">
                             <a href="${g.createLink(controller: 'comprobantes',action: 'nuevo',params: [mes:c.mes,tipo:c.tipo,numero:c.numero])}" class="btn btn-info btn-xsm editar ${mes}-${g.formatNumber(number:  c.numero,maxFractionDigits: 0)}" title="Editar" mes="${c.mes}" empresa="${c.empresa.codigo}" tipo="${c.tipo}" numero="${c.numero}">
@@ -151,7 +151,7 @@
                         message: msg,
 
                         buttons: {
-                            <g:if test="${mesObj.estado!='C'}">
+                            <g:if test="${mesObj?.estado!='C'}">
                             anular:{
                                 label:"Anular",
                                 className: "btn-danger btn-sm",

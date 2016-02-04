@@ -308,16 +308,18 @@
         var id = $(this).attr("iden")
         var rol = $(".valor-"+id).attr("rol")
         bootbox.confirm("Está seguro?",function(result){
-            openLoader()
-            $.ajax({
-                type: "POST",
-                url: "${createLink(controller:'rol', action:'deleteRubro_ajax')}",
-                data: "id="+id,
-                success: function (msg) {
-                    closeLoader()
-                    div.html(msg)
-                } //success
-            }); //ajax
+            if (result) {
+                openLoader()
+                $.ajax({
+                    type: "POST",
+                    url: "${createLink(controller:'rol', action:'deleteRubro_ajax')}",
+                    data: "id="+id,
+                    success: function (msg) {
+                        closeLoader()
+                        div.html(msg)
+                    } //success
+                });
+            }//ajax
         })
         return false
     })

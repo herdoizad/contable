@@ -22,7 +22,11 @@
         <elm:fieldRapido claseLabel="col-sm-2" label="Dias Laborables" claseField="col-sm-2">
             <g:textField name="diasLaborables" value="${mesNominaInstance.diasLaborables}" class="digits form-control  required" required=""/>
         </elm:fieldRapido>
-        
+
+        <elm:fieldRapido claseLabel="col-sm-2" label="Estado" claseField="col-sm-6">
+            <g:textField name="estado" maxlength="1" required="" class="form-control  required" value="${mesNominaInstance?.estado}"/>
+        </elm:fieldRapido>
+
     </g:form>
         </div>
 
