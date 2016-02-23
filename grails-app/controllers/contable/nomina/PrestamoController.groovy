@@ -315,9 +315,9 @@ class PrestamoController extends Shield {
             def email = "susana.barriga@petroleosyservicios.com"
             mailService.sendMail {
                 multipart true
-                to "valentinsvt@hotmail.com"
+                to "david.herdoiza@petroleosyservicios.com"
 //                to r.empleado.email
-                cc "valentinsvt@hotmail.com"
+                cc "david.herdoiza@petroleosyservicios.com"
 //                cc email
                 subject "Solicitud de prestamo de consumo"
                 body( view:"mailSolicitud",

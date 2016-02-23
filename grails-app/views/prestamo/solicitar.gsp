@@ -30,7 +30,7 @@
             <g:else>
                 <div class="row fila">
                     <div class="col-md-12">
-                        Usted podrá solicitar un nnnnnuevo prestamo el ${fecha.format("dd-MM-yyyy")}
+                        Usted podrá solicitar un nuevo prestamo el ${fecha.format("dd-MM-yyyy")}
                     </div>
                 </div>
             </g:else>
