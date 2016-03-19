@@ -221,10 +221,8 @@ class PrestamoController extends Shield {
             def email = "susana.barriga@petroleosyservicios.com"
             mailService.sendMail {
                 multipart true
-                to "valentinsvt@hotmail.com"
-//                to r.empleado.email
-                cc "valentinsvt@hotmail.com"
-//                cc email
+                to r.empleado.email
+                cc email
                 subject "Solicitud de anticipo"
                 body( view:"mailSolicitud",
                         model:[prestamo:prestamo,usuario:session.usuario.login,titulo:'Solicitud de anticipo'])
@@ -279,10 +277,8 @@ class PrestamoController extends Shield {
             def email = "susana.barriga@petroleosyservicios.com"
             mailService.sendMail {
                 multipart true
-                to "valentinsvt@hotmail.cola bm"
-//                to r.empleado.email
-                cc "valentinsvt@hotmail.com"
-//                cc email
+                to r.empleado.email
+                cc email
                 subject "Solicitud de prestamo emergente"
                 body( view:"mailSolicitud",
                         model:[prestamo:prestamo,usuario:session.usuario.login,titulo:'Solicitud de prestamo emergente'])
@@ -484,13 +480,11 @@ class PrestamoController extends Shield {
             prestamo.save(flush: true)
             mailService.sendMail {
                 multipart true
-                to "valentinsvt@hotmail.com"
-//                to prestamo.empleado.email
+                to prestamo.empleado.email
                 subject "Prestamo aprobado"
                 body( view:"mailResultado",
                         model:[prestamo:prestamo,usuario:session.usuario.login,titulo:'Prestamo aprobado'])
                 inline 'logo','image/png',grailsApplication.mainContext.getResource('/images/logo-login.png').getFile().readBytes()
-//            inline 'logo','image/png', new File('./web-app///images/logo-login.png').readBytes()
             }
             render "ok"
         }

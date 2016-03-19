@@ -1,5 +1,6 @@
 package contable.nomina
 
+import contable.core.Empresa
 import contable.seguridad.Shield
 import groovy.sql.Sql
 class RolController extends Shield {
@@ -8,7 +9,10 @@ class RolController extends Shield {
     def mailService
     def rolDePagosService
     def index() {
-        def meses = MesNomina.findAllByCodigoLessThanEquals((new Date().format("yyyy")+"16").toInteger(),[sort:"codigo"])
+        def mesInical = ""+Empresa.list()[0].anio + "01"
+        println "empresa "+mesInical
+
+        def meses = MesNomina.findAllByCodigoGreaterThanEquals(mesInical.toInteger())
         def empleados = Empleado.findAllByEstado("A",[sort: 'apellido'])
 
         [meses:meses,empleados:empleados,emp:params.empleado]
@@ -468,8 +472,7 @@ class RolController extends Shield {
             def detalle = DetalleRol.findAllByRol(r,[sort:"signo",order:"desc"])
             mailService.sendMail {
                 multipart true
-                to "valentinsvt@hotmail.com"
-//                to r.empleado.email
+                to r.empleado.email
                 subject "Rol de pagos"
                 body( view:"mailRol",
                         model:[rol: r,detalle:detalle,usuario:session.usuario.login])

@@ -352,16 +352,13 @@ class AccionesController extends Shield {
             println "error save usu "+usuario.errors
         def email = usuario.nombre.split(" ")
         email=email[0]+"."+email[1]+"@petroleosyservicios.com".toUpperCase()
-//        println "enviando email a "+email
         mailService.sendMail {
             multipart true
-//            to "valentinsvt@hotmail.com"
             to email
             subject "[CONTABLE]Nueva contraseña"
             body( view:"cambioPass",
                     model:[pass:pass,usuario:usuario.login,genera:session.usuario.login])
             inline 'logo','image/png',grailsApplication.mainContext.getResource('/images/logo-login.png').getFile().readBytes()
-//            inline 'logo','image/png', new File('./web-app///images/logo-login.png').readBytes()
         }
         render "ok"
 
