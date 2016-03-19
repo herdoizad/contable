@@ -34,10 +34,10 @@
             </a>
         </div>
         <div class="col-md-1">
-        <a href="${g.createLink(action: 'index',controller: 'reporteRolExcel',id: mes.id)}" class="btn btn-default btn-sm " id="reporte" empleado="${emp}" mes="${mes.id}">
-            <i class="fa fa-print"></i> Imprimir
-        </a>
-    </div>
+            <a href="${g.createLink(action: 'index',controller: 'reporteRolExcel',id: mes.id)}" class="btn btn-default btn-sm " id="reporte" empleado="${emp}" mes="${mes.id}">
+                <i class="fa fa-print"></i> Imprimir
+            </a>
+        </div>
         <div class="col-md-2">
             <a href="${g.createLink(action: 'index',controller: 'AcreditaBancosExcel',id: mes.id)}" class="btn btn-default btn-sm " id="reporte" empleado="${emp}" mes="${mes.id}">
                 <i class="fa fa-print"></i> Acreditacion Bancos
@@ -121,50 +121,52 @@
                     <g:if test="${d.rubro?.codigo=='Q1'}">
                         <g:set var="q1" value="${d.valor}"></g:set>
                     </g:if>
-                    <tr>
-                        <g:set var="total" value="${total+(d.signo*d.valor)}"></g:set>
-                        <g:if test="${d.signo>0}">
-                            <g:set var="totalI" value="${totalI+(d.valor)}"></g:set>
-                        </g:if>
-                        <g:else>
-                            <g:set var="totalE" value="${totalE+(d.valor)}"></g:set>
-                        </g:else>
-                        <td>
-                            <g:if test="${r.estado=='N'}">
-                                <input type="text" class="form-control input-sm  desc-${d.id}"  maxlength="150" value="${d.descripcion}" id="desc_${d.id}">
+                    <g:if test="${d.valor>0}">
+                        <tr>
+                            <g:set var="total" value="${total+(d.signo*d.valor)}"></g:set>
+                            <g:if test="${d.signo>0}">
+                                <g:set var="totalI" value="${totalI+(d.valor)}"></g:set>
                             </g:if>
                             <g:else>
-                                ${d.descripcion}
+                                <g:set var="totalE" value="${totalE+(d.valor)}"></g:set>
                             </g:else>
+                            <td>
+                                <g:if test="${r.estado=='N'}">
+                                    <input type="text" class="form-control input-sm  desc-${d.id}"  maxlength="150" value="${d.descripcion}" id="desc_${d.id}">
+                                </g:if>
+                                <g:else>
+                                    ${d.descripcion}
+                                </g:else>
 
-                        </td>
-                        <td style="text-align: center">
-                            ${d.signo==1?'Ingreso':'Egreso'}
-                        </td>
-                        <td style="text-align: right">
-                            <g:if test="${r.estado=='N'}">
-                                <input type="text" style="text-align: right" signo="${d.signo}"  value="${d.valor}"
-                                       class="form-control input-sm number valor-${d.id} dt-${r.id}" rol="${r.id}" id="valor_${r.id}">
-                            </g:if>
-                            <g:else>
-                                <g:formatNumber number="${d.valor}" type="currency" currencySymbol="" />
-                            </g:else>
-                        </td>
-                        <td style="text-align: center">
-                            <g:if test="${r.estado=='N' && d.codigo!='PRST'}">
-                                <a href="#" class="btn btn-info btn-xs guardar" title="Guardar" iden="${d.id}" >
-                                    <i class="fa fa-save"></i>
-                                </a>
-                            </g:if>
-                        </td>
-                        <td style="text-align: center">
-                            <g:if test="${r.estado=='N' && d.codigo!='PRST'}">
-                                <a href="#" class="btn btn-danger btn-xs borrar" title="Borrar" iden="${d.id}">
-                                    <i class="fa fa-trash"></i>
-                                </a>
-                            </g:if>
-                        </td>
-                    </tr>
+                            </td>
+                            <td style="text-align: center">
+                                ${d.signo==1?'Ingreso':'Egreso'}
+                            </td>
+                            <td style="text-align: right">
+                                <g:if test="${r.estado=='N'}">
+                                    <input type="text" style="text-align: right" signo="${d.signo}"  value="${d.valor}"
+                                           class="form-control input-sm number valor-${d.id} dt-${r.id}" rol="${r.id}" id="valor_${r.id}">
+                                </g:if>
+                                <g:else>
+                                    <g:formatNumber number="${d.valor}" type="currency" currencySymbol="" />
+                                </g:else>
+                            </td>
+                            <td style="text-align: center">
+                                <g:if test="${r.estado=='N' && d.codigo!='PRST'}">
+                                    <a href="#" class="btn btn-info btn-xs guardar" title="Guardar" iden="${d.id}" >
+                                        <i class="fa fa-save"></i>
+                                    </a>
+                                </g:if>
+                            </td>
+                            <td style="text-align: center">
+                                <g:if test="${r.estado=='N' && d.codigo!='PRST'}">
+                                    <a href="#" class="btn btn-danger btn-xs borrar" title="Borrar" iden="${d.id}">
+                                        <i class="fa fa-trash"></i>
+                                    </a>
+                                </g:if>
+                            </td>
+                        </tr>
+                    </g:if>
                 </g:each>
                 <tr>
                     <td colspan="2" style="text-align: right">

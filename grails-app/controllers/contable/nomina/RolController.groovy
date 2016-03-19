@@ -163,10 +163,10 @@ class RolController extends Shield {
         cal.set(Calendar.DATE, cal.getActualMaximum(Calendar.DATE));
         def fin  = cal.getTime();
         def resultados=[:]
-        println "inicio "+inicio.format("dd-MM-yyy")+" fin "+fin
-//        println "inicio "+inicio+"  fin "+fin
+       // println "inicio "+inicio.format("dd-MM-yyy")+" fin "+fin
+        //println "inicio "+inicio+"  fin "+fin
         empleados.each {e->
-//            println "empleado "+e
+           // println "empleado "+e
             def rol = Rol.findByMesAndEmpleado(mes,e)
             if(rol){
                 if(rol.estado!='C'){
@@ -242,12 +242,13 @@ class RolController extends Shield {
                 rubros = rubros.sort{it.rubro.signo*-1}
                 def finales = []
                 rubros.each {r->
-                    println " rubro! "+r.rubro.nombre
+                  //  println " rubro! "+r.rubro.nombre
                     if(r.rubro.codigo!="IRNTA"){
                         if(r.rubro.formula=~"@TIngresos") {
                             finales.add(r)
                         }else{
                             if(r.mes==0 || r.mes==mesNum){
+                                println ""+r.rubro.nombre+"  -------------"
                                 def dt = new DetalleRol()
                                 dt.rol=rol
                                 dt.usuario=session.usuario.login
@@ -259,6 +260,7 @@ class RolController extends Shield {
                                 else
                                     dt.valor = procesaFormula_ajax(r.rubro.formula,e,mes,inicio,fin,variables,resultados)
                                 dt.valor=dt.valor.round(2)
+                              //  println "valor "+dt.valor
                                 dt.signo=r.rubro.signo
                                 if(dt.signo>0)
                                     totalIngresos+=dt.valor
@@ -306,7 +308,7 @@ class RolController extends Shield {
                 }
                 println "finales --------------------------------------"
                 finales.each {r->
-                    println "final "+r.rubro.codigo
+                   // println "final "+r.rubro.nombre
                     if(r.mes==0 || r.mes==mesNum){
                         def dt = new DetalleRol()
                         dt.rol=rol
@@ -335,7 +337,7 @@ class RolController extends Shield {
                 prestamo.each {pre->
                     def detalle = DetallePrestamo.findByMesAndPrestamo(mes,pre)
                     if(detalle){
-                        println "hay detalle prestamo! "+detalle
+                      //  println "hay detalle prestamo! "+detalle
                         def dr = new DetalleRol()
                         dr.descripcion="Prestamo (${detalle.saldo.toDouble().round(2)}/${detalle.prestamo.monto})"
                         dr.codigo="PRST"
@@ -426,9 +428,10 @@ class RolController extends Shield {
         println "sql variable "+sql
 
         cn.eachRow(sql){r->
-//            println "r "+r
+           println "r "+r
             res=r[0]
         }
+        println "resultado "+res
         return res
     }
 

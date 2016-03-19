@@ -170,57 +170,60 @@ class ReporteRolExcelController {
         celda.setCellValue("Bono Alimentacion")
         celda.setCellStyle(styleHeader)
         celda =  row.createCell((short) 5)
-        celda.setCellValue("Decimo Tercero")
+        celda.setCellValue("Bono Alimentacion adicional")
         celda.setCellStyle(styleHeader)
         celda =  row.createCell((short) 6)
-        celda.setCellValue("Decimo Cuarto")
+        celda.setCellValue("Decimo Tercero")
         celda.setCellStyle(styleHeader)
         celda =  row.createCell((short) 7)
-        celda.setCellValue("Horas Extras")
+        celda.setCellValue("Decimo Cuarto")
         celda.setCellStyle(styleHeader)
         celda =  row.createCell((short) 8)
-        celda.setCellValue("Fondos de Reserva")
+        celda.setCellValue("Horas Extras")
         celda.setCellStyle(styleHeader)
         celda =  row.createCell((short) 9)
-        celda.setCellValue("Bono Antiguedad")
+        celda.setCellValue("Fondos de Reserva")
         celda.setCellStyle(styleHeader)
         celda =  row.createCell((short) 10)
-        celda.setCellValue("Bono Sistema Facturacion")
+        celda.setCellValue("Bono Antiguedad")
         celda.setCellStyle(styleHeader)
         celda =  row.createCell((short) 11)
-        celda.setCellValue("Bonificacion")
+        celda.setCellValue("Bono Sistema Facturacion")
         celda.setCellStyle(styleHeader)
         celda =  row.createCell((short) 12)
-        celda.setCellValue("Devolucion Descuentos")
+        celda.setCellValue("Bonificacion")
         celda.setCellStyle(styleHeader)
         celda =  row.createCell((short) 13)
-        celda.setCellValue("Horas Extras Sistema Facturacion")
+        celda.setCellValue("Devolucion Descuentos")
         celda.setCellStyle(styleHeader)
         celda =  row.createCell((short) 14)
-        celda.setCellValue("Reemplazo")
+        celda.setCellValue("Horas Extras Sistema Facturacion")
         celda.setCellStyle(styleHeader)
         celda =  row.createCell((short) 15)
-        celda.setCellValue("Total Ingresos")
+        celda.setCellValue("Reemplazo")
         celda.setCellStyle(styleHeader)
         celda =  row.createCell((short) 16)
-        celda.setCellValue("IESS")
+        celda.setCellValue("Total Ingresos")
         celda.setCellStyle(styleHeader)
         celda =  row.createCell((short) 17)
-        celda.setCellValue("Anticipo")
+        celda.setCellValue("IESS")
         celda.setCellStyle(styleHeader)
         celda =  row.createCell((short) 18)
-        celda.setCellValue("Impuesto Renta")
+        celda.setCellValue("Anticipo")
         celda.setCellStyle(styleHeader)
         celda =  row.createCell((short) 19)
-        celda.setCellValue("Primera Quincena")
+        celda.setCellValue("Impuesto Renta")
         celda.setCellStyle(styleHeader)
         celda =  row.createCell((short) 20)
-        celda.setCellValue("Otros Descuentos")
+        celda.setCellValue("Primera Quincena")
         celda.setCellStyle(styleHeader)
         celda =  row.createCell((short) 21)
-        celda.setCellValue("Total Egresos")
+        celda.setCellValue("Otros Descuentos")
         celda.setCellStyle(styleHeader)
         celda =  row.createCell((short) 22)
+        celda.setCellValue("Total Egresos")
+        celda.setCellStyle(styleHeader)
+        celda =  row.createCell((short) 23)
         celda.setCellValue("A Recibir")
         celda.setCellStyle(styleHeader)
 
@@ -357,6 +360,15 @@ class ReporteRolExcelController {
                alim = 0
             }
 
+            al = DetalleRol.findByRolAndCodigo(rol,'BAA')
+            def  alimAdc
+            if(al){
+                alimAdc = al?.valor
+            }
+            else{
+                alimAdc = 0
+            }
+
             def dc = DetalleRol.findByRolAndCodigo(rol,'S14')
             def  decimoc = 0
             if(dc){
@@ -371,19 +383,17 @@ class ReporteRolExcelController {
                 decimot = 0
             }
 
-            //def sc = DetalleRol.findByRolAndCodigo(rol,'SLDO')
-            def sc = Sueldo.findAllByEmpleado(em)
-            def  sueldo
-            sc.each{ s ->
-            if(s){
-                sueldo = s?.sueldo
-                 // println  "sueldo " + s.sueldo
+            def sc = DetalleRol.findByRolAndCodigo(rol,'Q1')
+            def sc2 = DetalleRol.findByRolAndCodigo(rol,'Q2')
+            //def sc = Sueldo.findAllByEmpleado(em)
+            println "s1 "+sc.valor+" s2  "+sc2.valor
+            def  sueldo = sc?.valor + sc2?.valor
 
-            }else{
-                sueldo = 0
+            if(!sueldo){
+                sc = DetalleRol.findByRolAndCodigo(rol,'SDLO')
+                sueldo = sc?.valor
             }
 
-            }
 
             def anticipo= DetalleRol.findByRolAndCodigo(rol,'ANTSU')
             def  a
@@ -405,32 +415,34 @@ class ReporteRolExcelController {
             celda = row.createCell((short) 4)
             celda.setCellValue(alim)
             celda = row.createCell((short) 5)
-            celda.setCellValue(decimot)
+            celda.setCellValue(alimAdc)
             celda = row.createCell((short) 6)
-            celda.setCellValue(decimoc)
+            celda.setCellValue(decimot)
             celda = row.createCell((short) 7)
-            celda.setCellValue(tt1)
+            celda.setCellValue(decimoc)
             celda = row.createCell((short) 8)
-            celda.setCellValue(fre)
+            celda.setCellValue(tt1)
             celda = row.createCell((short) 9)
-            celda.setCellValue(ban)
+            celda.setCellValue(fre)
             celda = row.createCell((short) 10)
-            celda.setCellValue(tt2)
+            celda.setCellValue(ban)
             celda = row.createCell((short) 11)
-            celda.setCellValue(bon)
+            celda.setCellValue(tt2)
             celda = row.createCell((short) 12)
-            celda.setCellValue(dev)
+            celda.setCellValue(bon)
             celda = row.createCell((short) 13)
-            celda.setCellValue(tt3)
+            celda.setCellValue(dev)
             celda = row.createCell((short) 14)
+            celda.setCellValue(tt3)
+            celda = row.createCell((short) 15)
             celda.setCellValue(ree)
-            celda = row.createCell((short) 16)
-            celda.setCellValue(iessr)
             celda = row.createCell((short) 17)
-            celda.setCellValue(a)
+            celda.setCellValue(iessr)
             celda = row.createCell((short) 18)
-            celda.setCellValue(i)
+            celda.setCellValue(a)
             celda = row.createCell((short) 19)
+            celda.setCellValue(i)
+            celda = row.createCell((short) 20)
             celda.setCellValue(pq.valor)
             def datos = 0
              def datoso = 0
@@ -444,9 +456,9 @@ class ReporteRolExcelController {
                   datos +=valore
                 }
                 datoso = datos - iees.valor - a - i
-                celda = row.createCell((short) 20)
-                celda.setCellValue(datoso)
                 celda = row.createCell((short) 21)
+                celda.setCellValue(datoso)
+                celda = row.createCell((short) 22)
                 celda.setCellValue(datos + pq.valor)
             }
 
@@ -459,13 +471,13 @@ class ReporteRolExcelController {
                     valorei = detalle.valor
                     datosi +=valorei
                 }
-                celda = row.createCell((short) 15)
+                celda = row.createCell((short) 16)
                 celda.setCellValue(datosi)
             }
 
             def rec = 0
             rec = datosi - datos - pq.valor
-            celda = row.createCell((short) 22)
+            celda = row.createCell((short) 23)
             celda.setCellValue(rec)
 
             curRow++

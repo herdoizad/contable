@@ -223,7 +223,7 @@ class ReportesNominaController extends Shield {
                 cont++
             }
             def otros  = 0
-            def detalle = DetalleRol.findAllByRolAndCodigo(rol,"OTROS")
+            def detalle = DetalleRol.findAllByRolAndCodigo(rol,"OTDS")
             detalle.each {d->
                 otros+=d.valor
             }
@@ -423,7 +423,7 @@ class ReportesNominaController extends Shield {
             celda.setCellValue(em.nombre)
 
 
-            // siempre traerpor elque se estaiterando,en este caso em
+            // siempre traer por el que se esta iterando,en este caso em
             def rol = Rol.findByEmpleadoAndMes(em, mes)
             def detalle13 = DetalleRol.findByRolAndCodigo(rol,'S13')
             def detalle14= DetalleRol.findByRolAndCodigo(rol,'S14')
@@ -901,6 +901,7 @@ class ReportesNominaController extends Shield {
             celda.setCellValue(em.nombre)
             def roles = Rol.findByEmpleadoAndMes(em, mes)
             def detalle = DetalleRol.findAllByRolAndSigno(roles, 1)
+
             def horas = HorasExtra.findAllByEmpleadoAndMes(em, mes)
             horas.each {hr ->
                 celda = row.createCell((short) 3)
