@@ -65,7 +65,7 @@ class AuxiliarController extends Shield  {
         p = new Paragraph("Desde: ${inicio.format("dd-MM-yyyy")} Hasta: "+fin.format("dd-MM-yyyy"),contenido)
         p.setAlignment(Element.ALIGN_CENTER)
         document.add(p);
-        def sql = "CONTABLE..up_rpt_auxiliar_por_cta  'PS' , ${inicio.format('yyyy').toInteger()}00 ,'${inicio.format('MM/dd/yyyy')}' , '${fin.format('MM/dd/yyyy')}','${cuenta.numero.trim()}', 'S'"
+        def sql = "CONTABLE..up_rpt_auxiliar_por_cta  'PS' , ${inicio.format('yyyy').toInteger()}00 ,'${inicio.format('MM/dd/yyyy')}' , '${fin.format('MM/dd/yyyy').concat(' 23:59:59')}','${cuenta.numero.trim()}', 'S'"
       // println "sql "+sql
         cn.call(sql.toString())
         sql = "select * from CONTABLE..COMPROBANTES_TMP    order by CON_FECHA, COM_NUMERO "

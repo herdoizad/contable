@@ -45,7 +45,7 @@ class LoginController {
             return
         } else {
             user=user.pop()
-            // println "pass " +params.pass+" "+params.pass.encodeAsMD5()+"  "+user.password
+            //println "pass " +params.pass+" "+params.pass.encodeAsMD5()+"  "+user.password
             if (params.pass.encodeAsMD5() != user.password) {
 
                 flash.message = "Contraseña incorrecta"

@@ -43,7 +43,7 @@ environments {
             password = ""
             dialect = org.hibernate.dialect.SybaseDialect
             dbCreate = "update" // one of 'create', 'create-drop', 'update', 'validate', ''
-            url = "jdbc:sybase:Tds:192.168.2.100:5000/PYS"
+            url = "jdbc:sybase:Tds:192.168.2.7:5000/PYS"
         }
     }
     test {
