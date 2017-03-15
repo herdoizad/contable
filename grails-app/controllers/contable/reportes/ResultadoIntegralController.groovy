@@ -176,10 +176,13 @@ class ResultadoIntegralController extends Shield {
                     uo=c["utilidado"]
                     def cell
                     def saldo = c["saldo"]
-                    def valor = c["debe"]-c["haber"]+c["inicial"]
+                    def valor = c["debe"]-c["haber"] //+c["inicial"]
                     if(saldo<0)
                         saldo=saldo*-1
-                    if(valor<0)
+                    //if(valor<0)
+                    //    valor=valor*-1
+                    //println c["cuenta"] + " VALOR: "+valor
+                    if (c["cuenta"].toString().subSequence(0,1) == "4")
                         valor=valor*-1
                     if(c["nivel"]>2){
                         if(c["nivel"]==nivel)
